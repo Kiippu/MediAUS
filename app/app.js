@@ -1,0 +1,1090 @@
+/* MediAUS prototype — SAMPLE DATA for UI/UX review only. Not for clinical use. */
+(function () {
+  'use strict';
+
+  var D = window.MEDIAUS_DATA;
+  var TEAL = '#1A6F67';
+  var MUTED = '#5B6F75';
+
+  // ---------- state ----------
+  var state = {
+    screen: 'splash',
+    medId: 'amiodarone',
+    formId: 'tab',
+    tab: 'overview',
+    selected: ['amiodarone', 'digoxin', 'warfarin'],
+    notif: true,
+    query: '',
+    route: 'All',
+    pro: false,
+    demo: false,
+    pillMode: 'describe',
+    pill: { shape: '', color: '', imprint: '', scored: 'any' },
+    photo: null,
+    photoState: 'idle',
+    pop: 'adult',
+    routeId: '',
+    doseId: '',
+    scan: { phase: 'idle', code: '', manual: false, torch: false }
+  };
+  var depth = 0;
+
+  // ---------- reference data ----------
+  var SEV = {
+    major:    { label: 'Major',     bg: '#FEF3F2', bd: '#FDA29B', icon: '#D92D20', fg: '#912018', rank: 0 },
+    moderate: { label: 'Moderate',  bg: '#FFFAEB', bd: '#FEC84B', icon: '#DC6803', fg: '#7A2E0E', rank: 1 },
+    minor:    { label: 'Minor',     bg: '#EFF8FF', bd: '#B2DDFF', icon: '#1570EF', fg: '#194185', rank: 2 },
+    conflict: { label: 'Sources differ', bg: '#F4F3FF', bd: '#BDB4FE', icon: '#6941C6', fg: '#4A1FB8', rank: 2.5 },
+    none:     { label: 'No action', bg: '#ECFDF3', bd: '#ABEFC6', icon: '#079455', fg: '#054F31', rank: 3 }
+  };
+
+  var CHECK_MEDS = {
+    amiodarone: 'Amiodarone', digoxin: 'Digoxin', warfarin: 'Warfarin', amoxicillin: 'Amoxicillin',
+    furosemide: 'Furosemide', verapamil: 'Verapamil', simvastatin: 'Simvastatin', methotrexate: 'Methotrexate',
+    coc: 'Oral Contraceptive', paracetamol: 'Paracetamol'
+  };
+  var PAIRS = [
+    { a: 'amiodarone', b: 'digoxin', sev: 'major', title: 'Amiodarone + Digoxin', text: 'Digoxin levels rise by about 70%. Monitor levels and ECG; adjust the digoxin dose.' },
+    { a: 'amiodarone', b: 'warfarin', sev: 'major', title: 'Amiodarone + Warfarin', text: 'Bleeding risk rises. Monitor INR more often, during treatment and after stopping amiodarone.' },
+    { a: 'amiodarone', b: 'simvastatin', sev: 'major', title: 'Amiodarone + Simvastatin', text: 'Risk of muscle toxicity. Use a statin not metabolised by CYP3A4.' },
+    { a: 'digoxin', b: 'verapamil', sev: 'major', title: 'Digoxin + Verapamil', text: 'Higher digoxin levels and a slower heart rate. Reduce the digoxin dose.' },
+    { a: 'amoxicillin', b: 'methotrexate', sev: 'major', title: 'Amoxicillin + Methotrexate', text: 'Increased methotrexate toxicity, especially at high doses.' },
+    { a: 'amiodarone', b: 'verapamil', sev: 'moderate', title: 'Amiodarone + Verapamil', text: 'Slow heart rate and heart block.' },
+    { a: 'digoxin', b: 'furosemide', sev: 'moderate', title: 'Digoxin + Furosemide', text: 'Low potassium increases the risk of digoxin toxicity. Monitor potassium.' },
+    { a: 'amoxicillin', b: 'warfarin', sev: 'moderate', title: 'Amoxicillin + Warfarin', text: 'Rare INR rises. Monitor INR when starting or stopping amoxicillin.' },
+    { a: 'warfarin', b: 'paracetamol', sev: 'moderate', title: 'Warfarin + Paracetamol', text: 'Regular paracetamol can raise INR.' },
+    { a: 'amoxicillin', b: 'coc', sev: 'conflict', title: 'Amoxicillin + Oral Contraceptive', text: 'The PI says efficacy may be reduced; UK FSRH guidance says no extra precautions unless vomiting or diarrhoea. Check local guidance.' }
+  ];
+
+  var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
+  var CATEGORIES = ['Antiarrhythmics', 'Antibiotics', 'Pain relief', 'Heart & blood pressure', 'Diabetes', 'Respiratory'];
+  var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', 'AI photo pill identifier', 'Barcode scanner for medicine packs', 'Ad-free experience'];
+  var TABS = [['overview', 'Overview'], ['dosage', 'Dosage'], ['admin', 'Administration'], ['interactions', 'Interactions'], ['pregnancy', 'Pregnancy'], ['more', 'More']];
+  var SHAPES = ['round', 'oval', 'oblong', 'capsule'];
+  var SWATCHES = ['white', 'ivory', 'yellow', 'blue', 'pink', 'orange', 'red', 'green', 'maroon'];
+
+  // All pills for the identifier
+  var PILLS = [];
+  D.ORDER.forEach(function (id) {
+    var m = D.MEDS[id];
+    m.forms.forEach(function (f) {
+      f.appearance.forEach(function (a) {
+        if (SHAPES.indexOf(a.shape) >= 0) PILLS.push({ a: a, medId: id, formId: f.id, sub: m.name + ' · ' + f.label });
+      });
+    });
+  });
+  D.EXTRA_PILLS.forEach(function (a) { PILLS.push({ a: a, sub: 'Details coming soon' }); });
+
+  // ---------- helpers ----------
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function med() { return D.MEDS[state.medId]; }
+  function form() {
+    var m = med();
+    for (var i = 0; i < m.forms.length; i++) if (m.forms[i].id === state.formId) return m.forms[i];
+    return m.forms[0];
+  }
+  function hex(c) { return (D.COLORS[c] || D.COLORS.white).hex; }
+  function colorNames(cs) { return cs.map(function (c) { return (D.COLORS[c] || { label: c }).label; }).join(' and '); }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  var LOGO = '<svg width="{s}" height="{s}" viewBox="0 0 74 74" aria-hidden="true"><rect x="25" y="4" width="24" height="66" rx="6" fill="#3FC1B2"/><rect x="4" y="25" width="66" height="24" rx="6" fill="#3FC1B2"/><rect x="25" y="25" width="24" height="24" fill="#7DE0D4"/></svg>';
+  function logo(size) { return LOGO.replace(/\{s\}/g, size); }
+  var AUS_PATH = 'M20 120L40 105L70 100L100 80L115 65L130 45L150 40L170 50L180 25L200 15L220 20L240 20L250 55L275 75L290 50L295 25L305 7L315 40L335 50L340 85L370 110L390 135L410 155L415 185L405 220L390 240L380 275L360 278L345 290L325 282L290 280L275 265L260 255L258 230L240 248L230 245L220 225L190 215L140 223L120 238L80 240L55 250L30 243L37 215L28 180L15 155Z M328 307L363 309L360 332L348 336L332 322Z';
+
+  var ICON = {
+    chevron: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6F75" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+    back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+    search: function (c, w) { return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="' + (w || 2) + '" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'; },
+    alert: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 6v8M12 18v.5"/></svg>',
+    x: function (c, s) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>'; },
+    drop: function (c) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z"/></svg>'; },
+    camera: function (c) { return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>'; },
+    lock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
+  };
+
+  // Draws a tablet, capsule, ampoule, vial or bottle. viewBox 80 x 50.
+  function drawPill(a, w) {
+    var h = Math.round(w * 50 / 80);
+    var c1 = hex(a.colors[0]), c2 = hex(a.colors[1] || a.colors[0]);
+    var stroke = '#B9C6C9';
+    var body = '';
+    var imp = a.imprint ? esc(a.imprint) : '';
+    var fs = imp.length > 4 ? 8 : 10;
+    var text = imp ? '<text x="40" y="' + (25 + fs / 3) + '" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="' + fs + '" fill="#2A3B40" stroke="#FFFFFF" stroke-width="2.2" paint-order="stroke">' + imp + '</text>' : '';
+    if (a.shape === 'round') {
+      body = '<circle cx="40" cy="25" r="22" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/><circle cx="40" cy="25" r="18" fill="none" stroke="#000" stroke-opacity="0.06" stroke-width="1"/>' +
+        (a.scored ? '<line x1="40" y1="5" x2="40" y2="45" stroke="#000" stroke-opacity="0.18" stroke-width="1.5"/>' : '') + text;
+    } else if (a.shape === 'oval') {
+      body = '<ellipse cx="40" cy="25" rx="32" ry="20" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/>' +
+        (a.scored ? '<line x1="40" y1="6" x2="40" y2="44" stroke="#000" stroke-opacity="0.18" stroke-width="1.5"/>' : '') + text;
+    } else if (a.shape === 'oblong') {
+      body = '<rect x="5" y="11" width="70" height="28" rx="14" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/>' +
+        (a.scored ? '<line x1="40" y1="11" x2="40" y2="39" stroke="#000" stroke-opacity="0.18" stroke-width="1.5"/>' : '') + text;
+    } else if (a.shape === 'capsule') {
+      body = '<path d="M40 11H19a14 14 0 0 0 0 28h21z" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/><path d="M40 11h21a14 14 0 0 1 0 28H40z" fill="' + c2 + '" stroke="' + stroke + '" stroke-width="1.5"/>' +
+        '<path d="M14 17h14" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round"/>' + text;
+    } else if (a.shape === 'ampoule') {
+      body = '<path d="M34 4h12v6l-2 4v4l4 4v24a3 3 0 0 1-3 3H35a3 3 0 0 1-3-3V22l4-4v-4l-2-4z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/>' +
+        '<path d="M33 28h14v18a2 2 0 0 1-2 2H35a2 2 0 0 1-2-2z" fill="' + c1 + '" stroke="#9FB2B6" stroke-width="1"/><line x1="34" y1="14" x2="46" y2="14" stroke="#D92D20" stroke-width="1.5"/>';
+    } else if (a.shape === 'vial') {
+      body = '<rect x="31" y="3" width="18" height="7" rx="2" fill="#5B6F75"/><path d="M32 10h16v4l2 2v30a3 3 0 0 1-3 3H33a3 3 0 0 1-3-3V16l2-2z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/>' +
+        '<rect x="32" y="34" width="16" height="13" rx="1.5" fill="' + c1 + '" stroke="#C9D3D5" stroke-width="1"/><rect x="31" y="20" width="18" height="10" fill="#E5F4F2"/>';
+    } else {
+      body = '<rect x="33" y="2" width="14" height="7" rx="1.5" fill="#F2F2F2" stroke="' + stroke + '" stroke-width="1.2"/><path d="M31 9h18v4l3 3v30a3 3 0 0 1-3 3H31a3 3 0 0 1-3-3V16l3-3z" fill="#9C5A1E" stroke="#6E3D12" stroke-width="1.2"/>' +
+        '<rect x="30" y="22" width="20" height="16" rx="1.5" fill="#FFFFFF"/><rect x="33" y="26" width="14" height="2" fill="#3FC1B2"/><rect x="33" y="31" width="10" height="2" fill="#C9D3D5"/>';
+    }
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 80 50" aria-hidden="true">' + body + '</svg>';
+  }
+
+  function backBar(title) {
+    return '<div style="display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:8px 8px 0">' +
+      '<button data-act="back" aria-label="Back" style="width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.back + '</button>' +
+      '<span style="text-align:center;font-size:15px;font-weight:600">' + title + '</span><span></span></div>';
+  }
+
+  function sampleBadge() {
+    return '<span style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#FFF4D6;color:#5C3D00;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700">Draft data under SME review · not for clinical use</span>';
+  }
+
+  function sevDeco(sev) {
+    var v = SEV[sev];
+    return {
+      v: v,
+      icon: '<span style="flex:none;width:24px;height:24px;border-radius:12px;background:' + v.icon + ';display:flex;align-items:center;justify-content:center">' + ICON.alert + '</span>',
+      tag: '<span style="flex:none;font-size:11px;font-weight:700;color:' + v.fg + ';background:#FFFFFF;border:1px solid ' + v.bd + ';border-radius:6px;padding:2px 8px">' + v.label + '</span>'
+    };
+  }
+
+  var H2 = 'margin:0;font-size:16px;font-weight:700';
+  var VERIFY_TAG = '<span style="font-size:10px;font-weight:800;color:#7A2E0E;background:#FFF4D6;border:1px solid #FEC84B;border-radius:6px;padding:1px 6px">To verify</span>';
+  function srcLine(t) { return '<span style="font-size:12px;color:#5B6F75;line-height:1.5">Sources: ' + esc(t) + '</span>'; }
+  var CARD = 'background:#FFFFFF;border:1.5px solid #E1E8E9;border-radius:14px';
+
+  // ---------- splash ----------
+  function viewSplash() {
+    return '<div style="flex:1;min-height:0;overflow-y:auto;background:#0C2A30;color:#FFFFFF;display:flex;flex-direction:column;align-items:center;padding:max(56px,env(safe-area-inset-top)) 28px max(28px,env(safe-area-inset-bottom))">' +
+      logo(74) +
+      '<span style="margin-top:18px;font-size:42px;font-weight:800;letter-spacing:-1px">MediAUS</span>' +
+      '<span style="margin-top:8px;font-size:17px;font-weight:600">Australian Medication Reference</span>' +
+      '<span style="margin-top:6px;font-size:13px;color:#A9C7C8">Trusted. Accurate. For Better Decisions.</span>' +
+      '<svg width="210" height="168" viewBox="0 0 430 345" aria-hidden="true" style="margin-top:32px;flex:none"><path d="' + AUS_PATH + '" fill="#163E45" stroke="#2A5960" stroke-width="3" stroke-linejoin="round"/></svg>' +
+      '<span style="margin-top:32px;font-size:14px;line-height:1.55;color:#D6E6E6;text-align:center">Comprehensive medication information<br>for Australian healthcare professionals.</span>' +
+      '<div style="margin-top:auto;padding-top:28px;width:100%;display:flex;flex-direction:column;gap:14px">' +
+        '<button data-act="start" style="font-size:16px;font-weight:700;color:#0C2A30;background:#FFFFFF;border:0;border-radius:14px;min-height:52px">Get Started</button>' +
+        '<button data-act="start" style="font-size:16px;font-weight:700;color:#FFFFFF;background:transparent;border:1.5px solid #A9C7C8;border-radius:14px;min-height:52px">Sign In</button>' +
+        '<span style="margin-top:12px;font-size:13px;line-height:1.55;color:#D6E6E6;text-align:center">Free access to essential information.<br>Upgrade for full features.</span>' +
+      '</div></div>';
+  }
+
+  // ---------- home ----------
+  function viewHome() {
+    function tile(svg, title, sub, act, badge) {
+      return '<button ' + (act ? 'data-act="' + act + '" ' : '') + 'style="text-align:left;display:flex;align-items:center;gap:14px;' + CARD + ';border-radius:16px;padding:14px">' +
+        '<span style="flex:none;width:56px;height:56px;border-radius:14px;background:#E5F4F2;display:flex;align-items:center;justify-content:center">' + svg + '</span>' +
+        '<span style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700">' + title + (badge || '') + '</span><span style="font-size:13px;color:#5B6F75">' + sub + '</span></span></button>';
+    }
+    var recent = [['amiodarone', 'tab', '200 mg tablet'], ['digoxin', 'tab', '250 microgram tablet'], ['amoxicillin', 'cap', '500 mg capsule']].map(function (r) {
+      var m = D.MEDS[r[0]];
+      var f = m.forms.filter(function (x) { return x.id === r[1]; })[0];
+      return '<button data-act="med:' + r[0] + ':' + r[1] + '" style="text-align:left;display:flex;align-items:center;gap:12px;' + CARD + ';padding:10px 14px;min-height:58px">' +
+        '<span style="flex:none">' + drawPill(f.appearance[0], 40) + '</span>' +
+        '<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">' + m.name + ' ' + r[2] + '</span><span style="font-size:12px;color:#5B6F75">' + esc(m.cls) + '</span></span>' + ICON.chevron + '</button>';
+    }).join('');
+    var proBadge = '<span style="font-size:10px;font-weight:800;color:#5C3D00;background:#F2B53A;border-radius:999px;padding:2px 8px">PRO</span>';
+    var newBadge = '<span style="font-size:10px;font-weight:800;color:#0E5E59;background:#D3EEEA;border-radius:999px;padding:2px 8px">NEW</span>';
+    return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:8px">' + logo(28) + '<span style="font-size:21px;font-weight:800;letter-spacing:-0.4px">Medi<span style="color:#1A8A7E">AUS</span></span></div>' +
+        '<button data-act="go:profile" aria-label="Profile and settings" style="width:44px;height:44px;border-radius:22px;border:1.5px solid #D9E3E4;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>' +
+      '</div>' +
+      '<button data-act="go:search" style="text-align:left;display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;background:#FFFFFF;border-radius:14px;padding:0 14px;min-height:50px;color:#5B6F75;font-size:15px">' + ICON.search('#5B6F75') + 'Search by active ingredient…</button>' +
+      '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:18px;display:flex;align-items:center;gap:12px">' +
+        '<div style="display:flex;flex-direction:column;gap:8px;flex:1"><span style="font-size:16px;font-weight:700;line-height:1.35">Australian Medication Information at your fingertips</span><span style="font-size:12px;line-height:1.5;color:#C3DADB">Evidence-based. Up to date. Built for healthcare professionals.</span></div>' +
+        '<svg width="64" height="52" viewBox="0 0 430 345" aria-hidden="true" style="flex:none"><path d="' + AUS_PATH + '" fill="#3FC1B2" opacity="0.85"/></svg>' +
+      '</div>' +
+      tile('<svg width="28" height="28" viewBox="0 0 80 50" aria-hidden="true"><circle cx="30" cy="25" r="16" fill="#FFFFFF" stroke="#0E5E59" stroke-width="3.5"/><path d="M48 11h10a14 14 0 0 1 0 28H48z" fill="#3FC1B2" stroke="#0E5E59" stroke-width="3.5"/></svg>', 'Pill Identifier', 'Describe or photograph a pill to identify it', 'go:pill', newBadge) +
+      tile('<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>', 'Scan Barcode', 'Point your camera at a medicine pack', 'go:scan', proBadge) +
+      tile('<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>', 'Browse Categories', 'Explore by class, condition or therapeutic area', 'go:search') +
+      '<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px"><h2 style="' + H2 + '">Recently Viewed</h2>' + recent + '</div>' +
+      '</div>';
+  }
+
+  // ---------- route status labels ----------
+  var RSTATUS = {
+    licensed:   { label: 'Licensed', bg: '#ECFDF3', fg: '#054F31', bd: '#ABEFC6', dot: '#079455' },
+    restricted: { label: 'Licensed, restricted', bg: '#ECFDF3', fg: '#054F31', bd: '#ABEFC6', dot: '#079455' },
+    accepted:   { label: 'Accepted practice', bg: '#EFF8FF', fg: '#194185', bd: '#B2DDFF', dot: '#1570EF' },
+    no:         { label: 'Do not use', bg: '#FEF3F2', fg: '#912018', bd: '#FDA29B', dot: '#D92D20' },
+    unverified: { label: 'Not verified', bg: '#F2F4F7', fg: '#344054', bd: '#D0D5DD', dot: '#98A2B3' },
+    differ:     { label: 'Sources differ', bg: '#F4F3FF', fg: '#4A1FB8', bd: '#BDB4FE', dot: '#6941C6' }
+  };
+  function rPill(status, note) {
+    var v = RSTATUS[status] || RSTATUS.unverified;
+    return '<span style="flex:none;white-space:nowrap;font-size:11px;font-weight:700;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:2px 8px">' + v.label + (note ? ' · ' + esc(note) : '') + '</span>';
+  }
+  function positionsHtml(list) {
+    return '<div style="display:flex;flex-direction:column;gap:8px">' + list.map(function (p) {
+      return '<div style="border-left:3px solid #BDB4FE;background:#FAFAFF;border-radius:0 10px 10px 0;padding:8px 12px;display:flex;flex-direction:column;gap:2px">' +
+        '<span style="font-size:11px;font-weight:800;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(p.src) + '</span>' +
+        '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  function formRouteCats(f) {
+    var cats = {};
+    f.routes.forEach(function (r) {
+      if (r.status === 'no') return;
+      if (!cats[r.cat]) cats[r.cat] = { verified: false };
+      if (r.status !== 'unverified') cats[r.cat].verified = true;
+    });
+    return cats;
+  }
+  function routeForCat(f, cat) {
+    var hits = f.routes.filter(function (r) { return r.cat === cat && r.status !== 'no'; });
+    var best = hits.filter(function (r) { return r.status !== 'unverified'; })[0];
+    return best || hits[0] || null;
+  }
+
+  // ---------- search ----------
+  function searchItems() {
+    var q = state.query.trim().toLowerCase();
+    var items = [];
+    D.ORDER.forEach(function (id) {
+      var m = D.MEDS[id];
+      var routes = [];
+      m.forms.forEach(function (f) { Object.keys(formRouteCats(f)).forEach(function (c) { if (routes.indexOf(c) < 0) routes.push(c); }); });
+      items.push({ name: m.name, sub: m.cls + ' · ' + m.schedule.split(' ')[0], routes: routes, med: m });
+    });
+    D.OTHERS.forEach(function (o) { items.push({ name: o.name, sub: o.cls + ' · ' + o.schedule, routes: o.routes }); });
+    return items.filter(function (it) {
+      var nameOk = !q || it.name.toLowerCase().indexOf(q) >= 0 || (it.med && it.med.brands.toLowerCase().indexOf(q) >= 0);
+      var routeOk = state.route === 'All' || it.routes.indexOf(state.route) >= 0;
+      return nameOk && routeOk;
+    });
+  }
+
+  function searchResultsHtml() {
+    var q = state.query.trim();
+    if (!q && state.route === 'All') {
+      var recents = ['Amiodarone', 'Digoxin', 'Amoxicillin'].map(function (r) {
+        return '<button data-act="pick:' + r + '" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:#F3F6F6;border:1px solid #E1E8E9;border-radius:999px;padding:0 14px;min-height:36px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6F75" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' + r + '</button>';
+      }).join('');
+      var cats = CATEGORIES.map(function (c) {
+        return '<button style="text-align:left;display:flex;flex-direction:column;gap:4px;' + CARD + ';padding:12px 14px;min-height:64px"><span style="width:22px;height:4px;border-radius:2px;background:#3FC1B2"></span><span style="font-size:14px;font-weight:700">' + esc(c) + '</span><span style="font-size:12px;color:#5B6F75">[COUNT] medicines</span></button>';
+      }).join('');
+      return '<div style="display:flex;flex-direction:column;gap:18px">' +
+        '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Recent Searches</h2><div style="display:flex;flex-wrap:wrap;gap:8px">' + recents + '</div></div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Browse by Category</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">' + cats + '</div></div></div>';
+    }
+    var items = searchItems();
+    var html = '<div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:600;color:#5B6F75">' + items.length + (items.length === 1 ? ' active ingredient' : ' active ingredients') + (state.route !== 'All' ? ' · ' + state.route : '') + '</span>';
+    items.forEach(function (it) {
+      var forms = '';
+      if (it.med) {
+        forms = it.med.forms.map(function (f) {
+          if (state.route === 'All') {
+            return '<button data-act="med:' + it.med.id + ':' + f.id + '" style="font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:8px;padding:0 10px;min-height:32px">' + esc(f.label) + '</button>';
+          }
+          var r = routeForCat(f, state.route);
+          if (!r) return '';
+          var v = RSTATUS[r.status];
+          return '<button data-act="medr:' + it.med.id + ':' + f.id + ':' + r.id + '" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:8px;padding:0 10px;min-height:32px">' + esc(f.label) + '<span style="width:8px;height:8px;border-radius:4px;background:' + v.dot + '" aria-hidden="true"></span><span style="font-weight:500;color:#24414A">' + v.label + (r.statusNote ? ' · ' + esc(r.statusNote) : '') + '</span></button>';
+        }).join('');
+      } else {
+        forms = it.routes.map(function (r) { return '<span style="font-size:12px;font-weight:600;color:#5B6F75;background:#F3F6F6;border-radius:8px;padding:6px 10px">' + esc(r) + '</span>'; }).join('');
+      }
+      html += '<div style="' + CARD + ';padding:12px 14px;display:flex;flex-direction:column;gap:10px">' +
+        (it.med
+          ? '<button data-act="med:' + it.med.id + ':' + it.med.forms[0].id + '" style="text-align:left;display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:0;min-height:40px"><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">' + esc(it.name) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(it.sub) + ' · ' + esc(it.med.brands) + '</span></span>' + ICON.chevron + '</button>'
+          : '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">' + esc(it.name) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(it.sub) + ' · details coming soon</span></span>') +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span style="font-size:12px;color:#5B6F75;margin-right:2px">' + (it.med ? (state.route === 'All' ? 'Choose form:' : 'Forms given ' + (state.route === 'Enteral tube' ? 'via tube' : state.route) + ':') : 'Routes:') + '</span>' + forms + '</div></div>';
+    });
+    if (!items.length) html += '<span style="font-size:14px;color:#24414A">No medications match. Try the active ingredient name, or a different route.</span>';
+    return html + '</div>';
+  }
+
+  function viewSearch() {
+    var routeChips = ROUTES.map(function (r) {
+      var on = state.route === r;
+      return '<button data-act="route:' + r + '" aria-pressed="' + on + '" style="flex:none;font-size:13px;font-weight:600;border-radius:999px;padding:0 14px;min-height:36px;border:1.5px solid ' + (on ? '#1A6F67' : '#D9E3E4') + ';background:' + (on ? '#1A6F67' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#142B33') + '">' + r + '</button>';
+    }).join('');
+    return '<div style="padding:20px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
+      '<h1 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.3px">Search</h1>' +
+      '<label style="display:flex;align-items:center;gap:10px;border:2px solid #1A8A7E;border-radius:14px;padding:0 14px;min-height:50px">' + ICON.search('#1A6F67', 2.2) +
+        '<span class="sr">Search by active ingredient or brand</span><input id="q" type="search" autocomplete="off" placeholder="Active ingredient or brand" style="font-size:16px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:46px"></label>' +
+      '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Route</span><div class="tabs" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">' + routeChips + '</div></div>' +
+      '<div id="results">' + searchResultsHtml() + '</div></div>';
+  }
+
+  // ---------- medication ----------
+  function viewMed() {
+    var m = med(), f = form();
+    var formChips = m.forms.map(function (x) {
+      var on = x.id === f.id;
+      return '<button data-act="form:' + x.id + '" aria-pressed="' + on + '" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;border-radius:12px;padding:6px 12px;min-height:44px;border:1.5px solid ' + (on ? '#1A6F67' : '#D9E3E4') + ';background:' + (on ? '#1A6F67' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#142B33') + '"><span style="font-size:13px;font-weight:700">' + esc(x.label) + '</span><span style="font-size:11px;opacity:.85">' + esc(x.strengths) + '</span></button>';
+    }).join('');
+    var tabs = TABS.map(function (t) {
+      var on = state.tab === t[0];
+      return '<button role="tab" aria-selected="' + on + '" data-act="tab:' + t[0] + '" style="flex:none;min-height:44px;padding:0 9px;border:0;background:transparent;font-size:13px;font-weight:' + (on ? 700 : 500) + ';color:' + (on ? TEAL : MUTED) + ';border-bottom:2.5px solid ' + (on ? TEAL : 'transparent') + '">' + t[1] + '</button>';
+    }).join('');
+    var body = { overview: tabOverview, dosage: tabDosage, admin: tabAdmin, interactions: tabInteractions, pregnancy: tabPregnancy, more: tabMore }[state.tab]();
+    return '<div style="display:flex;flex-direction:column">' + backBar('Medication') +
+      '<div style="padding:6px 20px 0;display:flex;flex-direction:column;gap:8px">' + sampleBadge() +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.4px">' + esc(m.name) + '</h1><span style="font-size:16px;font-weight:600;color:#1A8A7E">' + esc(f.unit) + '</span></div>' +
+        '<span style="flex:none">' + drawPill(f.appearance[0], 72) + '</span></div>' +
+        '<span style="font-size:13px;color:#5B6F75">Brands: ' + esc(m.brands) + '</span>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">' + m.chips.map(function (c) { return '<span style="background:#E5F4F2;color:#0E5E59;font-size:12px;font-weight:600;border-radius:999px;padding:4px 12px">' + esc(c) + '</span>'; }).join('') + '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Physical form</span><div class="tabs" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">' + formChips + '</div></div>' +
+      '</div>' +
+      '<div class="tabs" role="tablist" aria-label="Medication sections" style="display:flex;overflow-x:auto;margin-top:10px;padding:0 8px;border-bottom:1px solid #E1E8E9">' + tabs + '</div>' +
+      '<div style="padding:18px 20px 24px;display:flex;flex-direction:column;gap:14px">' + body + '</div></div>';
+  }
+
+  function appearanceCards(f) {
+    return f.appearance.map(function (a) {
+      var rows = [];
+      if (SHAPES.indexOf(a.shape) >= 0) {
+        rows.push(['Shape', cap(a.shape === 'oblong' ? 'oblong (capsule-shaped tablet)' : a.shape)]);
+        rows.push(['Colour', colorNames(a.colors)]);
+        if (a.size) rows.push(['Size', a.size]);
+        if (a.imprint) rows.push(['Markings', '“' + a.imprint + '”']);
+        if (a.shape !== 'capsule') rows.push(['Score line', a.scored ? 'Yes' : 'No']);
+      }
+      return '<div style="' + CARD + ';padding:14px;display:flex;flex-direction:column;gap:10px">' +
+        '<div style="display:flex;gap:14px;align-items:center"><span style="flex:none;width:92px;height:62px;border-radius:12px;background:#F3F6F6;display:flex;align-items:center;justify-content:center">' + drawPill(a, 80) + '</span>' +
+        '<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px;font-weight:700">' + esc(a.label) + (a.verify ? VERIFY_TAG : '') + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(a.desc) + '</span></div></div>' +
+        (rows.length ? '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px">' + rows.map(function (r) { return '<span style="display:flex;flex-direction:column;font-size:13px"><span style="font-size:11px;font-weight:600;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">' + r[0] + '</span><span style="font-weight:600">' + esc(r[1]) + '</span></span>'; }).join('') + '</div>' : '') +
+        (a.src ? '<span style="font-size:11px;color:#5B6F75">Appearance source: ' + esc(a.src) + '</span>' : '') +
+        '</div>';
+    }).join('');
+  }
+
+  function tabOverview() {
+    var m = med(), f = form();
+    var cats = formRouteCats(f);
+    var routeText = Object.keys(cats).map(function (c) { return c + (cats[c].verified ? '' : ' (not verified)'); }).join(', ');
+    var facts = [['Class', m.cls], ['ATC Code', m.atc], ['Schedule', m.schedule], ['PBS Listed', m.pbs], ['Form', f.label], ['Strengths', f.strengths], ['Routes', routeText]];
+    var rows = facts.map(function (r) {
+      return '<div style="display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid #EEF2F3;font-size:14px;line-height:1.4"><span style="color:#5B6F75">' + r[0] + '</span><span style="font-weight:500">' + esc(r[1]) + (r[0] === 'Routes' ? ' <button data-act="tab:admin" style="border:0;background:transparent;padding:0;color:#1A6F67;font-weight:700;font-size:13px">How to give →</button>' : '') + '</span></div>';
+    }).join('');
+    return '<h2 style="' + H2 + '">Key Information</h2><div>' + rows + '</div>' +
+      '<h2 style="' + H2 + ';margin-top:6px">What it looks like</h2>' + appearanceCards(f) +
+      srcLine(m.src.overview) +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<button data-act="go:pill" style="font-size:14px;font-weight:700;color:#1A6F67;background:#FFFFFF;border:1.5px solid #1A6F67;border-radius:14px;min-height:50px">Identify a pill</button>' +
+        '<button style="font-size:14px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:14px;min-height:50px">Save to List</button>' +
+      '</div>';
+  }
+
+  var STATUS = {
+    yes:     { label: 'Yes', bg: '#ECFDF3', fg: '#054F31', bd: '#ABEFC6', glyph: '<path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>', dot: '#079455' },
+    no:      { label: 'Do not', bg: '#FEF3F2', fg: '#912018', bd: '#FDA29B', glyph: '<path d="M8 8l8 8M16 8l-8 8" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>', dot: '#D92D20' },
+    caution: { label: 'Caution', bg: '#FFFAEB', fg: '#7A2E0E', bd: '#FEC84B', glyph: '<path d="M12 6.5v7M12 17v.5" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>', dot: '#DC6803' },
+    info:    { label: 'Info', bg: '#EFF8FF', fg: '#194185', bd: '#B2DDFF', glyph: '<path d="M12 11v6M12 7.5v.5" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/>', dot: '#1570EF' }
+  };
+
+  function chipRow(list, selId, act) {
+    return '<div class="tabs" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">' + list.map(function (x) {
+      var on = x.id === selId;
+      return '<button data-act="' + act + ':' + x.id + '" aria-pressed="' + on + '" style="flex:none;font-size:13px;font-weight:600;border-radius:999px;padding:0 14px;min-height:38px;border:1.5px solid ' + (on ? '#1A6F67' : '#D9E3E4') + ';background:' + (on ? '#1A6F67' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#142B33') + '">' + esc(x.label) + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function tabDosage() {
+    var f = form(), sets = f.dosing;
+    var d = sets.filter(function (s) { return s.id === state.doseId; })[0] || sets[0];
+    var ai = d.head.indexOf('Adult'), ci = -1;
+    d.head.forEach(function (h, i) { if (h.indexOf('Child') === 0) ci = i; });
+    var split = ai > 0 && ci > 0;
+    var cols = d.head.map(function (h, i) { return i; });
+    var mi = d.head.indexOf('Max');
+    if (split) cols = cols.filter(function (i) { return i !== (state.pop === 'adult' ? ci : ai) && !(state.pop === 'child' && i === mi); });
+    var popToggle = split ? '<div style="display:flex;gap:4px;background:#EEF2F3;border-radius:12px;padding:4px">' + [['adult', 'Adult'], ['child', 'Child (by weight)']].map(function (o) {
+      var on = state.pop === o[0];
+      return '<button data-act="pop:' + o[0] + '" aria-pressed="' + on + '" style="flex:1;min-height:40px;border:0;border-radius:10px;font-size:14px;font-weight:700;background:' + (on ? '#FFFFFF' : 'transparent') + ';color:' + (on ? '#142B33' : '#5B6F75') + ';box-shadow:' + (on ? '0 1px 3px rgba(0,0,0,.12)' : 'none') + '">' + o[1] + '</button>';
+    }).join('') + '</div>' : '';
+    var head = '<tr>' + cols.map(function (i) { return d.head[i]; }).map(function (h, i) { return '<th scope="col" style="text-align:left;padding:10px 12px;background:#F3F6F6;font-size:12px;font-weight:700;color:#24414A;border-bottom:1.5px solid #E1E8E9;' + (i === 0 ? 'position:sticky;left:0;z-index:1;' : '') + '">' + esc(h) + '</th>'; }).join('') + '</tr>';
+    var body = d.rows.map(function (r) {
+      return '<tr>' + cols.map(function (i) { return r[i]; }).map(function (c, i) {
+        var tag = i === 0 ? 'th scope="row"' : 'td';
+        return '<' + tag + ' style="text-align:left;vertical-align:top;padding:10px 12px;font-size:13px;line-height:1.4;border-bottom:1px solid #EEF2F3;' + (i === 0 ? 'position:sticky;left:0;background:#FFFFFF;font-weight:700;color:#142B33;min-width:104px;' : 'min-width:' + (split ? '90' : '150') + 'px;color:#24414A;') + '">' + esc(c) + '</' + tag.split(' ')[0] + '>';
+      }).join('') + '</tr>';
+    }).join('');
+    var notes = (d.notes || []).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('');
+    return '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><h2 style="' + H2 + '">Dosage · ' + esc(f.label) + '</h2>' + (split ? '' : '<span style="font-size:11px;color:#5B6F75">Scroll table →</span>') + '</div>' +
+      (sets.length > 1 ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Route</span>' + chipRow(sets, d.id, 'dsel') + '</div>' : '<span style="font-size:13px;color:#5B6F75">Route: ' + esc(d.label) + '</span>') +
+      popToggle +
+      '<div style="overflow-x:auto;border:1.5px solid #E1E8E9;border-radius:12px"><table style="border-collapse:separate;border-spacing:0;width:100%;min-width:' + (split ? '0' : '560px') + '"><caption class="sr">' + esc(d.label) + ' doses for ' + esc(f.label) + '</caption><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      (d.src ? srcLine(d.src) : '') +
+      (notes ? '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + notes + '</ul>' : '') +
+      '<button data-act="tab:admin" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1.5px solid #1A6F67;background:#FFFFFF;color:#1A6F67;border-radius:14px;padding:0 16px;min-height:50px;font-size:14px;font-weight:700">How to give this form' + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A6F67" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
+  }
+
+  function adminItemsHtml(items) {
+    return '<div style="display:flex;flex-direction:column">' + items.map(function (a) {
+      var s = STATUS[a.status];
+      return '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #EEF2F3">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="11" fill="' + s.dot + '"/>' + s.glyph + '</svg>' +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:3px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:700">' + esc(a.label) + '</span>' + (a.verify ? VERIFY_TAG : '') + '<span style="font-size:11px;font-weight:700;color:' + s.fg + ';background:' + s.bg + ';border:1px solid ' + s.bd + ';border-radius:6px;padding:1px 7px">' + s.label + '</span></div>' +
+        '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(a.text) + '</span></div></div>';
+    }).join('') + '</div>';
+  }
+
+  function tabAdmin() {
+    var f = form();
+    var sel = f.routes.filter(function (r) { return r.id === state.routeId; })[0] || f.routes[0];
+    var cards = f.routes.map(function (r) {
+      var open = r.id === sel.id;
+      var v = RSTATUS[r.status];
+      var head = '<button data-act="rsel:' + r.id + '" aria-expanded="' + open + '" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:12px 14px;min-height:56px">' +
+        '<span aria-hidden="true" style="flex:none;width:10px;height:10px;border-radius:5px;background:' + v.dot + '"></span>' +
+        '<span style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:700;color:#142B33">' + esc(r.label) + '</span><span>' + rPill(r.status, r.statusNote) + '</span></span>' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6F75" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;' + (open ? 'transform:rotate(180deg)' : '') + '"><path d="M6 9l6 6 6-6"/></svg></button>';
+      var body = '';
+      if (open) {
+        var brands = r.brands ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:700;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">By brand</span>' + r.brands.map(function (b) {
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:14px;font-weight:700">' + esc(b.brand) + '</span><span style="font-size:11px;color:#5B6F75">' + esc(b.note) + '</span></span>' + rPill(b.status) + '</div>';
+        }).join('') + '</div>' : '';
+        body = '<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:12px">' +
+          (r.summary ? '<span style="font-size:13px;line-height:1.5;color:#24414A">' + esc(r.summary) + '</span>' : '') +
+          (r.positions ? positionsHtml(r.positions) : '') + brands +
+          (r.items ? adminItemsHtml(r.items) : '') +
+          '<span style="font-size:12px;color:#5B6F75;line-height:1.5">' + (r.status === 'unverified' ? (r.src === '—' ? 'No document found yet.' : 'To check: ' + esc(r.src.replace(/^Needs /, ''))) : 'Sources: ' + esc(r.src)) + '</span></div>';
+      }
+      return '<div style="' + CARD + ';border-color:' + (open ? '#9CC5C0' : '#E1E8E9') + ';overflow:hidden">' + head + body + '</div>';
+    }).join('');
+    var legend = ['licensed', 'accepted', 'differ', 'unverified', 'no'].map(function (k) { return rPill(k); }).join('');
+    return '<h2 style="' + H2 + '">How to give · ' + esc(f.label) + '</h2>' +
+      '<span style="font-size:13px;line-height:1.5;color:#5B6F75">Each route is checked against the Product Information and Australian hospital guidelines. Tap a route for details.</span>' +
+      cards +
+      '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Status labels</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + legend + '</div>' +
+      '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Licensed: in the PI or on the ARTG. Accepted practice: in an Australian hospital guideline. Sources differ: each source’s position is shown. Not verified: no document found yet.</span></div>';
+  }
+
+  function tabInteractions() {
+    var m = med();
+    var cards = m.interactions.important.map(function (p) {
+      var d = sevDeco(p.sev);
+      return '<div style="display:flex;gap:12px;align-items:flex-start;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:14px;padding:14px">' + d.icon +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:14px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span>' + d.tag + '</div><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div>';
+    }).join('');
+    var other = m.interactions.other.map(function (o) {
+      var v = SEV[o.sev];
+      return '<li><span>' + esc(o.text) + ' <span style="white-space:nowrap;font-size:11px;font-weight:700;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:1px 7px">' + v.label + '</span></span>' + (o.positions ? '<div style="margin-top:6px">' + positionsHtml(o.positions) + '</div>' : '') + '</li>';
+    }).join('');
+    return '<h2 style="' + H2 + '">Important Interactions</h2>' + cards +
+      '<h2 style="' + H2 + ';margin-top:6px">Other Notable Interactions</h2>' +
+      '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45">' + other + '</ul>' +
+      srcLine(m.src.interactions) +
+      '<button data-act="checkwith" style="font-size:15px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:14px;min-height:50px">Check with other medicines</button>';
+  }
+
+  var TONES = {
+    green:  { bg: '#EEF8F1', bd: '#BFE3CB', fg: '#145C34', icon: '#1E7A45' },
+    amber:  { bg: '#FFFAEB', bd: '#FEC84B', fg: '#7A2E0E', icon: '#B54708' },
+    red:    { bg: '#FEF3F2', bd: '#FDA29B', fg: '#912018', icon: '#B42318' },
+    blue:   { bg: '#EEF5FC', bd: '#C2DAF3', fg: '#174D87', icon: '#1D5FA8' },
+    purple: { bg: '#F4F3FF', bd: '#BDB4FE', fg: '#4A1FB8', icon: '#6941C6' }
+  };
+
+  function tabPregnancy() {
+    var m = med();
+    function card(t, title, strong, text, extra) {
+      var c = TONES[t];
+      return '<div style="display:flex;gap:12px;background:' + c.bg + ';border:1.5px solid ' + c.bd + ';border-radius:16px;padding:14px"><span style="flex:none;width:40px;height:40px;border-radius:20px;background:#FFFFFF;display:flex;align-items:center;justify-content:center">' + ICON.drop(c.icon) + '</span>' +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:15px;font-weight:700;color:' + c.fg + '">' + title + '</span><span style="font-size:14px;font-weight:600">' + esc(strong) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(text) + '</span>' + (extra || '') + '</div></div>';
+    }
+    var bf = m.breastfeeding;
+    return '<h2 style="' + H2 + '">Pregnancy &amp; Breastfeeding</h2>' +
+      card(m.pregnancy.tone, 'Pregnancy', m.pregnancy.label || ('TGA Category ' + m.pregnancy.cat), m.pregnancy.text + ' Categories describe the evidence, not a safety ranking.') +
+      card(bf.tone, 'Breastfeeding', bf.status, bf.text, bf.positions ? positionsHtml(bf.positions) : '') +
+      srcLine(m.src.pregnancy) +
+      '<div style="display:flex;gap:10px;align-items:flex-start;border:1.5px solid #D6E3EE;background:#F7FAFC;border-radius:14px;padding:12px 14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D5FA8" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg><span style="font-size:13px;line-height:1.5;color:#24414A">Always consider the individual clinical situation. For advice in NSW, MotherSafe: <a href="tel:0293826539" style="font-weight:600">(02) 9382 6539</a></span></div>';
+  }
+
+  function tabMore() {
+    var m = med();
+    function block(color, fill, glyph, title, items) {
+      return '<div style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:' + color + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="' + fill + '"/>' + glyph + '</svg>' + title + '</span>' +
+        '<ul style="margin:0;padding-left:46px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul></div>';
+    }
+    var X = '<path d="M8 8l8 8M16 8l-8 8" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>';
+    var BANG = '<path d="M12 6.5v7M12 17v.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>';
+    var PULSE = '<path d="M5 12h3l2-4 3 8 2-4h4" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+    return block('#B42318', '#D92D20', X, 'Contraindications', m.contraindications) +
+      block('#93370D', '#F79009', BANG, 'Use with Caution', m.caution) +
+      block('#93370D', '#E8590C', BANG, 'Warnings', m.warnings) +
+      block('#0E5E59', '#1A8A7E', PULSE, 'Monitoring', m.monitoring) +
+      srcLine(m.src.more) +
+      '<a href="https://www.tga.gov.au/resources/artg" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;background:#EEF5FC;border:1.5px solid #C2DAF3;border-radius:14px;padding:12px 14px;text-decoration:none;color:#142B33"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D5FA8" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Full prescribing information</span><span style="font-size:12px;color:#1D5FA8">View TGA product information (PI)</span></span></a>';
+  }
+
+  // ---------- interaction checker ----------
+  function viewCheck() {
+    var sel = state.selected;
+    var chips = sel.map(function (id) {
+      return '<span style="display:inline-flex;align-items:center;background:#E5F4F2;color:#0E5E59;border-radius:8px;padding-left:10px;font-size:13px;font-weight:600">' + CHECK_MEDS[id] +
+        '<button data-act="remove:' + id + '" aria-label="Remove ' + CHECK_MEDS[id] + '" style="width:34px;height:34px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#0E5E59', 12) + '</button></span>';
+    }).join('');
+    var addable = Object.keys(CHECK_MEDS).filter(function (id) { return sel.indexOf(id) < 0; }).map(function (id) {
+      return '<button data-act="add:' + id + '" style="font-size:12px;font-weight:600;color:#0E5E59;background:#FFFFFF;border:1px solid #A8D3CD;border-radius:999px;padding:0 12px;min-height:34px">+ ' + CHECK_MEDS[id] + '</button>';
+    }).join('');
+    var hits = PAIRS.filter(function (p) { return sel.indexOf(p.a) >= 0 && sel.indexOf(p.b) >= 0; })
+      .sort(function (a, b) { return SEV[a.sev].rank - SEV[b.sev].rank; });
+    var results;
+    if (sel.length < 2) results = '<span style="font-size:14px;color:#24414A">Add at least two medications to check them together.</span>';
+    else if (!hits.length) results = '<span style="font-size:14px;color:#24414A">No interactions in our sample data. Always confirm with a pharmacist.</span>';
+    else results = hits.map(function (p) {
+      var d = sevDeco(p.sev);
+      return '<div style="display:flex;flex-direction:column;gap:8px;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:14px;padding:14px"><div style="display:flex;gap:10px;align-items:flex-start">' + d.icon +
+        '<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div><div style="align-self:flex-end">' + d.tag + '</div></div>';
+    }).join('');
+    return '<div style="display:flex;flex-direction:column">' + backBar('Drug Interaction Checker') +
+      '<div style="padding:14px 20px 24px;display:flex;flex-direction:column;gap:14px">' +
+        '<div style="border:1.5px solid #D9E3E4;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;color:#5B6F75">Add a medication, supplement or condition</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div></div>' +
+        (addable ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + addable + '</div>' : '') +
+        '<h2 style="' + H2 + ';margin-top:4px">Potential Interactions</h2>' + results +
+        '<span style="font-size:12px;color:#5B6F75">Sample data for review · not for clinical use</span>' +
+        '<div style="border-top:1px solid #E1E8E9;padding-top:16px;display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Check another medication</h2>' +
+          '<button data-act="go:search" style="text-align:left;display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;background:#FFFFFF;border-radius:12px;padding:0 12px;min-height:48px;color:#5B6F75;font-size:14px">' + ICON.search('#5B6F75') + 'Search for a medication…</button></div>' +
+      '</div></div>';
+  }
+
+  // ---------- pill identifier ----------
+  function norm(s) { return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+
+  function pillMatches() {
+    var p = state.pill;
+    var imp = norm(p.imprint);
+    if (!p.shape && !p.color && !imp && p.scored === 'any') return null;
+    var out = [];
+    PILLS.forEach(function (x) {
+      var a = x.a, score = 0, max = 0, why = [];
+      if (p.shape) { max += 2; if (a.shape === p.shape) { score += 2; why.push('shape'); } }
+      if (p.color) { max += 2; if (a.colors.indexOf(p.color) >= 0) { score += 2; why.push('colour'); } }
+      if (imp) { max += 4; var ai = norm(a.imprint); if (ai === imp) { score += 4; why.push('imprint'); } else if (ai.indexOf(imp) >= 0) { score += 3; why.push('part of imprint'); } }
+      if (p.scored !== 'any' && a.shape !== 'capsule') { max += 1; if ((p.scored === 'yes') === !!a.scored) { score += 1; why.push('score line'); } }
+      if (score > 0 && score / max >= 0.5) out.push({ x: x, score: score, max: max, why: why });
+    });
+    out.sort(function (a, b) { return b.score / b.max - a.score / a.max; });
+    return out.slice(0, 8);
+  }
+
+  function pillResultCard(x, label, labelColor, extra) {
+    var a = x.a;
+    var inner = '<span style="flex:none;width:76px;height:52px;border-radius:10px;background:#F3F6F6;display:flex;align-items:center;justify-content:center">' + drawPill(a, 66) + '</span>' +
+      '<span style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:700">' + esc(a.label) + '</span>' + (a.verify ? VERIFY_TAG : '') + '<span style="font-size:11px;font-weight:700;color:' + labelColor + '">' + label + '</span></span>' +
+      '<span style="font-size:12px;color:#5B6F75">' + esc(a.desc) + '</span>' + (extra || '') +
+      '<span style="font-size:12px;font-weight:600;color:#1A6F67">' + esc(x.sub) + '</span></span>' + (x.medId ? ICON.chevron : '');
+    var style = 'text-align:left;display:flex;align-items:center;gap:12px;' + CARD + ';padding:10px 12px';
+    return x.medId ? '<button data-act="med:' + x.medId + ':' + x.formId + '" style="' + style + '">' + inner + '</button>' : '<div style="' + style + '">' + inner + '</div>';
+  }
+
+  function pillResultsHtml() {
+    var res = pillMatches();
+    if (!res) return '<div style="' + CARD + ';padding:16px;font-size:14px;line-height:1.5;color:#24414A">Pick a shape, colour or imprint to see possible matches.</div>';
+    if (!res.length) return '<div style="' + CARD + ';padding:16px;font-size:14px;line-height:1.5;color:#24414A">No pills in our sample data match. Try fewer details, or just the imprint.</div>';
+    return '<span style="font-size:13px;font-weight:600;color:#5B6F75">' + res.length + ' possible ' + (res.length === 1 ? 'match' : 'matches') + '</span>' +
+      res.map(function (r) {
+        var full = r.score === r.max;
+        return pillResultCard(r.x, full ? 'Strong match' : 'Partial match', full ? '#054F31' : '#7A2E0E', '<span style="font-size:11px;color:#5B6F75">Matches: ' + r.why.join(', ') + '</span>');
+      }).join('');
+  }
+
+  function viewPill() {
+    var mode = state.pillMode;
+    function modeBtn(id, label, extra) {
+      var on = mode === id;
+      return '<button data-act="pillmode:' + id + '" aria-pressed="' + on + '" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:42px;border:0;border-radius:10px;font-size:14px;font-weight:700;background:' + (on ? '#FFFFFF' : 'transparent') + ';color:' + (on ? '#142B33' : '#5B6F75') + ';box-shadow:' + (on ? '0 1px 3px rgba(0,0,0,.12)' : 'none') + '">' + label + (extra || '') + '</button>';
+    }
+    var proTag = '<span style="font-size:10px;font-weight:800;color:#5C3D00;background:#F2B53A;border-radius:999px;padding:2px 7px">PRO</span>';
+    var top = '<div style="display:flex;gap:4px;background:#EEF2F3;border-radius:12px;padding:4px">' + modeBtn('describe', 'Describe it') + modeBtn('photo', 'Photo', proTag) + '</div>';
+    var content = mode === 'describe' ? pillDescribe() : pillPhoto();
+    return '<div style="display:flex;flex-direction:column">' + backBar('Pill Identifier') +
+      '<div style="padding:12px 20px 24px;display:flex;flex-direction:column;gap:16px">' + top + content +
+      '<div style="display:flex;gap:10px;align-items:flex-start;background:#FFFAEB;border:1.5px solid #FEC84B;border-radius:14px;padding:12px 14px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="11" fill="#DC6803"/><path d="M12 6.5v7M12 17v.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></svg><span style="font-size:13px;line-height:1.5;color:#4D2A06">Always confirm a pill’s identity with its packaging, imprint and a pharmacist before giving it. Appearances marked “To verify” are not yet confirmed.</span></div>' +
+      '</div></div>';
+  }
+
+  function pillDescribe() {
+    var p = state.pill;
+    var shapes = SHAPES.map(function (s) {
+      var on = p.shape === s;
+      return '<button data-act="pshape:' + s + '" aria-pressed="' + on + '" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;min-height:72px;border:2px solid ' + (on ? '#1A6F67' : '#E1E8E9') + ';background:' + (on ? '#E5F4F2' : '#FFFFFF') + ';font-size:12px;font-weight:600">' +
+        drawPill({ shape: s, colors: s === 'capsule' ? ['white', 'blue'] : ['white'] }, 48) + cap(s) + '</button>';
+    }).join('');
+    var colors = SWATCHES.map(function (c) {
+      var on = p.color === c;
+      return '<button data-act="pcolor:' + c + '" aria-pressed="' + on + '" aria-label="' + D.COLORS[c].label + '" style="display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:transparent;padding:2px;min-height:56px;font-size:11px;font-weight:600;color:' + (on ? '#142B33' : '#5B6F75') + '">' +
+        '<span style="width:34px;height:34px;border-radius:17px;background:' + hex(c) + ';border:' + (c === 'white' ? '1.5px solid #C9D3D5' : '1.5px solid rgba(0,0,0,.08)') + ';box-shadow:' + (on ? '0 0 0 3px #FFFFFF,0 0 0 5px #1A6F67' : 'none') + '"></span>' + D.COLORS[c].label + '</button>';
+    }).join('');
+    var scored = [['any', 'Any'], ['yes', 'Yes'], ['no', 'No']].map(function (s) {
+      var on = p.scored === s[0];
+      return '<button data-act="pscored:' + s[0] + '" aria-pressed="' + on + '" style="flex:1;min-height:40px;border-radius:10px;font-size:13px;font-weight:600;border:1.5px solid ' + (on ? '#1A6F67' : '#D9E3E4') + ';background:' + (on ? '#1A6F67' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#142B33') + '">' + s[1] + '</button>';
+    }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Imprint (letters or numbers)</span>' +
+        '<label style="display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;border-radius:12px;padding:0 12px;min-height:48px"><span class="sr">Imprint</span><input id="imp" type="text" autocomplete="off" autocapitalize="characters" placeholder="e.g. D25 or 200" style="font-size:16px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:44px;text-transform:uppercase"></label></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Shape</span><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">' + shapes + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Colour</span><div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px">' + colors + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Score line</span><div style="display:flex;gap:8px">' + scored + '</div></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="' + H2 + '">Possible matches</h2><button data-act="pclear" style="border:0;background:transparent;color:#1A6F67;font-size:13px;font-weight:700;min-height:36px">Clear all</button></div>' +
+      '<div id="pillresults" style="display:flex;flex-direction:column;gap:10px">' + pillResultsHtml() + '</div>';
+  }
+
+  function pillPhoto() {
+    if (!state.pro && !state.demo) {
+      return '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">' +
+        ICON.camera('#3FC1B2') +
+        '<span style="font-size:18px;font-weight:800">Identify a pill from a photo</span>' +
+        '<span style="font-size:14px;line-height:1.5;color:#D6E6E6">Take a photo and MediAUS uses AI to compare its shape, colour and imprint with every pill in the database. Part of MediAUS Pro.</span>' +
+        '<div style="display:flex;gap:10px;width:100%;margin-top:4px"><button data-act="go:plan" style="flex:1;min-height:46px;border:0;border-radius:12px;background:#1F9D8E;color:#FFFFFF;font-size:14px;font-weight:700">See Pro plans</button>' +
+        '<button data-act="demo" style="flex:1;min-height:46px;border:1.5px solid #A9C7C8;border-radius:12px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:700">Try the demo</button></div></div>';
+    }
+    var tips = '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.45;color:#24414A"><li>Put the pill on a plain, dark surface</li><li>Use good light, without flash glare</li><li>Imprint facing up and in focus</li></ul>';
+    if (state.photoState === 'idle') {
+      return '<div style="border:2px dashed #A8D3CD;border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;background:#F7FBFA">' +
+        ICON.camera('#1A6F67') + '<span style="font-size:16px;font-weight:700">Photograph the pill</span>' +
+        '<label style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:12px;background:#1A6F67;color:#FFFFFF;font-size:15px;font-weight:700;cursor:pointer">' + ICON.camera('#FFFFFF') + 'Take photo<input class="sr" type="file" accept="image/*" capture="environment" data-photo="1"></label>' +
+        '<label style="width:100%;display:flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;border:1.5px solid #1A6F67;color:#1A6F67;font-size:14px;font-weight:700;cursor:pointer">Choose from gallery<input class="sr" type="file" accept="image/*" data-photo="1"></label>' +
+        '</div><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700">For the best result</span>' + tips + '</div>' +
+        (state.pro ? '' : '<span style="font-size:12px;color:#5B6F75">Demo mode: results are simulated.</span>');
+    }
+    var img = '<div style="position:relative;border-radius:16px;overflow:hidden;background:#0C2A30;height:200px;display:flex;align-items:center;justify-content:center">' +
+      (state.photo ? '<img src="' + state.photo + '" alt="Your pill photo" style="width:100%;height:100%;object-fit:cover">' : '') +
+      (state.photoState === 'analysing' ? '<div style="position:absolute;inset:0;background:rgba(12,42,48,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#FFFFFF"><span class="spin" style="width:34px;height:34px;border-radius:17px;border:4px solid rgba(255,255,255,.3);border-top-color:#3FC1B2"></span><span style="font-size:14px;font-weight:600">Analysing shape, colour and imprint…</span></div>' : '') +
+      '</div>';
+    if (state.photoState === 'analysing') return img;
+    // simulated AI results
+    var picks = [
+      { find: 'Cordarone X 200 mg', conf: 86 },
+      { find: 'Lanoxin 250 microgram', conf: 58 },
+      { find: 'Metformin 500 mg', conf: 31 }
+    ];
+    var cards = picks.map(function (p) {
+      var x = PILLS.filter(function (y) { return y.a.label === p.find; })[0];
+      var bar = '<span style="display:flex;align-items:center;gap:8px"><span style="flex:1;height:6px;border-radius:3px;background:#E1E8E9;overflow:hidden"><span style="display:block;height:100%;width:' + p.conf + '%;background:' + (p.conf > 70 ? '#079455' : p.conf > 45 ? '#DC6803' : '#98A2B3') + '"></span></span><span style="font-size:12px;font-weight:700;color:#24414A">' + p.conf + '%</span></span>';
+      return pillResultCard(x, p.conf > 70 ? 'Likely' : 'Possible', p.conf > 70 ? '#054F31' : '#7A2E0E', bar);
+    }).join('');
+    return img + '<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="' + H2 + '">AI suggestions</h2><button data-act="retake" style="border:0;background:transparent;color:#1A6F67;font-size:13px;font-weight:700;min-height:36px">Retake</button></div>' +
+      cards + '<span style="font-size:12px;color:#5B6F75">' + (state.pro ? 'Pro preview' : 'Demo') + ': results are simulated for this prototype.</span>';
+  }
+
+
+  // ---------- barcode scanner (Pro) ----------
+  var cam = { stream: null, track: null, timer: null, detector: null, detectorReady: false, torchOk: false, simIndex: 0 };
+  function scanUnlocked() { return state.pro || state.demo; }
+
+  function lookupCode(raw) {
+    var c = String(raw || '').replace(/\D/g, '');
+    if (c.length === 14 && c.charAt(0) === '0') c = c.slice(1);
+    return { code: c || String(raw || ''), item: D.BARCODES[c] || null };
+  }
+
+  var BARCODE_ICON = function (c) { return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>'; };
+
+  function viewScanLocked() {
+    return '<div style="display:flex;flex-direction:column">' + backBar('Scan Barcode') +
+      '<div style="padding:12px 20px 24px;display:flex;flex-direction:column;gap:16px">' +
+      '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">' +
+        BARCODE_ICON('#3FC1B2') +
+        '<span style="font-size:18px;font-weight:800">Scan a medicine pack</span>' +
+        '<span style="font-size:14px;line-height:1.5;color:#D6E6E6">Point your camera at the barcode on an Australian medicine pack and MediAUS opens the right medicine, strength and form. Part of MediAUS Pro.</span>' +
+        '<div style="display:flex;gap:10px;width:100%;margin-top:4px"><button data-act="go:plan" style="flex:1;min-height:46px;border:0;border-radius:12px;background:#1F9D8E;color:#FFFFFF;font-size:14px;font-weight:700">See Pro plans</button>' +
+        '<button data-act="demo" style="flex:1;min-height:46px;border:1.5px solid #A9C7C8;border-radius:12px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:700">Try the demo</button></div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">How it works</span>' +
+        '<ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A"><li>Allow camera access</li><li>Line up the barcode inside the frame</li><li>MediAUS reads it automatically and opens the medicine</li></ol></div>' +
+      '</div></div>';
+  }
+
+  function scanStatusCard(title, text, spin) {
+    return '<div role="status" style="position:absolute;left:20px;right:20px;top:42%;transform:translateY(-50%);background:rgba(12,42,48,.92);border-radius:16px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">' +
+      (spin ? '<span class="spin" style="width:30px;height:30px;border-radius:15px;border:4px solid rgba(255,255,255,.3);border-top-color:#3FC1B2"></span>' : '') +
+      '<span style="font-size:16px;font-weight:700">' + title + '</span>' + (text ? '<span style="font-size:13px;line-height:1.5;color:#D6E6E6">' + text + '</span>' : '') + '</div>';
+  }
+
+  function scanResultSheet() {
+    var r = lookupCode(state.scan.code);
+    var body;
+    if (r.item) {
+      var m = D.MEDS[r.item.medId];
+      var f = m.forms.filter(function (x) { return x.id === r.item.formId; })[0] || m.forms[0];
+      var a = f.appearance.filter(function (x) { return x.label === r.item.product; })[0] || f.appearance[0];
+      body = '<div style="display:flex;gap:14px;align-items:center"><span style="flex:none;width:84px;height:58px;border-radius:12px;background:#F3F6F6;display:flex;align-items:center;justify-content:center">' + drawPill(a, 72) + '</span>' +
+        '<div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;font-weight:700;color:#079455">Match found</span><span style="font-size:17px;font-weight:800">' + esc(r.item.product) + '</span><span style="font-size:13px;color:#5B6F75">' + esc(m.name) + ' · ' + esc(f.label) + ' · ' + esc(r.item.pack) + '</span></div></div>' +
+        '<span style="font-size:12px;color:#5B6F75">Barcode ' + esc(r.code) + ' · sample code</span>' +
+        '<button data-act="med:' + m.id + ':' + f.id + '" style="min-height:50px;border:0;border-radius:14px;background:#1A6F67;color:#FFFFFF;font-size:15px;font-weight:700">View medicine</button>';
+    } else {
+      body = '<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;font-weight:700;color:#B54708">Not in the database</span><span style="font-size:17px;font-weight:800">We don’t recognise this barcode yet</span>' +
+        '<span style="font-size:13px;line-height:1.5;color:#5B6F75">Barcode ' + esc(r.code) + '. This prototype only knows a few sample codes. Real pack barcodes will work once the product database is loaded.</span></div>' +
+        '<button data-act="go:search" style="min-height:50px;border:0;border-radius:14px;background:#1A6F67;color:#FFFFFF;font-size:15px;font-weight:700">Search by name instead</button>';
+    }
+    return '<div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end">' +
+      '<div role="dialog" aria-label="Scan result" style="width:100%;background:#FFFFFF;color:#142B33;border-radius:20px 20px 0 0;padding:10px 20px max(20px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px">' +
+      '<span aria-hidden="true" style="align-self:center;width:40px;height:4px;border-radius:2px;background:#D9E3E4"></span>' + body +
+      '<button data-act="scanagain" style="min-height:46px;border:1.5px solid #1A6F67;border-radius:14px;background:#FFFFFF;color:#1A6F67;font-size:14px;font-weight:700">Scan another</button></div></div>';
+  }
+
+  function scanManualSheet() {
+    var chips = Object.keys(D.BARCODES).slice(0, 4).map(function (c) {
+      return '<button data-act="scancode:' + c + '" style="font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:8px;padding:0 10px;min-height:32px">' + c + '</button>';
+    }).join('');
+    return '<div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end">' +
+      '<div role="dialog" aria-label="Enter barcode" style="width:100%;background:#FFFFFF;color:#142B33;border-radius:20px 20px 0 0;padding:10px 20px max(20px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px">' +
+      '<span aria-hidden="true" style="align-self:center;width:40px;height:4px;border-radius:2px;background:#D9E3E4"></span>' +
+      '<span style="font-size:17px;font-weight:800">Enter the barcode number</span>' +
+      '<label style="display:flex;align-items:center;border:1.5px solid #D9E3E4;border-radius:12px;padding:0 12px;min-height:50px"><span class="sr">Barcode number</span><input id="gtin" type="text" inputmode="numeric" autocomplete="off" placeholder="13 digits under the barcode" style="font-size:18px;letter-spacing:1px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:46px"></label>' +
+      '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#5B6F75">Try a sample code:</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button data-act="scancancel" style="min-height:48px;border:1.5px solid #D9E3E4;border-radius:14px;background:#FFFFFF;font-size:14px;font-weight:700">Cancel</button>' +
+      '<button data-act="scansubmit" style="min-height:48px;border:0;border-radius:14px;background:#1A6F67;color:#FFFFFF;font-size:14px;font-weight:700">Look up</button></div></div></div>';
+  }
+
+  function viewScan() {
+    var sc = state.scan;
+    var corner = function (pos) {
+      var b = 'position:absolute;width:30px;height:30px;border-color:#3FC1B2;border-style:solid;';
+      var m = { tl: 'top:-2px;left:-2px;border-width:4px 0 0 4px;border-radius:16px 0 0 0', tr: 'top:-2px;right:-2px;border-width:4px 4px 0 0;border-radius:0 16px 0 0', bl: 'bottom:-2px;left:-2px;border-width:0 0 4px 4px;border-radius:0 0 0 16px', br: 'bottom:-2px;right:-2px;border-width:0 4px 4px 0;border-radius:0 0 16px 0' };
+      return '<span style="' + b + m[pos] + '"></span>';
+    };
+    var live = sc.phase === 'live';
+    var frame = '<div aria-hidden="true" style="position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:78%;max-width:340px;height:170px;border-radius:16px;box-shadow:0 0 0 9999px rgba(5,20,24,.62)">' +
+      corner('tl') + corner('tr') + corner('bl') + corner('br') +
+      (live && !sc.manual ? '<span class="scanline" style="position:absolute;left:8%;right:8%;height:2px;border-radius:1px;background:#3FC1B2;box-shadow:0 0 12px 2px rgba(63,193,178,.8)"></span>' : '') + '</div>';
+    var torch = cam.torchOk
+      ? '<button data-act="torch" aria-pressed="' + sc.torch + '" aria-label="Torch" style="width:44px;height:44px;border-radius:22px;border:0;background:' + (sc.torch ? '#F2B53A' : 'rgba(255,255,255,.18)') + ';display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="' + (sc.torch ? '#0C2A30' : '#FFFFFF') + '" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 2h8l-1 6H9z"/><path d="M9 8h6v6l-1 8h-4l-1-8z"/></svg></button>'
+      : '<span style="width:44px"></span>';
+    var status = '';
+    if (sc.phase === 'starting' || sc.phase === 'idle') status = scanStatusCard('Starting camera…', '', true);
+    else if (sc.phase === 'denied') status = scanStatusCard('Camera access is blocked', 'Allow camera access for this site in your browser settings, then reopen the scanner. Or enter the number instead.');
+    else if (sc.phase === 'unsupported') status = scanStatusCard('Camera not available here', 'The camera only works on a secure (https) link or on this computer’s localhost address. You can still enter the number.');
+    var noAuto = live && !cam.detector;
+    var bottom = '<div style="position:absolute;left:0;right:0;bottom:0;padding:16px 20px max(20px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;background:linear-gradient(transparent,rgba(5,20,24,.85) 30%)">' +
+      (noAuto ? '<span style="font-size:12px;line-height:1.45;color:#D6E6E6;text-align:center">This browser can’t read barcodes automatically (common on iPhone). The full app will use a built-in reader.</span><button data-act="scansim" style="min-height:48px;border:0;border-radius:14px;background:#3FC1B2;color:#0C2A30;font-size:15px;font-weight:700">Simulate a scan (demo)</button>' : '') +
+      '<button data-act="scanmanual" style="min-height:48px;border:1.5px solid rgba(255,255,255,.6);border-radius:14px;background:transparent;color:#FFFFFF;font-size:15px;font-weight:700">Enter barcode number</button>' +
+      '<span style="font-size:11px;color:#A9C7C8;text-align:center">' + (state.pro ? 'Pro preview' : 'Demo') + ' · sample barcodes only. Test codes: open test-barcodes.html on another screen.</span></div>';
+    return '<div style="position:relative;flex:1;min-height:0;background:#000000;color:#FFFFFF;overflow:hidden">' +
+      '<video id="cam" playsinline muted autoplay style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>' +
+      frame +
+      '<div style="position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:max(10px,env(safe-area-inset-top)) 12px 10px;background:linear-gradient(rgba(5,20,24,.7),transparent)">' +
+        '<button data-act="back" aria-label="Close scanner" style="width:44px;height:44px;border-radius:22px;border:0;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center">' + ICON.x('#FFFFFF', 18) + '</button>' +
+        '<span style="font-size:16px;font-weight:700">Scan Barcode</span>' + torch + '</div>' +
+      (live ? '<div style="position:absolute;left:0;right:0;top:calc(42% + 100px);display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 24px;text-align:center"><span style="font-size:15px;font-weight:700">Line up the barcode inside the frame</span><span style="font-size:12px;color:#C3DADB">' + (cam.detector ? 'It scans automatically. Hold steady, about 15 cm away.' : 'Hold steady, about 15 cm away.') + '</span></div>' : '') +
+      status + bottom +
+      (sc.phase === 'result' ? scanResultSheet() : '') + (sc.manual ? scanManualSheet() : '') +
+      '</div>';
+  }
+
+  function setupDetector() {
+    if (cam.detectorReady) return Promise.resolve();
+    cam.detectorReady = true;
+    if (!('BarcodeDetector' in window)) { cam.detector = null; return Promise.resolve(); }
+    var want = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'data_matrix', 'qr_code'];
+    return window.BarcodeDetector.getSupportedFormats().then(function (f) {
+      var use = want.filter(function (x) { return f.indexOf(x) >= 0; });
+      cam.detector = use.length ? new window.BarcodeDetector({ formats: use }) : null;
+    }).catch(function () { cam.detector = null; });
+  }
+
+  function startDetectLoop() {
+    clearInterval(cam.timer);
+    if (!cam.detector) return;
+    var busy = false;
+    cam.timer = setInterval(function () {
+      var v = document.getElementById('cam');
+      if (busy || !v || v.readyState < 2 || state.scan.phase !== 'live' || state.scan.manual) return;
+      busy = true;
+      cam.detector.detect(v).then(function (codes) {
+        busy = false;
+        if (codes && codes.length && state.scan.phase === 'live') gotCode(codes[0].rawValue);
+      }).catch(function () { busy = false; });
+    }, 250);
+  }
+
+  function gotCode(raw) {
+    if (navigator.vibrate) { try { navigator.vibrate(60); } catch (e) { /* ignore */ } }
+    state.scan.code = raw;
+    state.scan.manual = false;
+    state.scan.phase = 'result';
+    render();
+  }
+
+  function startCamera() {
+    state.scan.phase = 'starting';
+    render();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext) {
+      state.scan.phase = 'unsupported'; render(); return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false })
+      .then(function (stream) {
+        if (state.screen !== 'scan') { stream.getTracks().forEach(function (t) { t.stop(); }); state.scan.phase = 'idle'; return; }
+        cam.stream = stream;
+        cam.track = stream.getVideoTracks()[0];
+        try { var caps = cam.track.getCapabilities ? cam.track.getCapabilities() : {}; cam.torchOk = !!caps.torch; } catch (e) { cam.torchOk = false; }
+        return setupDetector().then(function () {
+          state.scan.phase = 'live';
+          render();
+          startDetectLoop();
+        });
+      })
+      .catch(function (err) {
+        state.scan.phase = (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) ? 'denied' : 'unsupported';
+        render();
+      });
+  }
+
+  function stopCamera() {
+    clearInterval(cam.timer);
+    cam.timer = null;
+    if (cam.stream) cam.stream.getTracks().forEach(function (t) { t.stop(); });
+    cam.stream = null; cam.track = null; cam.torchOk = false;
+    state.scan.torch = false;
+    state.scan.phase = 'idle';
+    state.scan.manual = false;
+  }
+
+  function afterRender() {
+    if (state.screen === 'scan' && scanUnlocked()) {
+      var v = document.getElementById('cam');
+      if (cam.stream) {
+        if (v && v.srcObject !== cam.stream) { v.srcObject = cam.stream; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      } else if (state.scan.phase === 'idle') {
+        setTimeout(startCamera, 0);
+      }
+      var g = document.getElementById('gtin');
+      if (g && document.activeElement !== g) g.focus({ preventScroll: true });
+    } else if (cam.stream || state.scan.phase !== 'idle') {
+      stopCamera();
+    }
+  }
+
+  // ---------- profile & plan ----------
+  function viewProfile() {
+    var ROW = 'display:flex;align-items:center;gap:14px;width:100%;min-height:52px;padding:0;border:0;border-bottom:1px solid #EEF2F3;background:transparent;font-size:14px;font-weight:500;text-align:left';
+    function row(icon, label, value, act) {
+      return '<button ' + (act ? 'data-act="' + act + '" ' : '') + 'style="' + ROW + '">' + icon + '<span style="flex:1">' + label + '</span>' + (value ? '<span style="color:#5B6F75;font-size:13px">' + value + '</span>' : '') + ICON.chevron + '</button>';
+    }
+    function ic(d) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
+    var on = state.notif;
+    return '<div style="padding:20px 20px 24px;display:flex;flex-direction:column;gap:18px">' +
+      '<h1 style="margin:0;font-size:20px;font-weight:700">Profile &amp; Settings</h1>' +
+      '<div style="display:flex;align-items:center;gap:16px"><span style="width:64px;height:64px;border-radius:32px;background:#EEF2F3;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:18px;font-weight:700">Taylor Wilson</span><span style="font-size:13px;color:#5B6F75">Registered Nurse</span></div></div>' +
+      '<div style="display:flex;flex-direction:column"><h2 style="margin:0 0 4px;font-size:16px;font-weight:700">Account</h2>' +
+        row(ic('<path d="M4 8l4 4 4-6 4 6 4-4-2 11H6z"/>'), 'Subscription', state.pro ? 'Pro (demo)' : 'Free Plan', 'go:plan') +
+        row(ic('<path d="M6 3h12v18l-6-4-6 4z"/>'), 'Saved Medications', '12') +
+        row(ic('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6"/>'), 'Clinical References') +
+        '<button data-act="notif" role="switch" aria-checked="' + on + '" style="' + ROW + '">' + ic('<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>') + '<span style="flex:1">Notifications</span>' +
+          '<span style="flex:none;width:46px;height:28px;border-radius:14px;position:relative;background:' + (on ? '#1F9D8E' : '#C9D3D5') + '"><span style="position:absolute;top:3px;left:' + (on ? '21px' : '3px') + ';width:22px;height:22px;border-radius:11px;background:#FFFFFF;transition:left .15s"></span></span></button>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column"><h2 style="margin:0 0 4px;font-size:16px;font-weight:700">App Settings</h2>' +
+        row(ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>'), 'Appearance', 'System') +
+        row(ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'), 'Region', 'Australia') +
+        row(ic('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/>'), 'About', 'Version 1.1.0') +
+      '</div>' +
+      '<p style="margin:0;font-size:12px;line-height:1.5;color:#5B6F75">Prototype with sample data for review. Not for clinical use.</p>' +
+      '</div>';
+  }
+
+  function viewPlan() {
+    var perks = PERKS.map(function (p) {
+      return '<span style="display:flex;align-items:center;gap:12px;font-size:14px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><circle cx="12" cy="12" r="11" fill="#2DB3A3"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' + esc(p) + '</span>';
+    }).join('');
+    var freeBtn = state.pro
+      ? '<button data-act="downgrade" style="margin-top:10px;font-size:13px;font-weight:600;color:#1A6F67;background:#FFFFFF;border:1.5px solid #1A6F67;border-radius:10px;min-height:40px">Switch to Free</button>'
+      : '<span style="margin-top:10px;font-size:13px;font-weight:600;color:#5B6F75;background:#EEF2F3;border-radius:10px;min-height:40px;display:flex;align-items:center;justify-content:center">Current Plan</span>';
+    var proBtn = state.pro
+      ? '<span style="margin-top:10px;font-size:13px;font-weight:700;color:#0C2A30;background:#3FC1B2;border-radius:10px;min-height:40px;display:flex;align-items:center;justify-content:center">Current Plan (demo)</span>'
+      : '<button data-act="upgrade" style="margin-top:10px;font-size:13px;font-weight:700;color:#FFFFFF;background:#1F9D8E;border:0;border-radius:10px;min-height:40px">Upgrade Now</button>';
+    return '<div style="flex:1;min-height:100%;background:#0C2A30;color:#FFFFFF;padding:12px 18px max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:14px">' +
+      '<button data-act="back" aria-label="Close" style="align-self:flex-start;width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#FFFFFF', 20) + '</button>' +
+      '<svg width="40" height="32" viewBox="0 0 40 32" aria-hidden="true"><path d="M4 26L2 8l10 8 8-14 8 14 10-8-2 18z" fill="#F2B53A"/><rect x="4" y="27" width="32" height="4" rx="2" fill="#F2B53A"/></svg>' +
+      '<h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.3px">Unlock Full Access</h1>' +
+      '<span style="font-size:14px;line-height:1.55;color:#D6E6E6;text-align:center">Get complete medication information, including detailed interactions, pregnancy and breastfeeding data, and more.</span>' +
+      '<div style="align-self:stretch;display:flex;flex-direction:column;gap:12px;padding:4px 8px">' + perks + '</div>' +
+      '<div style="align-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px">' +
+        '<div style="background:#FFFFFF;color:#142B33;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:17px;font-weight:700">Free</span><span style="font-size:12px;color:#5B6F75">Essential information</span><span style="margin-top:10px;font-size:13px;color:#5B6F75"><span style="font-size:24px;font-weight:800;color:#142B33">$0</span> / forever</span>' + freeBtn + '</div>' +
+        '<div style="background:#0F3A40;border:2px solid #2DB3A3;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px"><span style="font-size:17px;font-weight:700">Pro</span><span style="font-size:12px;color:#C3DADB">Full access to all features</span><span style="margin-top:10px;font-size:13px;color:#C3DADB"><span style="font-size:24px;font-weight:800;color:#FFFFFF">$14.99</span> / month</span>' + proBtn + '</div>' +
+      '</div>' +
+      '<span style="margin-top:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:#C3DADB">' + ICON.lock + 'Cancel anytime. Secure payment via Stripe.</span>' +
+      '</div>';
+  }
+
+  // ---------- bottom nav ----------
+  function navHtml() {
+    var scr = state.screen;
+    var section = scr === 'search' ? 'search' : scr === 'check' ? 'check' : (scr === 'profile' || scr === 'plan') ? 'more' : 'home';
+    function item(id, act, label, svg) {
+      var on = section === id;
+      return '<button data-act="' + act + '"' + (on ? ' aria-current="page"' : '') + ' style="position:relative;min-height:64px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:' + (on ? 800 : 500) + ';color:' + (on ? TEAL : MUTED) + '">' +
+        '<span aria-hidden="true" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:3px;border-radius:0 0 3px 3px;background:' + (on ? TEAL : 'transparent') + '"></span>' +
+        '<span style="display:flex;align-items:center;justify-content:center;width:58px;height:30px;border-radius:15px;background:' + (on ? '#D3EEEA' : 'transparent') + '">' + svg(on) + '</span>' + label + '</button>';
+    }
+    return '<nav class="nav" aria-label="Main">' +
+      item('home', 'go:home', 'Home', function (on) { return '<svg width="22" height="22" viewBox="0 0 24 24" fill="' + (on ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="' + (on ? 2.6 : 2) + '" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>'; }) +
+      item('search', 'go:search', 'Search', function (on) { return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (on ? 2.6 : 2) + '" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>'; }) +
+      item('check', 'go:check', 'Interactions', function (on) { return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (on ? 2.6 : 2) + '" aria-hidden="true"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></svg>'; }) +
+      item('more', 'go:profile', 'More', function () { return '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/></svg>'; }) +
+      '</nav>';
+  }
+
+  // ---------- render & navigation ----------
+  var app = document.getElementById('app');
+  var VIEWS = { splash: viewSplash, home: viewHome, search: viewSearch, med: viewMed, check: viewCheck, profile: viewProfile, plan: viewPlan, pill: viewPill, scan: viewScanLocked };
+  var TITLES = { home: 'MediAUS', search: 'Search', check: 'Interaction Checker', profile: 'Profile', plan: 'Upgrade', pill: 'Pill Identifier', scan: 'Scan Barcode' };
+
+  function render(keepScroll) {
+    var scr = state.screen;
+    var sc = document.getElementById('scroll');
+    var top = keepScroll && sc ? sc.scrollTop : 0;
+    var dark = scr === 'splash' || scr === 'plan' || (scr === 'scan' && scanUnlocked());
+    app.className = 'app' + (dark ? ' is-dark' : '');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0C2A30' : '#FFFFFF');
+    var showNav = scr === 'home' || scr === 'search' || scr === 'check' || scr === 'profile';
+    if (scr === 'splash') app.innerHTML = viewSplash();
+    else if (scr === 'scan' && scanUnlocked()) app.innerHTML = viewScan();
+    else app.innerHTML = '<div class="scroll" id="scroll">' + (VIEWS[scr] || viewHome)() + '</div>' + (showNav ? navHtml() : '');
+    var q = document.getElementById('q'); if (q) q.value = state.query;
+    var imp = document.getElementById('imp'); if (imp) imp.value = state.pill.imprint;
+    var sc2 = document.getElementById('scroll'); if (sc2 && top) sc2.scrollTop = top;
+    document.title = scr === 'med' ? med().name + ' · MediAUS' : (TITLES[scr] ? TITLES[scr] + (scr === 'home' ? '' : ' · MediAUS') : 'MediAUS');
+    app.querySelectorAll('.tabs [aria-pressed="true"]').forEach(function (el) {
+      var row = el.parentNode;
+      if (el.offsetLeft + el.offsetWidth > row.scrollLeft + row.clientWidth || el.offsetLeft < row.scrollLeft) row.scrollLeft = el.offsetLeft - 16;
+    });
+    afterRender();
+  }
+
+  function snapshot() { return { screen: state.screen, tab: state.tab, medId: state.medId, formId: state.formId }; }
+
+  function navigate(screen, extra, opts) {
+    var before = JSON.stringify(snapshot());
+    state.screen = screen;
+    if (extra) for (var k in extra) state[k] = extra[k];
+    var changed = JSON.stringify(snapshot()) !== before;
+    if (opts && opts.replace) history.replaceState(snapshot(), '');
+    else if (changed) { history.pushState(snapshot(), ''); depth++; }
+    render();
+    if (screen === 'search' && !(opts && opts.noFocus)) {
+      var q = document.getElementById('q');
+      if (q) q.focus({ preventScroll: true });
+    }
+  }
+
+  function goBack() {
+    if (depth > 0) history.back();
+    else navigate('home', null, { replace: true });
+  }
+
+  window.addEventListener('popstate', function (e) {
+    if (depth > 0) depth--;
+    var s = e.state || { screen: 'home' };
+    if (s.screen === 'splash') s.screen = 'home';
+    state.screen = s.screen;
+    if (s.tab) state.tab = s.tab;
+    if (s.medId) state.medId = s.medId;
+    if (s.formId) state.formId = s.formId;
+    render();
+  });
+
+  function updatePill() {
+    var r = document.getElementById('pillresults');
+    if (r) r.innerHTML = pillResultsHtml();
+  }
+
+  app.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]');
+    if (!el) { if (e.target.closest('a[href="#"]')) e.preventDefault(); return; }
+    var parts = el.getAttribute('data-act').split(':');
+    var act = parts[0], arg = parts[1], arg2 = parts[2];
+    switch (act) {
+      case 'start': navigate('home', null, { replace: true }); break;
+      case 'go': navigate(arg); break;
+      case 'med': navigate('med', { medId: arg, formId: arg2 || D.MEDS[arg].forms[0].id, tab: 'overview', routeId: '', doseId: '' }); break;
+      case 'medr': navigate('med', { medId: arg, formId: arg2, tab: 'admin', routeId: parts[3] || '', doseId: '' }); break;
+      case 'rsel': state.routeId = arg; render(true); break;
+      case 'dsel': state.doseId = arg; render(true); break;
+      case 'form': state.formId = arg; state.routeId = ''; state.doseId = ''; history.replaceState(snapshot(), ''); render(true); break;
+      case 'pop': state.pop = arg; render(true); break;
+      case 'tab': state.tab = arg; history.replaceState(snapshot(), ''); render(true); break;
+      case 'back': goBack(); break;
+      case 'checkwith':
+        if (state.selected.indexOf(state.medId) < 0 && CHECK_MEDS[state.medId]) state.selected = [state.medId].concat(state.selected);
+        navigate('check');
+        break;
+      case 'remove': state.selected = state.selected.filter(function (x) { return x !== arg; }); render(true); break;
+      case 'add': state.selected = state.selected.concat([arg]); render(true); break;
+      case 'notif': state.notif = !state.notif; render(true); break;
+      case 'route': state.route = arg; render(true); break;
+      case 'pick':
+        state.query = arg;
+        var q = document.getElementById('q'); if (q) q.value = arg;
+        document.getElementById('results').innerHTML = searchResultsHtml();
+        break;
+      case 'pillmode': state.pillMode = arg; render(true); break;
+      case 'pshape': state.pill.shape = state.pill.shape === arg ? '' : arg; render(true); break;
+      case 'pcolor': state.pill.color = state.pill.color === arg ? '' : arg; render(true); break;
+      case 'pscored': state.pill.scored = arg; render(true); break;
+      case 'pclear': state.pill = { shape: '', color: '', imprint: '', scored: 'any' }; render(true); break;
+      case 'demo': state.demo = true; render(true); break;
+      case 'retake': state.photoState = 'idle'; state.photo = null; render(true); break;
+      case 'upgrade': state.pro = true; goBack(); break;
+      case 'downgrade': state.pro = false; render(true); break;
+      case 'scanagain': state.scan.code = ''; state.scan.phase = cam.stream ? 'live' : 'idle'; render(); break;
+      case 'scanmanual': state.scan.manual = true; render(); break;
+      case 'scancancel': state.scan.manual = false; render(); break;
+      case 'scancode': gotCode(arg); break;
+      case 'scansubmit':
+        var g = document.getElementById('gtin');
+        if (g && g.value.replace(/\D/g, '').length >= 8) gotCode(g.value);
+        else if (g) { g.setAttribute('aria-invalid', 'true'); g.style.color = '#B42318'; g.focus(); }
+        break;
+      case 'scansim':
+        var codes = Object.keys(D.BARCODES);
+        gotCode(codes[cam.simIndex++ % codes.length]);
+        break;
+      case 'torch':
+        if (cam.track) {
+          var want = !state.scan.torch;
+          cam.track.applyConstraints({ advanced: [{ torch: want }] }).then(function () { state.scan.torch = want; render(); }).catch(function () {});
+        }
+        break;
+    }
+  });
+
+  app.addEventListener('input', function (e) {
+    if (e.target.id === 'q') {
+      state.query = e.target.value;
+      document.getElementById('results').innerHTML = searchResultsHtml();
+    } else if (e.target.id === 'imp') {
+      state.pill.imprint = e.target.value;
+      updatePill();
+    }
+  });
+
+  app.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.id === 'gtin') { e.preventDefault(); var b = app.querySelector('[data-act="scansubmit"]'); if (b) b.click(); }
+  });
+
+  app.addEventListener('change', function (e) {
+    if (e.target.getAttribute && e.target.getAttribute('data-photo') && e.target.files && e.target.files[0]) {
+      if (state.photo) { try { URL.revokeObjectURL(state.photo); } catch (err) { /* ignore */ } }
+      state.photo = URL.createObjectURL(e.target.files[0]);
+      state.photoState = 'analysing';
+      render(true);
+      setTimeout(function () { state.photoState = 'done'; if (state.screen === 'pill') render(true); }, 1800);
+    }
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && cam.stream) { stopCamera(); }
+    else if (!document.hidden && state.screen === 'scan') { render(); }
+  });
+
+  history.replaceState(snapshot(), '');
+  render();
+
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+})();

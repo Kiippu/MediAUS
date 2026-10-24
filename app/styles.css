@@ -1,0 +1,99 @@
+:root {
+  --ink: #142B33;
+  --muted: #5B6F75;
+  --body: #24414A;
+  --teal: #1A6F67;
+  --teal-2: #1A8A7E;
+  --mint: #3FC1B2;
+  --dark: #0C2A30;
+  --line: #E1E8E9;
+  --line-2: #D9E3E4;
+  --tint: #E5F4F2;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #E9EFEF;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--teal); }
+a:hover { color: #0E4F49; }
+
+:focus-visible { outline: 3px solid #2DB3A3; outline-offset: 2px; }
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100vh;
+  height: 100dvh;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.app.is-dark { background: var(--dark); }
+
+@media (min-width: 560px) and (min-height: 760px) {
+  .app {
+    height: min(100dvh - 48px, 900px);
+    margin-top: max(24px, calc((100dvh - 900px) / 2));
+    border-radius: 28px;
+    box-shadow: 0 12px 48px rgba(12, 42, 48, 0.18);
+  }
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.nav {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: #FFFFFF;
+  border-top: 1px solid var(--line);
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+}
+
+.tabs { scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+
+input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+
+th[scope="row"] { box-shadow: 1px 0 0 #EEF2F3; }
+
+@keyframes scanmove { 0% { top: 10%; } 50% { top: 88%; } 100% { top: 10%; } }
+.scanline { animation: scanmove 2.4s ease-in-out infinite; top: 10%; }
+@media (prefers-reduced-motion: reduce) { .scanline { animation: none; top: 50%; } }

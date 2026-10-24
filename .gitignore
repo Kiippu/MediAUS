@@ -1,0 +1,5 @@
+tools/
+*.log
+tests/shots/
+tests/fakecam.y4m
+__pycache__/

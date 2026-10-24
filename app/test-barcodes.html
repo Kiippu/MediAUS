@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MediAUS test barcodes</title>
+<style>
+  :root { --ink: #142B33; --muted: #5B6F75; --line: #E1E8E9; --teal: #1A6F67; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F4F7F7; color: var(--ink); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { margin: 0 0 8px; font-size: 26px; }
+  p { margin: 0 0 6px; color: var(--muted); line-height: 1.5; }
+  .note { display: inline-block; margin: 10px 0 24px; background: #FFF4D6; color: #5C3D00; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card { background: #FFFFFF; border: 1.5px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .card h2 { margin: 0; font-size: 16px; align-self: flex-start; }
+  .card span { align-self: flex-start; font-size: 13px; color: var(--muted); }
+  svg { width: 100%; max-width: 300px; height: auto; background: #FFFFFF; }
+  @media print { body { background: #FFFFFF; } .card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>MediAUS test barcodes</h1>
+  <p>Show this page on a laptop or print it, then scan a code with the MediAUS scanner on your phone.</p>
+  <p>Turn the screen brightness up and hold the phone about 15 cm away.</p>
+  <span class="note">Made-up sample codes. They only work in this prototype.</span>
+  <div class="grid" id="grid"></div>
+</main>
+<script src="data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011'];
+  var G = ['0100111', '0110011', '0011011', '0100001', '0011101', '0111001', '0000101', '0010001', '0001001', '0010111'];
+  var R = ['1110010', '1100110', '1101100', '1000010', '1011100', '1001110', '1010000', '1000100', '1001000', '1110100'];
+  var PARITY = ['LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG', 'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL'];
+
+  function ean13Bits(code) {
+    var first = +code[0], par = PARITY[first], bits = '101';
+    for (var i = 1; i <= 6; i++) bits += (par[i - 1] === 'L' ? L : G)[+code[i]];
+    bits += '01010';
+    for (var j = 7; j <= 12; j++) bits += R[+code[j]];
+    return bits + '101';
+  }
+
+  function svg(code) {
+    var bits = ean13Bits(code), m = 3, quiet = 11, h = 110, guardExtra = 10;
+    var w = (bits.length + quiet * 2) * m, out = '';
+    var guard = function (i) { return i < 3 || (i >= 45 && i < 50) || i >= 92; };
+    for (var i = 0; i < bits.length; i++) {
+      if (bits[i] === '1') {
+        out += '<rect x="' + ((quiet + i) * m) + '" y="10" width="' + m + '" height="' + (h + (guard(i) ? guardExtra : 0)) + '" fill="#000"/>';
+      }
+    }
+    var ty = 10 + h + 20, f = 'font-family="Arial,sans-serif" font-size="20" fill="#000"';
+    out += '<text x="' + (quiet - 2) * m + '" y="' + ty + '" text-anchor="end" ' + f + '>' + code[0] + '</text>';
+    out += '<text x="' + (quiet + 3 + 21) * m + '" y="' + ty + '" text-anchor="middle" letter-spacing="4" ' + f + '>' + code.slice(1, 7) + '</text>';
+    out += '<text x="' + (quiet + 50 + 21) * m + '" y="' + ty + '" text-anchor="middle" letter-spacing="4" ' + f + '>' + code.slice(7) + '</text>';
+    return '<svg viewBox="0 0 ' + w + ' ' + (ty + 8) + '" role="img" aria-label="EAN-13 barcode ' + code + '">' + out + '</svg>';
+  }
+
+  var B = window.MEDIAUS_DATA.BARCODES, html = '';
+  Object.keys(B).forEach(function (code) {
+    html += '<div class="card"><h2>' + B[code].product + '</h2><span>' + B[code].pack + ' · ' + code + '</span>' + svg(code) + '</div>';
+  });
+  document.getElementById('grid').innerHTML = html;
+})();
+</script>
+</body>
+</html>
