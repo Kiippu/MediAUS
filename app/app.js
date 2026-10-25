@@ -22,7 +22,7 @@
     pill: { shape: '', color: '', imprint: '', scored: 'any' },
     photo: null,
     photoState: 'idle',
-    pop: 'adult',
+    pop: 'all',
     routeId: '',
     doseId: '',
     scan: { phase: 'idle', code: '', manual: false, torch: false }
@@ -220,16 +220,38 @@
     accepted:   { label: 'Accepted practice', bg: '#EFF8FF', fg: '#194185', bd: '#B2DDFF', dot: '#1570EF' },
     no:         { label: 'Do not use', bg: '#FEF3F2', fg: '#912018', bd: '#FDA29B', dot: '#D92D20' },
     unverified: { label: 'Not verified', bg: '#F2F4F7', fg: '#344054', bd: '#D0D5DD', dot: '#98A2B3' },
-    differ:     { label: 'Sources differ', bg: '#F4F3FF', fg: '#4A1FB8', bd: '#BDB4FE', dot: '#6941C6' }
+    differ:     { label: 'Sources differ', bg: '#F4F3FF', fg: '#4A1FB8', bd: '#BDB4FE', dot: '#6941C6' },
+    na:         { label: 'Not for this group', bg: '#FFFFFF', fg: '#5B6F75', bd: '#D0D5DD', dot: '#D0D5DD' }
   };
   function rPill(status, note) {
     var v = RSTATUS[status] || RSTATUS.unverified;
     return '<span style="flex:none;white-space:nowrap;font-size:11px;font-weight:700;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:2px 8px">' + v.label + (note ? ' · ' + esc(note) : '') + '</span>';
   }
+  // ---------- populations ----------
+  var GROUPS = { adult: 'Adults', child: 'Children', newborn: 'Newborns', all: 'All ages' };
+  function popsOf(x) { var p = x && x.pop; return !p ? ['all'] : (typeof p === 'string' ? [p] : p); }
+  function forPop(x, g) { var p = popsOf(x); return g === 'all' || p.indexOf('all') >= 0 || p.indexOf(g) >= 0; }
+  function formPops(f) { return f.pops || ['adult', 'child']; }
+  function curPop(f) { return formPops(f).indexOf(state.pop) >= 0 ? state.pop : 'all'; }
+  function popLabel(x) { return popsOf(x).map(function (p) { return GROUPS[p]; }).join(', '); }
+  function popSwitch(list) {
+    var opts = list.concat(['all']), cur = list.indexOf(state.pop) >= 0 ? state.pop : 'all';
+    return '<div role="group" aria-label="Patient group" style="display:flex;gap:4px;background:#EEF2F3;border-radius:12px;padding:4px">' + opts.map(function (g) {
+      var on = cur === g;
+      return '<button data-act="pop:' + g + '" aria-pressed="' + on + '" style="flex:1;min-height:40px;border:0;border-radius:10px;font-size:13px;font-weight:700;background:' + (on ? '#FFFFFF' : 'transparent') + ';color:' + (on ? '#142B33' : '#5B6F75') + ';box-shadow:' + (on ? '0 1px 3px rgba(0,0,0,.12)' : 'none') + '">' + (g === 'all' ? 'All' : GROUPS[g]) + '</button>';
+    }).join('') + '</div>';
+  }
+  function groupTag(label) {
+    return '<span style="flex:none;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#0E5E59;background:#E5F4F2;border-radius:5px;padding:2px 6px">' + esc(label) + '</span>';
+  }
+  function groupHead(label) {
+    return '<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#0E5E59;border-left:3px solid #1A8A7E;padding-left:8px;margin-top:4px">' + esc(label) + '</span>';
+  }
+
   function positionsHtml(list) {
     return '<div style="display:flex;flex-direction:column;gap:8px">' + list.map(function (p) {
       return '<div style="border-left:3px solid #BDB4FE;background:#FAFAFF;border-radius:0 10px 10px 0;padding:8px 12px;display:flex;flex-direction:column;gap:2px">' +
-        '<span style="font-size:11px;font-weight:800;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(p.src) + '</span>' +
+        '<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + (p.pop ? groupTag(popLabel(p)) : '') + '<span style="font-size:11px;font-weight:800;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(p.src) + '</span></span>' +
         '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div>';
     }).join('') + '</div>';
   }
@@ -396,28 +418,33 @@
   function tabDosage() {
     var f = form(), sets = f.dosing;
     var d = sets.filter(function (s) { return s.id === state.doseId; })[0] || sets[0];
-    var ai = d.head.indexOf('Adult'), ci = -1;
-    d.head.forEach(function (h, i) { if (h.indexOf('Child') === 0) ci = i; });
-    var split = ai > 0 && ci > 0;
+    var col = { adult: -1, child: -1, newborn: -1 }, mi = -1;
+    d.head.forEach(function (h, i) {
+      if (i === 0) return;
+      if (h.indexOf('Adult') === 0) col.adult = i;
+      else if (h.indexOf('Child') === 0) col.child = i;
+      else if (h.indexOf('Newborn') === 0) col.newborn = i;
+      else if (h === 'Max') mi = i;
+    });
+    var groups = ['adult', 'child', 'newborn'].filter(function (g) { return col[g] > 0; });
+    var split = groups.length > 1;
+    var g = split && groups.indexOf(state.pop) >= 0 ? state.pop : 'all';
     var cols = d.head.map(function (h, i) { return i; });
-    var mi = d.head.indexOf('Max');
-    if (split) cols = cols.filter(function (i) { return i !== (state.pop === 'adult' ? ci : ai) && !(state.pop === 'child' && i === mi); });
-    var popToggle = split ? '<div style="display:flex;gap:4px;background:#EEF2F3;border-radius:12px;padding:4px">' + [['adult', 'Adult'], ['child', 'Child (by weight)']].map(function (o) {
-      var on = state.pop === o[0];
-      return '<button data-act="pop:' + o[0] + '" aria-pressed="' + on + '" style="flex:1;min-height:40px;border:0;border-radius:10px;font-size:14px;font-weight:700;background:' + (on ? '#FFFFFF' : 'transparent') + ';color:' + (on ? '#142B33' : '#5B6F75') + ';box-shadow:' + (on ? '0 1px 3px rgba(0,0,0,.12)' : 'none') + '">' + o[1] + '</button>';
-    }).join('') + '</div>' : '';
+    if (g !== 'all') cols = [0, col[g]].concat(g === 'adult' && mi > 0 ? [mi] : []);
+    var narrow = cols.length <= 3;
     var head = '<tr>' + cols.map(function (i) { return d.head[i]; }).map(function (h, i) { return '<th scope="col" style="text-align:left;padding:10px 12px;background:#F3F6F6;font-size:12px;font-weight:700;color:#24414A;border-bottom:1.5px solid #E1E8E9;' + (i === 0 ? 'position:sticky;left:0;z-index:1;' : '') + '">' + esc(h) + '</th>'; }).join('') + '</tr>';
     var body = d.rows.map(function (r) {
       return '<tr>' + cols.map(function (i) { return r[i]; }).map(function (c, i) {
         var tag = i === 0 ? 'th scope="row"' : 'td';
-        return '<' + tag + ' style="text-align:left;vertical-align:top;padding:10px 12px;font-size:13px;line-height:1.4;border-bottom:1px solid #EEF2F3;' + (i === 0 ? 'position:sticky;left:0;background:#FFFFFF;font-weight:700;color:#142B33;min-width:104px;' : 'min-width:' + (split ? '90' : '150') + 'px;color:#24414A;') + '">' + esc(c) + '</' + tag.split(' ')[0] + '>';
+        return '<' + tag + ' style="text-align:left;vertical-align:top;padding:10px 12px;font-size:13px;line-height:1.4;border-bottom:1px solid #EEF2F3;' + (i === 0 ? 'position:sticky;left:0;background:#FFFFFF;font-weight:700;color:#142B33;min-width:104px;' : 'min-width:' + (narrow ? '90' : '150') + 'px;color:#24414A;') + '">' + esc(c) + '</' + tag.split(' ')[0] + '>';
       }).join('') + '</tr>';
     }).join('');
     var notes = (d.notes || []).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('');
-    return '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><h2 style="' + H2 + '">Dosage · ' + esc(f.label) + '</h2>' + (split ? '' : '<span style="font-size:11px;color:#5B6F75">Scroll table →</span>') + '</div>' +
+    return '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><h2 style="' + H2 + '">Dosage · ' + esc(f.label) + '</h2>' + (narrow ? '' : '<span style="font-size:11px;color:#5B6F75">Scroll table →</span>') + '</div>' +
       (sets.length > 1 ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Route</span>' + chipRow(sets, d.id, 'dsel') + '</div>' : '<span style="font-size:13px;color:#5B6F75">Route: ' + esc(d.label) + '</span>') +
-      popToggle +
-      '<div style="overflow-x:auto;border:1.5px solid #E1E8E9;border-radius:12px"><table style="border-collapse:separate;border-spacing:0;width:100%;min-width:' + (split ? '0' : '560px') + '"><caption class="sr">' + esc(d.label) + ' doses for ' + esc(f.label) + '</caption><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
+      (split ? popSwitch(groups) : '') +
+      (split ? '<span style="font-size:14px;font-weight:700;color:#142B33">Showing: ' + (g === 'all' ? 'all groups' : GROUPS[g]) + '</span>' : '') +
+      '<div style="overflow-x:auto;border:1.5px solid #E1E8E9;border-radius:12px"><table style="border-collapse:separate;border-spacing:0;width:100%;min-width:' + (narrow ? '0' : '560px') + '"><caption class="sr">' + esc(d.label) + ' doses for ' + esc(f.label) + '</caption><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
       (d.src ? srcLine(d.src) : '') +
       (notes ? '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + notes + '</ul>' : '') +
       '<button data-act="tab:admin" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1.5px solid #1A6F67;background:#FFFFFF;color:#1A6F67;border-radius:14px;padding:0 16px;min-height:50px;font-size:14px;font-weight:700">How to give this form' + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A6F67" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
@@ -433,35 +460,94 @@
     }).join('') + '</div>';
   }
 
+  var STEPS = [['reconstitute', 'Reconstitute'], ['dilute', 'Dilute'], ['give', 'Give']];
+  function fmtMin(m) { return m % 60 === 0 ? (m / 60) + (m === 60 ? ' hour' : ' hours') : m + ' minutes'; }
+  function pumpText(p) {
+    var lo = p.min[0], hi = p.min[1], fast = Math.round(p.ml / (lo / 60)), slow = Math.round(p.ml / (hi / 60));
+    return {
+      text: p.ml + ' mL over ' + fmtMin(lo) + ' to ' + fmtMin(hi) + ' = ' + slow + ' to ' + fast + ' mL/h.',
+      work: 'Worked out: ' + p.ml + ' mL ÷ ' + (hi / 60) + ' h = ' + slow + ' mL/h; ' + p.ml + ' mL ÷ ' + (Math.round(lo / 60 * 100) / 100) + ' h = ' + fast + ' mL/h.'
+    };
+  }
+  function prepEntryHtml(e, showTag) {
+    var tag = showTag ? groupTag(popLabel(e)) : '';
+    var src = e.src ? '<span style="font-size:11px;color:#5B6F75">Source: ' + esc(e.src) + '</span>' : '';
+    var wrap = function (inner, style) { return '<div style="display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;' + style + '">' + inner + '</div>'; };
+    if (e.missing) return wrap('<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + tag + '<span style="font-size:11px;font-weight:800;color:#344054;text-transform:uppercase;letter-spacing:.4px">Not found yet</span></span><span style="font-size:13px;line-height:1.45;color:#344054">' + esc(e.missing) + '</span>', 'background:#F2F4F7;border:1px dashed #98A2B3');
+    if (e.none) return wrap((tag ? '<span style="display:flex">' + tag + '</span>' : '') + '<span style="font-size:13px;line-height:1.45;color:#5B6F75">' + esc(e.none) + '</span>' + src, 'background:#F7F9F9');
+    if (e.pump) {
+      var p = pumpText(e.pump);
+      return wrap('<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + tag + '<span style="font-size:11px;font-weight:800;color:#0E5E59;text-transform:uppercase;letter-spacing:.4px">Pump rate</span></span><span style="font-size:14px;font-weight:700;color:#142B33">' + esc(p.text) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(p.work) + ' Uses only the volume and times the source states.</span>' + src, 'background:#E5F4F2');
+    }
+    return wrap((tag ? '<span style="display:flex">' + tag + '</span>' : '') + '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(e.text) + '</span>' + src, 'background:#F7F9F9');
+  }
+  function prepHtml(prep, g, gl) {
+    var steps = STEPS.map(function (st, i) {
+      var list = (prep[st[0]] || []).filter(function (e) { return forPop(e, g); });
+      var inner = list.length ? list.map(function (e) { return prepEntryHtml(e, true); }).join('') :
+        prepEntryHtml({ missing: g === 'all' ? 'No source read covers this step.' : 'No source read covers this step for ' + gl.toLowerCase() + '.' }, false);
+      return '<div style="display:flex;gap:10px"><span aria-hidden="true" style="flex:none;width:24px;height:24px;border-radius:12px;background:#1A6F67;color:#FFFFFF;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">' + (i + 1) + '</span>' +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:14px;font-weight:700;color:#142B33">' + (i + 1) + '. ' + st[1] + '</span>' + inner + '</div></div>';
+    }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:10px;border:1.5px solid #E1E8E9;border-radius:12px;padding:12px"><span style="font-size:12px;font-weight:700;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">Preparation</span>' + steps + '</div>';
+  }
+  function itemsByGroupHtml(items, g, gl, pops, rp) {
+    var order = (g === 'all' ? ['all'].concat(pops) : ['all', g]).filter(function (k) { return !(rp && rp[k] && rp[k].status === 'na'); });
+    var out = order.map(function (k) {
+      var list = (items || []).filter(function (a) { return popsOf(a).indexOf(k) >= 0; });
+      if (!list.length) return k === 'all' ? '' : groupHead(GROUPS[k] + ' only') + '<span style="font-size:13px;color:#5B6F75;padding:6px 0">No ' + (k === 'adult' ? 'adult' : k === 'child' ? 'child' : 'newborn') + '-specific guidance found in the sources read.</span>';
+      return groupHead(k === 'all' ? 'All ages' : GROUPS[k] + ' only') + adminItemsHtml(list);
+    }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:2px">' + out + '</div>';
+  }
+
   function tabAdmin() {
-    var f = form();
+    var f = form(), pops = formPops(f), g = curPop(f), gl = GROUPS[g];
     var sel = f.routes.filter(function (r) { return r.id === state.routeId; })[0] || f.routes[0];
     var cards = f.routes.map(function (r) {
       var open = r.id === sel.id;
-      var v = RSTATUS[r.status];
+      var gp = r.pops && g !== 'all' ? (r.pops[g] || { status: 'unverified', note: 'Not found in the sources read.' }) : null;
+      var st = gp ? gp.status : r.status;
+      var v = RSTATUS[st] || RSTATUS.unverified;
+      var mini = g === 'all' && r.pops ? '<span style="display:flex;flex-wrap:wrap;gap:4px">' + pops.map(function (p) {
+        var x = r.pops[p] || { status: 'unverified' }, vv = RSTATUS[x.status] || RSTATUS.unverified;
+        return '<span style="font-size:10px;font-weight:700;color:' + vv.fg + ';background:' + vv.bg + ';border:1px solid ' + vv.bd + ';border-radius:5px;padding:1px 6px">' + GROUPS[p] + ': ' + vv.label + '</span>';
+      }).join('') + '</span>' : '<span>' + rPill(st, gp ? '' : r.statusNote) + '</span>';
       var head = '<button data-act="rsel:' + r.id + '" aria-expanded="' + open + '" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:12px 14px;min-height:56px">' +
         '<span aria-hidden="true" style="flex:none;width:10px;height:10px;border-radius:5px;background:' + v.dot + '"></span>' +
-        '<span style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:700;color:#142B33">' + esc(r.label) + '</span><span>' + rPill(r.status, r.statusNote) + '</span></span>' +
+        '<span style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:700;color:#142B33">' + esc(r.label) + '</span>' + mini + '</span>' +
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B6F75" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;' + (open ? 'transform:rotate(180deg)' : '') + '"><path d="M6 9l6 6 6-6"/></svg></button>';
       var body = '';
       if (open) {
+        var who = r.pops ? '<div style="display:flex;flex-direction:column;gap:6px">' + (g === 'all' ? pops : [g]).map(function (p) {
+          var x = r.pops[p] || { status: 'unverified', note: 'Not found in the sources read.' };
+          return '<div style="display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;font-weight:800;color:#142B33">' + GROUPS[p] + '</span>' + rPill(x.status) + '</span>' + (x.note ? '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(x.note) + '</span>' : '') + '</div>';
+        }).join('') + '</div>' : '';
+        var na = gp && gp.status === 'na';
+        var pos = (r.positions || []).filter(function (p) { return forPop(p, g); });
         var brands = r.brands ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:700;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">By brand</span>' + r.brands.map(function (b) {
           return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:14px;font-weight:700">' + esc(b.brand) + '</span><span style="font-size:11px;color:#5B6F75">' + esc(b.note) + '</span></span>' + rPill(b.status) + '</div>';
         }).join('') + '</div>' : '';
         body = '<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:12px">' +
           (r.summary ? '<span style="font-size:13px;line-height:1.5;color:#24414A">' + esc(r.summary) + '</span>' : '') +
-          (r.positions ? positionsHtml(r.positions) : '') + brands +
-          (r.items ? adminItemsHtml(r.items) : '') +
+          who +
+          (na ? '' :
+            (r.prep ? prepHtml(r.prep, g, gl) : '') +
+            (pos.length ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:700;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(r.positionsTitle || 'What each source says') + '</span>' + positionsHtml(pos) + '</div>' : '') +
+            brands +
+            (r.items ? itemsByGroupHtml(r.items, g, gl, pops, r.pops) : '')) +
           '<span style="font-size:12px;color:#5B6F75;line-height:1.5">' + (r.status === 'unverified' ? (r.src === '—' ? 'No document found yet.' : 'To check: ' + esc(r.src.replace(/^Needs /, ''))) : 'Sources: ' + esc(r.src)) + '</span></div>';
       }
       return '<div style="' + CARD + ';border-color:' + (open ? '#9CC5C0' : '#E1E8E9') + ';overflow:hidden">' + head + body + '</div>';
     }).join('');
-    var legend = ['licensed', 'accepted', 'differ', 'unverified', 'no'].map(function (k) { return rPill(k); }).join('');
+    var legend = ['licensed', 'accepted', 'differ', 'unverified', 'no', 'na'].map(function (k) { return rPill(k); }).join('');
     return '<h2 style="' + H2 + '">How to give · ' + esc(f.label) + '</h2>' +
-      '<span style="font-size:13px;line-height:1.5;color:#5B6F75">Each route is checked against the Product Information and Australian hospital guidelines. Tap a route for details.</span>' +
+      popSwitch(pops) +
+      '<span style="font-size:15px;font-weight:800;color:#142B33">Showing: ' + (g === 'all' ? 'all groups (' + pops.map(function (p) { return GROUPS[p].toLowerCase(); }).join(', ') + ')' : gl) + '</span>' +
+      '<span style="font-size:13px;line-height:1.5;color:#5B6F75">Each route is checked against the Product Information and Australian guidelines, for each patient group. Tap a route for details.</span>' +
       cards +
       '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Status labels</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + legend + '</div>' +
-      '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Licensed: in the PI or on the ARTG. Accepted practice: in an Australian hospital guideline. Sources differ: each source’s position is shown. Not verified: no document found yet.</span></div>';
+      '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Licensed: in the PI or on the ARTG. Accepted practice: in an Australian guideline. Sources differ: each source’s position is shown. Not verified: no document found yet. Not for this group: another form is used.</span></div>';
   }
 
   function tabInteractions() {
