@@ -1,7 +1,8 @@
   // ---------- preview harness (artifact only, not for app.js) ----------
   state.screen = PAGE;
   state.area = '';
-  state.adding = false;
+  state.addq = '';
+  state.addIdx = 0;
   var mode = 'new', toastMsg = '', toastTimer = null;
   var app = document.getElementById('app');
   var NAMES = { home: 'Home', search: 'Search', check: 'Interactions', profile: 'More', pill: 'Pill identifier', scan: 'Scan barcode' };
@@ -17,6 +18,7 @@
     app.innerHTML = '<div class="scroll" id="scroll">' + view() + '</div>' + navHtml() +
       '<div id="toast" role="status"' + (toastMsg ? '' : ' hidden') + ' style="position:absolute;left:16px;right:16px;bottom:84px;background:#0C2A30;color:#FFFFFF;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px rgba(12,42,48,.25)">' + esc(toastMsg) + '</div>';
     var q = document.getElementById('q'); if (q) q.value = state.query;
+    var aq = document.getElementById('addq'); if (aq) { aq.value = state.addq; if (state.addq) updateAddList(); }
     var s2 = document.getElementById('scroll'); if (s2 && top) s2.scrollTop = top;
     app.querySelectorAll('.tabs [aria-pressed="true"]').forEach(function (el) {
       var row = el.parentNode;
@@ -46,11 +48,22 @@
       case 'qclear': state.query = ''; render(true); var q = document.getElementById('q'); if (q) q.focus(); break;
       case 'pick': state.query = arg; var q2 = document.getElementById('q'); if (q2) q2.value = arg; liveUpdate(); break;
       case 'remove': state.selected = state.selected.filter(function (x) { return x !== arg; }); render(true); break;
-      case 'add': state.selected = state.selected.concat([arg]); render(true); break;
-      case 'adding': state.adding = !state.adding; render(true); break;
+      case 'add': addAndFocus(arg); break;
     }
   });
-  app.addEventListener('input', function (e) { if (e.target.id === 'q') { state.query = e.target.value; liveUpdate(); } });
+  function addAndFocus(id) {
+    checkAdd(id); render(true);
+    var a = document.getElementById('addq'); if (a) a.focus({ preventScroll: true });
+  }
+  app.addEventListener('input', function (e) {
+    if (e.target.id === 'q') { state.query = e.target.value; liveUpdate(); }
+    else if (e.target.id === 'addq') checkAddInput(e.target.value);
+  });
+  app.addEventListener('keydown', function (e) {
+    if (e.target.id !== 'addq') return;
+    var id = checkAddKey(e);
+    if (id) addAndFocus(id);
+  });
 
   function setMode(m) {
     mode = m;

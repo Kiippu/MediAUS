@@ -41,7 +41,6 @@
   }
 
   var THUMB = 'flex:none;width:56px;height:56px;border-radius:14px;background:#E5F4F2;display:flex;align-items:center;justify-content:center';
-  var ROW_LINE = 'border-top:1px solid #EEF2F3';
   var MINI = 'font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px';
 
   function recentRow(id, fid) {
@@ -79,32 +78,6 @@
         '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">' + tiles + '</div></div></div>';
   }
 
-  // One form inside a result card. With a route filter, shows that route's status per group.
-  function formRow(m, f, first) {
-    var head = '<span style="font-size:14px;font-weight:600">' + esc(f.label) + ' <span style="font-weight:400;color:#5B6F75">' + esc(f.strengths) + '</span></span>';
-    var line = 'display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:transparent;padding:10px 14px;min-height:56px;' + (first ? '' : ROW_LINE);
-    var thumb = '<span style="flex:none;width:40px;display:flex;justify-content:center">' + drawPill(f.appearance[0], 34) + '</span>';
-    if (state.route === 'All') {
-      var cats = formRouteCats(f);
-      var rt = Object.keys(cats).map(function (c) { return c + (cats[c].verified ? '' : ' (not verified)'); }).join(' · ');
-      var grp = formPops(f).map(function (g) { return groupTag(GROUPS[g]); }).join('');
-      return '<button data-act="med:' + m.id + ':' + f.id + '" style="' + line + '">' + thumb +
-        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">' + head +
-        '<span style="font-size:12px;color:#24414A;line-height:1.4">' + esc(rt) + '</span><span style="display:flex;flex-wrap:wrap;gap:4px">' + grp + '</span></span>' + ICON.chevron + '</button>';
-    }
-    var r = routeForCat(f, state.route);
-    if (!r) return '';
-    var who = r.pops ? '<span style="display:flex;flex-wrap:wrap;gap:4px 10px">' + formPops(f).map(function (g) {
-      var p = r.pops[g]; if (!p) return '';
-      var v = RSTATUS[p.status] || RSTATUS.unverified;
-      return '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#24414A"><span aria-hidden="true" style="width:8px;height:8px;border-radius:4px;background:' + v.dot + '"></span>' + GROUPS[g] + ': ' + v.label + '</span>';
-    }).join('') + '</span>' : '';
-    var brand = r.brands ? '<span style="' + MINI + ';color:#4A1FB8;background:#F4F3FF;border:1px solid #BDB4FE">Differs by brand</span>' : '';
-    return '<button data-act="medr:' + m.id + ':' + f.id + ':' + r.id + '" style="' + line + '">' + thumb +
-      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">' + head +
-      '<span style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">' + rPill(r.status, r.statusNote) + brand + '</span>' + who + '</span>' + ICON.chevron + '</button>';
-  }
-
   function resultCard(it, q) {
     if (!it.med) {
       return '<div style="' + CARD + ';border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:14px;background:#FAFBFB">' +
@@ -113,20 +86,16 @@
         '<span style="font-size:13px;color:#5B6F75">' + esc(it.cls) + ' · ' + esc(it.sched) + '</span>' +
         '<span style="font-size:12px;color:#5B6F75">Routes listed: ' + esc(it.routes.join(', ')) + '. Full entry not built yet.</span></span></div>';
     }
-    var m = it.med, b = brandHit(it, q);
-    var rows = m.forms.map(function (f, i) { return formRow(m, f, i === 0); }).filter(Boolean);
-    rows = rows.map(function (h, i) { return i === 0 ? h.replace(ROW_LINE, '') : h; });
-    var nots = state.route === 'All' ? [] : m.forms.filter(function (f) {
-      return !routeForCat(f, state.route) && f.routes.some(function (r) { return r.cat === state.route && r.status === 'no'; });
-    });
-    var notLine = nots.length ? '<div style="' + ROW_LINE + ';padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:#912018"><span style="font-weight:700">Not for this route:</span>' + nots.map(function (f) { return esc(f.label); }).join(', ') + rPill('no') + '</div>' : '';
-    return '<div style="' + CARD + ';border-radius:16px;overflow:hidden">' +
-      '<button data-act="med:' + m.id + ':' + m.forms[0].id + '" style="width:100%;text-align:left;display:flex;align-items:center;gap:14px;border:0;background:transparent;padding:14px">' +
-        '<span style="' + THUMB + '">' + drawPill(m.forms[0].appearance[0], 40) + '</span>' +
-        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">' +
-          '<span style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;font-size:15px;font-weight:700">' + esc(m.name) + '<span style="' + MINI + ';color:#0E5E59;background:#D3EEEA">' + esc(it.sched) + '</span>' + (b ? '<span style="' + MINI + ';color:#5C3D00;background:#FFF4D6">Brand: ' + esc(b) + '</span>' : '') + '</span>' +
-          '<span style="font-size:13px;color:#5B6F75">' + esc(m.cls) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(m.brands) + '</span></span>' + ICON.chevron + '</button>' +
-      '<div style="' + ROW_LINE + ';display:flex;flex-direction:column">' + rows.join('') + '</div>' + notLine + '</div>';
+    // Route filter on: open the first form given that way, on the Administration tab.
+    var m = it.med, b = brandHit(it, q), act = 'med:' + m.id + ':' + m.forms[0].id;
+    if (state.route !== 'All') {
+      for (var i = 0; i < m.forms.length; i++) { var r = routeForCat(m.forms[i], state.route); if (r) { act = 'medr:' + m.id + ':' + m.forms[i].id + ':' + r.id; break; } }
+    }
+    return '<button data-act="' + act + '" style="text-align:left;display:flex;align-items:center;gap:14px;' + CARD + ';border-radius:16px;padding:14px">' +
+      '<span style="' + THUMB + '">' + drawPill(m.forms[0].appearance[0], 40) + '</span>' +
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">' +
+        '<span style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;font-size:15px;font-weight:700">' + esc(m.name) + '<span style="' + MINI + ';color:#0E5E59;background:#D3EEEA">' + esc(it.sched) + '</span>' + (b ? '<span style="' + MINI + ';color:#5C3D00;background:#FFF4D6">Brand: ' + esc(b) + '</span>' : '') + '</span>' +
+        '<span style="font-size:13px;color:#5B6F75">' + esc(m.cls) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(m.brands) + '</span></span>' + ICON.chevron + '</button>';
   }
 
   function searchResults2() {

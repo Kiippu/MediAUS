@@ -13,10 +13,11 @@ core = (cut("  var D = window.MEDIAUS_DATA;", "  // ---------- splash ----------
 new = (root / 'design' / (page + '.js')).read_text(encoding='utf-8')
 harness = (root / 'design/harness.js').read_text(encoding='utf-8')
 sha = subprocess.check_output(['git', '-C', str(root), 'rev-parse', '--short', 'HEAD'], text=True).strip()
+branch = subprocess.check_output(['git', '-C', str(root), 'rev-parse', '--abbrev-ref', 'HEAD'], text=True).strip()
 title = {'search': 'MediAUS Search Redesign', 'check': 'MediAUS Interactions Redesign'}[page]
 label = {'search': 'Search', 'check': 'Interactions'}[page]
 tpl = (root / 'design/shell.html').read_text(encoding='utf-8')
-html = (tpl.replace('{{TITLE}}', title).replace('{{LABEL}}', label).replace('{{SHA}}', sha)
+html = (tpl.replace('{{TITLE}}', title).replace('{{LABEL}}', label).replace('{{SHA}}', sha).replace('{{BRANCH}}', branch)
         .replace('{{STYLES}}', (root / 'app/styles.css').read_text(encoding='utf-8'))
         .replace('{{DATA}}', (root / 'app/data.js').read_text(encoding='utf-8'))
         .replace('{{APP}}', "(function () {\n  'use strict';\n  var PAGE = '" + page + "';\n" + core + new + harness + "})();"))
