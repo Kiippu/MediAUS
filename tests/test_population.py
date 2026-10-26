@@ -30,7 +30,9 @@ async def main():
             await pg.click('text=Get Started')
             await pg.click('nav >> text=Search')
             await pg.fill('#q', q)
-            await pg.click(f'[data-act="{act}"]')
+            _, med, frm = act.split(':')
+            await pg.click(f'[data-act^="med:{med}:"]')
+            await pg.click(f'[data-act="form:{frm}"]')
             await pg.click('[role=tab]:has-text("Administration")')
 
         # amoxicillin powder, IV infusion

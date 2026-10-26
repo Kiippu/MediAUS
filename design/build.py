@@ -1,25 +1,28 @@
-"""Bundle a redesigned MediAUS view into one self-contained artifact page."""
+"""Bundle the whole app (app/) into one self-contained HTML page for an artifact preview.
+
+Usage: python design/build.py out.html
+"""
 import sys, pathlib, subprocess
 root = pathlib.Path(__file__).resolve().parent.parent
-page, out = sys.argv[1], pathlib.Path(sys.argv[2])
-app = (root / 'app/app.js').read_text(encoding='utf-8')
-def cut(a, b):
-    i = app.index(a); j = app.index(b, i)
-    return app[i:j]
-core = (cut("  var D = window.MEDIAUS_DATA;", "  // ---------- splash ----------")
-        + cut("  // ---------- route status labels ----------", "  // ---------- medication ----------")
-        + cut("  // ---------- interaction checker ----------", "  // ---------- pill identifier ----------")
-        + cut("  function navHtml() {", "  // ---------- render & navigation ----------"))
-new = (root / 'design' / (page + '.js')).read_text(encoding='utf-8')
-harness = (root / 'design/harness.js').read_text(encoding='utf-8')
-sha = subprocess.check_output(['git', '-C', str(root), 'rev-parse', '--short', 'HEAD'], text=True).strip()
-branch = subprocess.check_output(['git', '-C', str(root), 'rev-parse', '--abbrev-ref', 'HEAD'], text=True).strip()
-title = {'search': 'MediAUS Search Redesign', 'check': 'MediAUS Interactions Redesign'}[page]
-label = {'search': 'Search', 'check': 'Interactions'}[page]
-tpl = (root / 'design/shell.html').read_text(encoding='utf-8')
-html = (tpl.replace('{{TITLE}}', title).replace('{{LABEL}}', label).replace('{{SHA}}', sha).replace('{{BRANCH}}', branch)
-        .replace('{{STYLES}}', (root / 'app/styles.css').read_text(encoding='utf-8'))
-        .replace('{{DATA}}', (root / 'app/data.js').read_text(encoding='utf-8'))
-        .replace('{{APP}}', "(function () {\n  'use strict';\n  var PAGE = '" + page + "';\n" + core + new + harness + "})();"))
-out.write_text(html, encoding='utf-8')
-print(out, len(html))
+app = root / 'app'
+git = lambda *a: subprocess.check_output(['git', '-C', str(root), *a], text=True).strip()
+ref = git('rev-parse', '--abbrev-ref', 'HEAD') + ' @ ' + git('rev-parse', '--short', 'HEAD')
+read = lambda n: (app / n).read_text(encoding='utf-8')
+html = f'''<title>MediAUS App Preview</title>
+<meta name="description" content="MediAUS prototype, built from {ref}.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<meta name="theme-color" content="#0C2A30">
+<style>
+{read('styles.css')}
+</style>
+<main id="app" class="app" aria-live="polite"></main>
+<script>
+{read('data.js')}
+</script>
+<script>
+{read('app.js')}
+</script>
+'''
+out = pathlib.Path(sys.argv[1]); out.write_text(html, encoding='utf-8')
+print(out, len(html), ref)

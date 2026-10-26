@@ -39,7 +39,7 @@ async def main():
         # digoxin IM differ
         await pg.click('[data-act="back"]')
         await pg.goto('http://localhost:8090/', wait_until='networkidle'); await pg.click('text=Get Started')
-        await pg.click('nav >> text=Search'); await pg.fill('#q', 'dig'); await pg.click('[data-act="med:digoxin:inj"]')
+        await pg.click('nav >> text=Search'); await pg.fill('#q', 'dig'); await pg.click('[data-act^="med:digoxin:"]'); await pg.click('[data-act="form:inj"]')
         await pg.click('[role=tab]:has-text("Administration")'); await top(330); await shot('12-dig-iv')
         await pg.click('[data-act="rsel:im"]'); await top(330); await shot('13-dig-im')
         await pg.click('[data-act="form:tab"]'); await top(560); await shot('14-dig-tab-overview')
@@ -49,6 +49,17 @@ async def main():
         await pg.click('[role=tab]:has-text("Administration")'); await pg.click('[data-act="rsel:open"]'); await top(300); await shot('16-amox-open')
         # pill identifier + scanner smoke
         await pg.click('[data-act="back"]'); await pg.click('text=Pill Identifier'); await pg.fill('#imp', 'u3a'); await top(600); await shot('17-pill-u3a')
+        # checker: type-to-add picker
+        await pg.click('[data-act="back"]'); await pg.click('nav >> text=Interactions'); await shot('18-check')
+        await pg.fill('#addq', 'cord'); await pg.keyboard.press('ArrowDown')
+        assert await pg.locator('#addlist >> text=In your list').count() == 1, 'added meds show as in list'
+        await pg.fill('#addq', 'meth'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(150)
+        assert await pg.locator('[data-act="remove:methotrexate"]').count() == 1, 'enter adds top match'
+        assert await pg.evaluate("document.activeElement.id") == 'addq', 'focus stays in picker'
+        await shot('19-check-added')
+        # every screen but home uses the shared header
+        await pg.click('nav >> text=More'); await shot('20-profile')
+        assert await pg.locator('h1:has-text("Profile")').count() == 1
         print('errors:', errs)
         await b.close()
 

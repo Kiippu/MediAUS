@@ -16,6 +16,9 @@
     notif: true,
     query: '',
     route: 'All',
+    area: '',
+    addq: '',
+    addIdx: 0,
     pro: false,
     demo: false,
     pillMode: 'describe',
@@ -57,7 +60,6 @@
   ];
 
   var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
-  var CATEGORIES = ['Antiarrhythmics', 'Antibiotics', 'Pain relief', 'Heart & blood pressure', 'Diabetes', 'Respiratory'];
   var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', 'AI photo pill identifier', 'Barcode scanner for medicine packs', 'Ad-free experience'];
   var TABS = [['overview', 'Overview'], ['dosage', 'Dosage'], ['admin', 'Administration'], ['interactions', 'Interactions'], ['pregnancy', 'Pregnancy'], ['more', 'More']];
   var SHAPES = ['round', 'oval', 'oblong', 'capsule'];
@@ -140,10 +142,17 @@
     return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 80 50" aria-hidden="true">' + body + '</svg>';
   }
 
-  function backBar(title) {
-    return '<div style="display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:8px 8px 0">' +
-      '<button data-act="back" aria-label="Back" style="width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.back + '</button>' +
-      '<span style="text-align:center;font-size:15px;font-weight:600">' + title + '</span><span></span></div>';
+  var PROFILE_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  // Header for every screen but Home and the splash.
+  // opts: back (arrow on the left), profile (default true), dark, tag (default h1).
+  function pageHeader(title, opts) {
+    opts = opts || {};
+    var fg = opts.dark ? '#FFFFFF' : '#142B33', tag = opts.tag || 'h1';
+    var back = opts.back ? '<button data-act="back" aria-label="Back" style="flex:none;width:44px;height:44px;margin-left:-10px;border:0;border-radius:22px;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.back.replace('#142B33', fg) + '</button>' : '';
+    var prof = opts.profile === false ? '' : '<button data-act="go:profile" aria-label="Profile and settings" style="flex:none;width:44px;height:44px;border-radius:22px;border:1.5px solid #D9E3E4;background:#FFFFFF;display:flex;align-items:center;justify-content:center">' + PROFILE_SVG + '</button>';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px">' +
+      '<div style="display:flex;align-items:center;gap:8px;min-width:0">' + back + '<span style="flex:none;display:flex">' + logo(28) + '</span>' +
+      '<' + tag + ' style="margin:0;font-size:21px;font-weight:800;letter-spacing:-0.4px;color:' + fg + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + title + '</' + tag + '></div>' + prof + '</div>';
   }
 
   function sampleBadge() {
@@ -199,7 +208,7 @@
     return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
       '<div style="display:flex;align-items:center;justify-content:space-between">' +
         '<div style="display:flex;align-items:center;gap:8px">' + logo(28) + '<span style="font-size:21px;font-weight:800;letter-spacing:-0.4px">Medi<span style="color:#1A8A7E">AUS</span></span></div>' +
-        '<button data-act="go:profile" aria-label="Profile and settings" style="width:44px;height:44px;border-radius:22px;border:1.5px solid #D9E3E4;background:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></button>' +
+        '<button data-act="go:profile" aria-label="Profile and settings" style="width:44px;height:44px;border-radius:22px;border:1.5px solid #D9E3E4;background:#FFFFFF;display:flex;align-items:center;justify-content:center">' + PROFILE_SVG + '</button>' +
       '</div>' +
       '<button data-act="go:search" style="text-align:left;display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;background:#FFFFFF;border-radius:14px;padding:0 14px;min-height:50px;color:#5B6F75;font-size:15px">' + ICON.search('#5B6F75') + 'Search by active ingredient…</button>' +
       '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:18px;display:flex;align-items:center;gap:12px">' +
@@ -271,74 +280,134 @@
   }
 
   // ---------- search ----------
-  function searchItems() {
-    var q = state.query.trim().toLowerCase();
-    var items = [];
-    D.ORDER.forEach(function (id) {
-      var m = D.MEDS[id];
-      var routes = [];
+  // #live holds chips + results so the input keeps focus while typing.
+
+  // Draft browse groups. SME to confirm.
+  var AREAS = [
+    { id: 'heart', label: 'Heart & circulation', match: ['antiarrhythmic', 'cardiac glycoside', 'antianginal', 'cholesterol'],
+      icon: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>' },
+    { id: 'infection', label: 'Infections', match: ['antibiotic'],
+      icon: '<circle cx="12" cy="12" r="5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>' },
+    { id: 'pain', label: 'Pain & fever', match: ['analgesic'],
+      icon: '<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/><path d="M12 11v6"/>' },
+    { id: 'diabetes', label: 'Diabetes', match: ['diabetes'],
+      icon: '<path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z"/>' },
+    { id: 'breathing', label: 'Breathing', match: ['bronchodilator'],
+      icon: '<path d="M12 4v7M12 11l-3 2M12 11l3 2"/><path d="M9 8c-3 0-5 5-5 9.5 0 1.8 1.8 2.6 3.4 1.8L9 18.5z"/><path d="M15 8c3 0 5 5 5 9.5 0 1.8-1.8 2.6-3.4 1.8L15 18.5z"/>' }
+  ];
+  function areaOf(id) { return AREAS.filter(function (a) { return a.id === id; })[0]; }
+  function inArea(it, a) { var c = it.cls.toLowerCase(); return a.match.some(function (k) { return c.indexOf(k) >= 0; }); }
+  function areaIcon(a, s) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + a.icon + '</svg>'; }
+
+  function allItems() {
+    var items = D.ORDER.map(function (id) {
+      var m = D.MEDS[id], routes = [];
       m.forms.forEach(function (f) { Object.keys(formRouteCats(f)).forEach(function (c) { if (routes.indexOf(c) < 0) routes.push(c); }); });
-      items.push({ name: m.name, sub: m.cls + ' · ' + m.schedule.split(' ')[0], routes: routes, med: m });
+      return { name: m.name, cls: m.cls, sched: m.schedule.split(' ')[0], routes: routes, med: m };
     });
-    D.OTHERS.forEach(function (o) { items.push({ name: o.name, sub: o.cls + ' · ' + o.schedule, routes: o.routes }); });
-    return items.filter(function (it) {
-      var nameOk = !q || it.name.toLowerCase().indexOf(q) >= 0 || (it.med && it.med.brands.toLowerCase().indexOf(q) >= 0);
-      var routeOk = state.route === 'All' || it.routes.indexOf(state.route) >= 0;
-      return nameOk && routeOk;
+    return items.concat(D.OTHERS.map(function (o) { return { name: o.name, cls: o.cls, sched: o.schedule, routes: o.routes }; }));
+  }
+  // Brand that matched the query, when the name didn't.
+  function brandHit(it, q) {
+    if (!it.med || !q || it.name.toLowerCase().indexOf(q) >= 0) return '';
+    return it.med.brands.split(',').map(function (b) { return b.trim(); }).filter(function (b) { return b.toLowerCase().indexOf(q) >= 0; })[0] || '';
+  }
+  function findItems(route) {
+    var q = state.query.trim().toLowerCase(), a = areaOf(state.area);
+    return allItems().filter(function (it) {
+      var qOk = !q || it.name.toLowerCase().indexOf(q) >= 0 || !!brandHit(it, q);
+      return qOk && (!a || inArea(it, a)) && (route === 'All' || it.routes.indexOf(route) >= 0);
     });
   }
 
-  function searchResultsHtml() {
-    var q = state.query.trim();
-    if (!q && state.route === 'All') {
-      var recents = ['Amiodarone', 'Digoxin', 'Amoxicillin'].map(function (r) {
-        return '<button data-act="pick:' + r + '" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:#F3F6F6;border:1px solid #E1E8E9;border-radius:999px;padding:0 14px;min-height:36px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B6F75" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' + r + '</button>';
-      }).join('');
-      var cats = CATEGORIES.map(function (c) {
-        return '<button style="text-align:left;display:flex;flex-direction:column;gap:4px;' + CARD + ';padding:12px 14px;min-height:64px"><span style="width:22px;height:4px;border-radius:2px;background:#3FC1B2"></span><span style="font-size:14px;font-weight:700">' + esc(c) + '</span><span style="font-size:12px;color:#5B6F75">[COUNT] medicines</span></button>';
-      }).join('');
-      return '<div style="display:flex;flex-direction:column;gap:18px">' +
-        '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Recent Searches</h2><div style="display:flex;flex-wrap:wrap;gap:8px">' + recents + '</div></div>' +
-        '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Browse by Category</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">' + cats + '</div></div></div>';
+  var THUMB = 'flex:none;width:56px;height:56px;border-radius:14px;background:#E5F4F2;display:flex;align-items:center;justify-content:center';
+  var MINI = 'font-size:10px;font-weight:800;border-radius:999px;padding:2px 8px';
+
+  function recentRow(id, fid) {
+    var m = D.MEDS[id], f = m.forms.filter(function (x) { return x.id === fid; })[0];
+    return '<button data-act="med:' + id + ':' + fid + '" style="text-align:left;display:flex;align-items:center;gap:12px;' + CARD + ';padding:10px 14px;min-height:58px">' +
+      '<span style="flex:none">' + drawPill(f.appearance[0], 40) + '</span>' +
+      '<span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">' + esc(m.name) + ' ' + esc(f.unit) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(m.cls) + '</span></span>' + ICON.chevron + '</button>';
+  }
+
+  function routeChipsHtml() {
+    return ROUTES.map(function (r) {
+      var on = state.route === r, n = findItems(r).length;
+      var fg = on ? '#FFFFFF' : (n ? '#142B33' : '#9AA9AD');
+      return '<button data-act="route:' + r + '" aria-pressed="' + on + '" style="flex:none;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:0 12px 0 14px;min-height:38px;border:1.5px solid ' + (on ? '#0C2A30' : '#D9E3E4') + ';background:' + (on ? '#0C2A30' : '#FFFFFF') + ';color:' + fg + '">' + r +
+        '<span style="font-size:11px;font-weight:700;min-width:18px;border-radius:999px;padding:1px 6px;background:' + (on ? '#3FC1B2' : '#EEF2F3') + ';color:' + (on ? '#0C2A30' : '#5B6F75') + '">' + n + '</span></button>';
+    }).join('');
+  }
+
+  function searchStart() {
+    var tiles = AREAS.map(function (a) {
+      var n = allItems().filter(function (it) { return inArea(it, a); });
+      return '<button data-act="area:' + a.id + '" style="text-align:left;display:flex;flex-direction:column;gap:10px;' + CARD + ';border-radius:16px;padding:12px 14px">' +
+        '<span style="width:40px;height:40px;border-radius:12px;background:#E5F4F2;display:flex;align-items:center;justify-content:center">' + areaIcon(a, 22) + '</span>' +
+        '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:700">' + esc(a.label) + '</span><span style="font-size:12px;color:#5B6F75">' + n.length + (n.length === 1 ? ' medicine' : ' medicines') + '</span></span></button>';
+    }).join('');
+    var legend = ['licensed', 'accepted', 'differ', 'unverified', 'no'].map(function (k) { return rPill(k); }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:18px">' +
+      '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">' +
+        '<span style="font-size:15px;font-weight:700;line-height:1.35">Pick a route to see how each form can be given</span>' +
+        '<span style="font-size:12px;line-height:1.5;color:#C3DADB">Every route shows its status and the source behind it.</span>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px">' + legend + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Recently Viewed</h2>' +
+        recentRow('amiodarone', 'tab') + recentRow('digoxin', 'tab') + recentRow('amoxicillin', 'cap') + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 style="' + H2 + '">Browse by Area</h2><span style="font-size:11px;color:#5B6F75">Draft groups</span></div>' +
+        '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">' + tiles + '</div></div></div>';
+  }
+
+  function resultCard(it, q) {
+    if (!it.med) {
+      return '<div style="' + CARD + ';border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:14px;background:#FAFBFB">' +
+        '<span style="' + THUMB + ';background:#EEF2F3;font-size:16px;font-weight:800;color:#5B6F75">' + esc(it.name.slice(0, 2)) + '</span>' +
+        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700">' + esc(it.name) + '<span style="' + MINI + ';color:#5B6F75;background:#EEF2F3">SOON</span></span>' +
+        '<span style="font-size:13px;color:#5B6F75">' + esc(it.cls) + ' · ' + esc(it.sched) + '</span>' +
+        '<span style="font-size:12px;color:#5B6F75">Routes listed: ' + esc(it.routes.join(', ')) + '. Full entry not built yet.</span></span></div>';
     }
-    var items = searchItems();
-    var html = '<div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;font-weight:600;color:#5B6F75">' + items.length + (items.length === 1 ? ' active ingredient' : ' active ingredients') + (state.route !== 'All' ? ' · ' + state.route : '') + '</span>';
-    items.forEach(function (it) {
-      var forms = '';
-      if (it.med) {
-        forms = it.med.forms.map(function (f) {
-          if (state.route === 'All') {
-            return '<button data-act="med:' + it.med.id + ':' + f.id + '" style="font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:8px;padding:0 10px;min-height:32px">' + esc(f.label) + '</button>';
-          }
-          var r = routeForCat(f, state.route);
-          if (!r) return '';
-          var v = RSTATUS[r.status];
-          return '<button data-act="medr:' + it.med.id + ':' + f.id + ':' + r.id + '" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:8px;padding:0 10px;min-height:32px">' + esc(f.label) + '<span style="width:8px;height:8px;border-radius:4px;background:' + v.dot + '" aria-hidden="true"></span><span style="font-weight:500;color:#24414A">' + v.label + (r.statusNote ? ' · ' + esc(r.statusNote) : '') + '</span></button>';
-        }).join('');
-      } else {
-        forms = it.routes.map(function (r) { return '<span style="font-size:12px;font-weight:600;color:#5B6F75;background:#F3F6F6;border-radius:8px;padding:6px 10px">' + esc(r) + '</span>'; }).join('');
-      }
-      html += '<div style="' + CARD + ';padding:12px 14px;display:flex;flex-direction:column;gap:10px">' +
-        (it.med
-          ? '<button data-act="med:' + it.med.id + ':' + it.med.forms[0].id + '" style="text-align:left;display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:0;min-height:40px"><span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">' + esc(it.name) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(it.sub) + ' · ' + esc(it.med.brands) + '</span></span>' + ICON.chevron + '</button>'
-          : '<span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700">' + esc(it.name) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(it.sub) + ' · details coming soon</span></span>') +
-        '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"><span style="font-size:12px;color:#5B6F75;margin-right:2px">' + (it.med ? (state.route === 'All' ? 'Choose form:' : 'Forms given ' + (state.route === 'Enteral tube' ? 'via tube' : state.route) + ':') : 'Routes:') + '</span>' + forms + '</div></div>';
-    });
-    if (!items.length) html += '<span style="font-size:14px;color:#24414A">No medications match. Try the active ingredient name, or a different route.</span>';
-    return html + '</div>';
+    // Route filter on: open the first form given that way, on the Administration tab.
+    var m = it.med, b = brandHit(it, q), act = 'med:' + m.id + ':' + m.forms[0].id;
+    if (state.route !== 'All') {
+      for (var i = 0; i < m.forms.length; i++) { var r = routeForCat(m.forms[i], state.route); if (r) { act = 'medr:' + m.id + ':' + m.forms[i].id + ':' + r.id; break; } }
+    }
+    return '<button data-act="' + act + '" style="text-align:left;display:flex;align-items:center;gap:14px;' + CARD + ';border-radius:16px;padding:14px">' +
+      '<span style="' + THUMB + '">' + drawPill(m.forms[0].appearance[0], 40) + '</span>' +
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">' +
+        '<span style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;font-size:15px;font-weight:700">' + esc(m.name) + '<span style="' + MINI + ';color:#0E5E59;background:#D3EEEA">' + esc(it.sched) + '</span>' + (b ? '<span style="' + MINI + ';color:#5C3D00;background:#FFF4D6">Brand: ' + esc(b) + '</span>' : '') + '</span>' +
+        '<span style="font-size:13px;color:#5B6F75">' + esc(m.cls) + '</span><span style="font-size:12px;color:#5B6F75">' + esc(m.brands) + '</span></span>' + ICON.chevron + '</button>';
+  }
+
+  function searchResults() {
+    var q = state.query.trim().toLowerCase(), a = areaOf(state.area);
+    if (!q && state.route === 'All' && !a) return searchStart();
+    var items = findItems(state.route);
+    var filters = (a ? '<button data-act="area:" aria-label="Remove filter ' + esc(a.label) + '" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#0E5E59;background:#E5F4F2;border:0;border-radius:999px;padding:0 10px;min-height:30px">' + areaIcon(a, 14) + esc(a.label) + ICON.x('#0E5E59', 10) + '</button>' : '');
+    var any = q || a || state.route !== 'All';
+    var head = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span style="font-size:13px;font-weight:700;color:#24414A">' + items.length + (items.length === 1 ? ' medicine' : ' medicines') + '</span>' + filters +
+      (any ? '<button data-act="sclear" style="margin-left:auto;font-size:13px;font-weight:600;color:#1A6F67;background:transparent;border:0;min-height:30px;padding:0 4px">Clear all</button>' : '') + '</div>';
+    if (!items.length) {
+      return '<div style="display:flex;flex-direction:column;gap:12px">' + head +
+        '<div style="border:1.5px dashed #D9E3E4;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start">' +
+        '<span style="font-size:15px;font-weight:700">No medicines match' + (q ? ' “' + esc(state.query.trim()) + '”' : '') + '</span>' +
+        '<span style="font-size:13px;line-height:1.5;color:#24414A">Try the active ingredient, for example amoxicillin, or a brand name such as Aratac.</span>' +
+        (state.route !== 'All' ? '<button data-act="route:All" style="font-size:13px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:12px;min-height:40px;padding:0 14px">Search all routes</button>' : '') + '</div></div>';
+    }
+    return '<div style="display:flex;flex-direction:column;gap:12px">' + head + items.map(function (it) { return resultCard(it, q); }).join('') + sampleBadge() + '</div>';
+  }
+
+  function searchLive() {
+    return '<div style="display:flex;flex-direction:column;gap:16px"><div class="tabs" role="group" aria-label="Route" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">' + routeChipsHtml() + '</div>' + searchResults() + '</div>';
   }
 
   function viewSearch() {
-    var routeChips = ROUTES.map(function (r) {
-      var on = state.route === r;
-      return '<button data-act="route:' + r + '" aria-pressed="' + on + '" style="flex:none;font-size:13px;font-weight:600;border-radius:999px;padding:0 14px;min-height:36px;border:1.5px solid ' + (on ? '#1A6F67' : '#D9E3E4') + ';background:' + (on ? '#1A6F67' : '#FFFFFF') + ';color:' + (on ? '#FFFFFF' : '#142B33') + '">' + r + '</button>';
-    }).join('');
-    return '<div style="padding:20px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
-      '<h1 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-0.3px">Search</h1>' +
-      '<label style="display:flex;align-items:center;gap:10px;border:2px solid #1A8A7E;border-radius:14px;padding:0 14px;min-height:50px">' + ICON.search('#1A6F67', 2.2) +
-        '<span class="sr">Search by active ingredient or brand</span><input id="q" type="search" autocomplete="off" placeholder="Active ingredient or brand" style="font-size:16px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:46px"></label>' +
-      '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Route</span><div class="tabs" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">' + routeChips + '</div></div>' +
-      '<div id="results">' + searchResultsHtml() + '</div></div>';
+    var has = !!state.query;
+    return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
+      pageHeader('Search') +
+      '<label style="display:flex;align-items:center;gap:10px;border:2px solid #1A8A7E;background:#FFFFFF;border-radius:14px;padding:0 4px 0 14px;min-height:52px;box-shadow:0 0 0 4px #E5F4F2">' + ICON.search('#1A6F67', 2.2) +
+        '<span class="sr">Search by active ingredient or brand</span><input id="q" type="text" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Active ingredient or brand" style="font-size:16px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:46px">' +
+        '<button id="qclear" data-act="qclear" aria-label="Clear search"' + (has ? '' : ' hidden') + ' style="flex:none;width:40px;height:40px;border:0;border-radius:20px;background:#EEF2F3;display:flex;align-items:center;justify-content:center">' + ICON.x('#24414A', 14) + '</button></label>' +
+      '<div id="live">' + searchLive() + '</div></div>';
   }
 
   // ---------- medication ----------
@@ -353,8 +422,8 @@
       return '<button role="tab" aria-selected="' + on + '" data-act="tab:' + t[0] + '" style="flex:none;min-height:44px;padding:0 9px;border:0;background:transparent;font-size:13px;font-weight:' + (on ? 700 : 500) + ';color:' + (on ? TEAL : MUTED) + ';border-bottom:2.5px solid ' + (on ? TEAL : 'transparent') + '">' + t[1] + '</button>';
     }).join('');
     var body = { overview: tabOverview, dosage: tabDosage, admin: tabAdmin, interactions: tabInteractions, pregnancy: tabPregnancy, more: tabMore }[state.tab]();
-    return '<div style="display:flex;flex-direction:column">' + backBar('Medication') +
-      '<div style="padding:6px 20px 0;display:flex;flex-direction:column;gap:8px">' + sampleBadge() +
+    return '<div style="display:flex;flex-direction:column">' +
+      '<div style="padding:18px 20px 0;display:flex;flex-direction:column;gap:8px">' + pageHeader('Medicine', { back: true, tag: 'span' }) + sampleBadge() +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.4px">' + esc(m.name) + '</h1><span style="font-size:16px;font-weight:600;color:#1A8A7E">' + esc(f.unit) + '</span></div>' +
         '<span style="flex:none">' + drawPill(f.appearance[0], 72) + '</span></div>' +
         '<span style="font-size:13px;color:#5B6F75">Brands: ' + esc(m.brands) + '</span>' +
@@ -609,34 +678,174 @@
   }
 
   // ---------- interaction checker ----------
-  function viewCheck() {
-    var sel = state.selected;
-    var chips = sel.map(function (id) {
-      return '<span style="display:inline-flex;align-items:center;background:#E5F4F2;color:#0E5E59;border-radius:8px;padding-left:10px;font-size:13px;font-weight:600">' + CHECK_MEDS[id] +
-        '<button data-act="remove:' + id + '" aria-label="Remove ' + CHECK_MEDS[id] + '" style="width:34px;height:34px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#0E5E59', 12) + '</button></span>';
-    }).join('');
-    var addable = Object.keys(CHECK_MEDS).filter(function (id) { return sel.indexOf(id) < 0; }).map(function (id) {
-      return '<button data-act="add:' + id + '" style="font-size:12px;font-weight:600;color:#0E5E59;background:#FFFFFF;border:1px solid #A8D3CD;border-radius:999px;padding:0 12px;min-height:34px">+ ' + CHECK_MEDS[id] + '</button>';
-    }).join('');
-    var hits = PAIRS.filter(function (p) { return sel.indexOf(p.a) >= 0 && sel.indexOf(p.b) >= 0; })
+  // Add picker: type to filter, so it scales past a handful of medicines.
+  var SEV_ORDER = ['major', 'moderate', 'minor', 'conflict', 'none'];
+
+  function checkHits(sel) {
+    return PAIRS.filter(function (p) { return sel.indexOf(p.a) >= 0 && sel.indexOf(p.b) >= 0; })
       .sort(function (a, b) { return SEV[a.sev].rank - SEV[b.sev].rank; });
-    var results;
-    if (sel.length < 2) results = '<span style="font-size:14px;color:#24414A">Add at least two medications to check them together.</span>';
-    else if (!hits.length) results = '<span style="font-size:14px;color:#24414A">No interactions in our sample data. Always confirm with a pharmacist.</span>';
-    else results = hits.map(function (p) {
-      var d = sevDeco(p.sev);
-      return '<div style="display:flex;flex-direction:column;gap:8px;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:14px;padding:14px"><div style="display:flex;gap:10px;align-items:flex-start">' + d.icon +
-        '<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:14px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div><div style="align-self:flex-end">' + d.tag + '</div></div>';
+  }
+  // PAIRS are demo text. Look for the same pair in data.js so the card can name a real source.
+  function pairEvidence(p) {
+    var out = [];
+    [[p.a, p.b], [p.b, p.a]].forEach(function (x) {
+      var m = D.MEDS[x[0]]; if (!m) return;
+      var other = CHECK_MEDS[x[1]].toLowerCase();
+      var all = m.interactions.important.concat(m.interactions.other);
+      var hit = all.filter(function (i) { return ((i.title || '') + ' ' + i.text).toLowerCase().indexOf(other) >= 0; })[0];
+      if (hit) out.push({ med: m, item: hit, verify: /to verify/i.test(hit.text) || hit.verify });
+    });
+    return out;
+  }
+  function medThumb(id, s) {
+    var m = D.MEDS[id];
+    if (m) return '<span style="flex:none;width:' + s + 'px;height:' + s + 'px;border-radius:12px;background:#E5F4F2;display:flex;align-items:center;justify-content:center">' + drawPill(m.forms[0].appearance[0], Math.round(s * 0.75)) + '</span>';
+    return '<span style="flex:none;width:' + s + 'px;height:' + s + 'px;border-radius:12px;background:#EEF2F3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#5B6F75">' + esc(CHECK_MEDS[id].slice(0, 2)) + '</span>';
+  }
+
+  function checkHero(sel, hits) {
+    var title, sub, sevs = '';
+    if (sel.length < 2) { title = 'Add two or more medicines'; sub = 'Every pair in your list is checked.'; }
+    else if (!hits.length) { title = 'No interactions listed'; sub = 'None in our sample data for these ' + sel.length + '. That is not proof there are none.'; }
+    else {
+      title = hits.length + (hits.length === 1 ? ' interaction' : ' interactions') + ' across ' + sel.length + ' medicines';
+      sub = 'Most serious first. Each one names its source.';
+      sevs = '<div style="display:flex;flex-wrap:wrap;gap:6px">' + SEV_ORDER.map(function (k) {
+        var n = hits.filter(function (p) { return p.sev === k; }).length;
+        return n ? '<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:' + SEV[k].fg + ';background:' + SEV[k].bg + ';border-radius:999px;padding:3px 10px"><span aria-hidden="true" style="width:8px;height:8px;border-radius:4px;background:' + SEV[k].icon + '"></span>' + n + ' ' + SEV[k].label + '</span>' : '';
+      }).join('') + '</div>';
+    }
+    return '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:18px;display:flex;align-items:center;gap:12px">' +
+      '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"><span style="font-size:16px;font-weight:700;line-height:1.35">' + title + '</span><span style="font-size:12px;line-height:1.5;color:#C3DADB">' + sub + '</span>' + sevs + '</div>' +
+      '<svg width="58" height="40" viewBox="0 0 24 16" fill="none" stroke="#3FC1B2" stroke-width="1.6" aria-hidden="true" style="flex:none"><circle cx="8.5" cy="8" r="6.5"/><circle cx="15.5" cy="8" r="6.5" fill="#3FC1B2" fill-opacity="0.18"/></svg></div>';
+  }
+
+  function checkList(sel, hits) {
+    var rows = sel.map(function (id, i) {
+      var mine = hits.filter(function (p) { return p.a === id || p.b === id; });
+      var worst = mine[0];
+      var sub = D.MEDS[id] ? esc(D.MEDS[id].cls) : 'Checker only · full entry not built yet';
+      var count = worst ? '<span style="font-size:12px;font-weight:700;color:' + SEV[worst.sev].fg + '">' + mine.length + (mine.length === 1 ? ' interaction' : ' interactions') + '</span>' : '';
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 4px 10px 12px;' + (i ? 'border-top:1px solid #EEF2F3' : '') + '">' + medThumb(id, 44) +
+        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:700">' + esc(CHECK_MEDS[id]) + '</span><span style="font-size:12px;color:#5B6F75">' + sub + '</span>' + count + '</span>' +
+        '<button data-act="remove:' + id + '" aria-label="Remove ' + esc(CHECK_MEDS[id]) + '" style="flex:none;width:44px;height:44px;border:0;border-radius:22px;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#5B6F75', 14) + '</button></div>';
     }).join('');
-    return '<div style="display:flex;flex-direction:column">' + backBar('Drug Interaction Checker') +
-      '<div style="padding:14px 20px 24px;display:flex;flex-direction:column;gap:14px">' +
-        '<div style="border:1.5px solid #D9E3E4;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px"><span style="font-size:13px;color:#5B6F75">Add a medication, supplement or condition</span><div style="display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div></div>' +
-        (addable ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + addable + '</div>' : '') +
-        '<h2 style="' + H2 + ';margin-top:4px">Potential Interactions</h2>' + results +
-        '<span style="font-size:12px;color:#5B6F75">Sample data for review · not for clinical use</span>' +
-        '<div style="border-top:1px solid #E1E8E9;padding-top:16px;display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Check another medication</h2>' +
-          '<button data-act="go:search" style="text-align:left;display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;background:#FFFFFF;border-radius:12px;padding:0 12px;min-height:48px;color:#5B6F75;font-size:14px">' + ICON.search('#5B6F75') + 'Search for a medication…</button></div>' +
-      '</div></div>';
+    var total = Object.keys(CHECK_MEDS).length;
+    var adder = '<div style="border-top:1px solid #EEF2F3;padding:12px;display:flex;flex-direction:column;gap:6px;background:#F7FAFA">' +
+      '<label style="display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;border-radius:12px;padding:0 12px;min-height:48px;background:#FFFFFF">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A6F67" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>' +
+        '<span class="sr">Add a medicine by name or brand</span><input id="addq" type="text" role="combobox" aria-autocomplete="list" aria-controls="addlist" aria-expanded="false" autocomplete="off" enterkeyhint="done" placeholder="Add a medicine or brand" style="font-size:16px;border:0;outline:none;background:transparent;flex:1;min-width:0;min-height:44px"></label>' +
+      '<div id="addlist" role="listbox" aria-label="Matching medicines" style="display:flex;flex-direction:column">' + addListHtml() + '</div>' +
+      '<span id="addhint" style="font-size:12px;color:#5B6F75;padding:0 2px">Type a name or brand. Checks against ' + total + ' medicines.</span></div>';
+    return '<div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="' + H2 + '">Your Medicines</h2><span style="font-size:12px;color:#5B6F75">' + sel.length + ' added</span></div>' +
+      '<div style="' + CARD + ';border-radius:16px;overflow:hidden">' + (rows || '<div style="padding:14px;font-size:13px;color:#5B6F75">Nothing added yet.</div>') + adder + '</div></div>';
+  }
+
+  // ---- add picker: scales to a long list by typing, not scrolling chips ----
+  var ADD_MAX = 6;
+  function addCandidates(raw) {
+    var q = raw.trim().toLowerCase(), out = [];
+    if (!q) return out;
+    Object.keys(CHECK_MEDS).forEach(function (id) {
+      var name = CHECK_MEDS[id], n = name.toLowerCase(), m = D.MEDS[id], score = -1, brand = '';
+      if (n.indexOf(q) === 0) score = 0;
+      else if (n.split(/\s+/).some(function (w) { return w.indexOf(q) === 0; })) score = 1;
+      else if (n.indexOf(q) >= 0) score = 2;
+      else if (m) {
+        brand = m.brands.split(',').map(function (x) { return x.trim(); }).filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; })[0] || '';
+        if (brand) score = 3;
+      }
+      var added = state.selected.indexOf(id) >= 0;
+      if (score >= 0) out.push({ id: id, name: name, brand: brand, score: added ? 9 : score, added: added });
+    });
+    return out.sort(function (a, b) { return a.score - b.score || a.name.localeCompare(b.name); });
+  }
+  function markq(text, q) {
+    var i = text.toLowerCase().indexOf(q.trim().toLowerCase());
+    if (i < 0 || !q.trim()) return esc(text);
+    var j = i + q.trim().length;
+    return esc(text.slice(0, i)) + '<strong style="font-weight:800;color:#0E5E59">' + esc(text.slice(i, j)) + '</strong>' + esc(text.slice(j));
+  }
+  function addListHtml() {
+    var q = state.addq || '';
+    if (!q.trim()) return '';
+    var list = addCandidates(q), open = list.filter(function (x) { return !x.added; });
+    if (!list.length) return '<span style="padding:10px 4px;font-size:13px;line-height:1.45;color:#24414A">No medicine matching “' + esc(q.trim()) + '” in the checker yet.</span>';
+    var shown = open.slice(0, ADD_MAX).concat(list.filter(function (x) { return x.added; }).slice(0, 2));
+    var html = shown.map(function (x, i) {
+      var on = !x.added && i === state.addIdx;
+      var sub = x.brand ? 'Brand: ' + markq(x.brand, q) : (D.MEDS[x.id] ? esc(D.MEDS[x.id].cls) : 'Checker only');
+      var right = x.added ? '<span style="flex:none;font-size:11px;font-weight:700;color:#5B6F75">In your list</span>' :
+        '<span aria-hidden="true" style="flex:none;width:28px;height:28px;border-radius:14px;background:' + (on ? '#1A6F67' : '#E5F4F2') + ';display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + (on ? '#FFFFFF' : '#1A6F67') + '" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>';
+      return '<button ' + (x.added ? 'disabled aria-disabled="true"' : 'data-act="add:' + x.id + '"') + ' role="option" id="opt-' + i + '" aria-selected="' + on + '" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:10px;padding:6px 8px;min-height:52px;background:' + (on ? '#E5F4F2' : 'transparent') + ';opacity:' + (x.added ? '.6' : '1') + '">' + medThumb(x.id, 36) +
+        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font-size:14px;font-weight:600">' + markq(x.name, q) + '</span><span style="font-size:12px;color:#5B6F75">' + sub + '</span></span>' + right + '</button>';
+    }).join('');
+    if (open.length > ADD_MAX) html += '<span style="padding:6px 8px;font-size:12px;color:#5B6F75">' + (open.length - ADD_MAX) + ' more. Keep typing to narrow.</span>';
+    return html;
+  }
+  function updateAddList() {
+    var l = document.getElementById('addlist'), i = document.getElementById('addq'), h = document.getElementById('addhint');
+    if (l) l.innerHTML = addListHtml();
+    var q = (state.addq || '').trim();
+    if (h) h.hidden = !!q;
+    if (i) {
+      i.setAttribute('aria-expanded', q ? 'true' : 'false');
+      if (q && document.getElementById('opt-' + state.addIdx)) i.setAttribute('aria-activedescendant', 'opt-' + state.addIdx);
+      else i.removeAttribute('aria-activedescendant');
+    }
+  }
+  function checkAddInput(v) { state.addq = v; state.addIdx = 0; updateAddList(); }
+  function checkAdd(id) { if (state.selected.indexOf(id) < 0) state.selected = state.selected.concat([id]); state.addq = ''; state.addIdx = 0; }
+  // Returns an id to add on Enter, else null.
+  function checkAddKey(e) {
+    var n = Math.min(ADD_MAX, addCandidates(state.addq || '').filter(function (x) { return !x.added; }).length);
+    if (e.key === 'ArrowDown' && n) { e.preventDefault(); state.addIdx = (state.addIdx + 1) % n; updateAddList(); }
+    else if (e.key === 'ArrowUp' && n) { e.preventDefault(); state.addIdx = (state.addIdx - 1 + n) % n; updateAddList(); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.target.value = ''; checkAddInput(''); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      var hit = addCandidates(state.addq || '').filter(function (x) { return !x.added; })[state.addIdx];
+      return hit ? hit.id : null;
+    }
+    return null;
+  }
+
+  function pairCard(p) {
+    var d = sevDeco(p.sev), ev = pairEvidence(p);
+    var conflict = ev.filter(function (e) { return e.item.positions; })[0];
+    var srcRows = ev.length ? ev.map(function (e) {
+      return '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">' + esc(e.med.name) + ' entry: </span>' + esc(e.med.src.interactions) + (e.verify ? ' ' + VERIFY_TAG : '') + '</span>';
+    }).join('') : '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">No source yet.</span> Check the PI for each medicine.</span>';
+    var open = [p.a, p.b].filter(function (id) { return D.MEDS[id]; }).map(function (id) {
+      return '<button data-act="medtab:' + id + ':interactions" style="font-size:12px;font-weight:700;color:#0E5E59;background:#FFFFFF;border:1px solid ' + d.v.bd + ';border-radius:10px;padding:0 12px;min-height:36px">Open ' + esc(D.MEDS[id].name) + '</button>';
+    }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:10px;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:16px;padding:14px">' +
+      '<div style="display:flex;gap:10px;align-items:flex-start">' + d.icon +
+        '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:15px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span>' + d.tag + '</div>' +
+        '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div>' +
+      (conflict ? positionsHtml(conflict.item.positions) : '') +
+      '<div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid ' + d.v.bd + ';padding-top:10px">' + srcRows + '</div>' +
+      (open ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + open + '</div>' : '') + '</div>';
+  }
+
+  function viewCheck() {
+    var sel = state.selected, hits = checkHits(sel);
+    var quiet = [];
+    for (var i = 0; i < sel.length; i++) for (var j = i + 1; j < sel.length; j++) {
+      var a = sel[i], b = sel[j];
+      if (!hits.some(function (p) { return (p.a === a && p.b === b) || (p.a === b && p.b === a); })) quiet.push(CHECK_MEDS[a] + ' + ' + CHECK_MEDS[b]);
+    }
+    var results = sel.length < 2 ? '' :
+      '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Potential Interactions</h2>' +
+        (hits.length ? hits.map(pairCard).join('') : '') +
+        (quiet.length ? '<details style="' + CARD + ';border-radius:14px;padding:0 14px"><summary style="cursor:pointer;min-height:48px;display:flex;align-items:center;font-size:13px;font-weight:600;color:#24414A">' + quiet.length + (quiet.length === 1 ? ' pair' : ' pairs') + ' with nothing listed</summary>' +
+          '<div style="display:flex;flex-direction:column;gap:6px;padding:0 0 12px;font-size:13px;color:#24414A">' + quiet.map(function (q) { return '<span>' + esc(q) + '</span>'; }).join('') +
+          '<span style="font-size:12px;color:#5B6F75">Not in our sample data. Confirm with a pharmacist.</span></div></details>' : '') + '</div>';
+    return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
+      pageHeader('Interactions') +
+      checkHero(sel, hits) + checkList(sel, hits) + results +
+      '<div style="display:flex;flex-direction:column;gap:6px">' + sampleBadge() + '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Checker pairs are demo data. Real pair data is on the MVP to-do list.</span></div>' +
+      '</div>';
   }
 
   // ---------- pill identifier ----------
@@ -689,8 +898,8 @@
     var proTag = '<span style="font-size:10px;font-weight:800;color:#5C3D00;background:#F2B53A;border-radius:999px;padding:2px 7px">PRO</span>';
     var top = '<div style="display:flex;gap:4px;background:#EEF2F3;border-radius:12px;padding:4px">' + modeBtn('describe', 'Describe it') + modeBtn('photo', 'Photo', proTag) + '</div>';
     var content = mode === 'describe' ? pillDescribe() : pillPhoto();
-    return '<div style="display:flex;flex-direction:column">' + backBar('Pill Identifier') +
-      '<div style="padding:12px 20px 24px;display:flex;flex-direction:column;gap:16px">' + top + content +
+    return '<div style="display:flex;flex-direction:column">' +
+      '<div style="padding:18px 20px 24px;display:flex;flex-direction:column;gap:16px">' + pageHeader('Pill Identifier', { back: true }) + top + content +
       '<div style="display:flex;gap:10px;align-items:flex-start;background:#FFFAEB;border:1.5px solid #FEC84B;border-radius:14px;padding:12px 14px"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="11" fill="#DC6803"/><path d="M12 6.5v7M12 17v.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/></svg><span style="font-size:13px;line-height:1.5;color:#4D2A06">Always confirm a pill’s identity with its packaging, imprint and a pharmacist before giving it. Appearances marked “To verify” are not yet confirmed.</span></div>' +
       '</div></div>';
   }
@@ -772,8 +981,8 @@
   var BARCODE_ICON = function (c) { return '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M18 4h3v3M21 17v3h-3M6 20H3v-3"/><path d="M7 8v8M10 8v8M13 8v8M16 8v8"/></svg>'; };
 
   function viewScanLocked() {
-    return '<div style="display:flex;flex-direction:column">' + backBar('Scan Barcode') +
-      '<div style="padding:12px 20px 24px;display:flex;flex-direction:column;gap:16px">' +
+    return '<div style="display:flex;flex-direction:column">' +
+      '<div style="padding:18px 20px 24px;display:flex;flex-direction:column;gap:16px">' + pageHeader('Scan Barcode', { back: true }) +
       '<div style="background:#0C2A30;color:#FFFFFF;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">' +
         BARCODE_ICON('#3FC1B2') +
         '<span style="font-size:18px;font-weight:800">Scan a medicine pack</span>' +
@@ -953,8 +1162,8 @@
     }
     function ic(d) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>'; }
     var on = state.notif;
-    return '<div style="padding:20px 20px 24px;display:flex;flex-direction:column;gap:18px">' +
-      '<h1 style="margin:0;font-size:20px;font-weight:700">Profile &amp; Settings</h1>' +
+    return '<div style="padding:18px 20px 24px;display:flex;flex-direction:column;gap:18px">' +
+      pageHeader('Profile &amp; Settings', { profile: false }) +
       '<div style="display:flex;align-items:center;gap:16px"><span style="width:64px;height:64px;border-radius:32px;background:#EEF2F3;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#142B33" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:18px;font-weight:700">Taylor Wilson</span><span style="font-size:13px;color:#5B6F75">Registered Nurse</span></div></div>' +
       '<div style="display:flex;flex-direction:column"><h2 style="margin:0 0 4px;font-size:16px;font-weight:700">Account</h2>' +
         row(ic('<path d="M4 8l4 4 4-6 4 6 4-4-2 11H6z"/>'), 'Subscription', state.pro ? 'Pro (demo)' : 'Free Plan', 'go:plan') +
@@ -983,9 +1192,9 @@
       ? '<span style="margin-top:10px;font-size:13px;font-weight:700;color:#0C2A30;background:#3FC1B2;border-radius:10px;min-height:40px;display:flex;align-items:center;justify-content:center">Current Plan (demo)</span>'
       : '<button data-act="upgrade" style="margin-top:10px;font-size:13px;font-weight:700;color:#FFFFFF;background:#1F9D8E;border:0;border-radius:10px;min-height:40px">Upgrade Now</button>';
     return '<div style="flex:1;min-height:100%;background:#0C2A30;color:#FFFFFF;padding:12px 18px max(24px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:14px">' +
-      '<button data-act="back" aria-label="Close" style="align-self:flex-start;width:44px;height:44px;border:0;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#FFFFFF', 20) + '</button>' +
+      '<div style="align-self:stretch;padding-top:6px">' + pageHeader('Upgrade', { back: true, dark: true, profile: false }) + '</div>' +
       '<svg width="40" height="32" viewBox="0 0 40 32" aria-hidden="true"><path d="M4 26L2 8l10 8 8-14 8 14 10-8-2 18z" fill="#F2B53A"/><rect x="4" y="27" width="32" height="4" rx="2" fill="#F2B53A"/></svg>' +
-      '<h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.3px">Unlock Full Access</h1>' +
+      '<h2 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.3px">Unlock Full Access</h2>' +
       '<span style="font-size:14px;line-height:1.55;color:#D6E6E6;text-align:center">Get complete medication information, including detailed interactions, pregnancy and breastfeeding data, and more.</span>' +
       '<div style="align-self:stretch;display:flex;flex-direction:column;gap:12px;padding:4px 8px">' + perks + '</div>' +
       '<div style="align-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px">' +
@@ -1017,7 +1226,7 @@
   // ---------- render & navigation ----------
   var app = document.getElementById('app');
   var VIEWS = { splash: viewSplash, home: viewHome, search: viewSearch, med: viewMed, check: viewCheck, profile: viewProfile, plan: viewPlan, pill: viewPill, scan: viewScanLocked };
-  var TITLES = { home: 'MediAUS', search: 'Search', check: 'Interaction Checker', profile: 'Profile', plan: 'Upgrade', pill: 'Pill Identifier', scan: 'Scan Barcode' };
+  var TITLES = { home: 'MediAUS', search: 'Search', check: 'Interactions', profile: 'Profile', plan: 'Upgrade', pill: 'Pill Identifier', scan: 'Scan Barcode' };
 
   function render(keepScroll) {
     var scr = state.screen;
@@ -1031,6 +1240,7 @@
     else if (scr === 'scan' && scanUnlocked()) app.innerHTML = viewScan();
     else app.innerHTML = '<div class="scroll" id="scroll">' + (VIEWS[scr] || viewHome)() + '</div>' + (showNav ? navHtml() : '');
     var q = document.getElementById('q'); if (q) q.value = state.query;
+    var aq = document.getElementById('addq'); if (aq) { aq.value = state.addq; if (state.addq) updateAddList(); }
     var imp = document.getElementById('imp'); if (imp) imp.value = state.pill.imprint;
     var sc2 = document.getElementById('scroll'); if (sc2 && top) sc2.scrollTop = top;
     document.title = scr === 'med' ? med().name + ' · MediAUS' : (TITLES[scr] ? TITLES[scr] + (scr === 'home' ? '' : ' · MediAUS') : 'MediAUS');
@@ -1087,6 +1297,7 @@
       case 'start': navigate('home', null, { replace: true }); break;
       case 'go': navigate(arg); break;
       case 'med': navigate('med', { medId: arg, formId: arg2 || D.MEDS[arg].forms[0].id, tab: 'overview', routeId: '', doseId: '' }); break;
+      case 'medtab': navigate('med', { medId: arg, formId: D.MEDS[arg].forms[0].id, tab: arg2, routeId: '', doseId: '' }); break;
       case 'medr': navigate('med', { medId: arg, formId: arg2, tab: 'admin', routeId: parts[3] || '', doseId: '' }); break;
       case 'rsel': state.routeId = arg; render(true); break;
       case 'dsel': state.doseId = arg; render(true); break;
@@ -1099,13 +1310,14 @@
         navigate('check');
         break;
       case 'remove': state.selected = state.selected.filter(function (x) { return x !== arg; }); render(true); break;
-      case 'add': state.selected = state.selected.concat([arg]); render(true); break;
+      case 'add': addAndFocus(arg); break;
       case 'notif': state.notif = !state.notif; render(true); break;
-      case 'route': state.route = arg; render(true); break;
-      case 'pick':
-        state.query = arg;
-        var q = document.getElementById('q'); if (q) q.value = arg;
-        document.getElementById('results').innerHTML = searchResultsHtml();
+      case 'route': state.route = arg; searchUpdate(); break;
+      case 'area': state.area = arg || ''; searchUpdate(); break;
+      case 'sclear': state.query = ''; state.route = 'All'; state.area = ''; render(true); break;
+      case 'qclear':
+        state.query = ''; render(true);
+        var qi = document.getElementById('q'); if (qi) qi.focus({ preventScroll: true });
         break;
       case 'pillmode': state.pillMode = arg; render(true); break;
       case 'pshape': state.pill.shape = state.pill.shape === arg ? '' : arg; render(true); break;
@@ -1138,10 +1350,23 @@
     }
   });
 
+  function searchUpdate() {
+    var live = document.getElementById('live');
+    if (!live) return;
+    live.innerHTML = searchLive();
+    var c = document.getElementById('qclear'); if (c) c.hidden = !state.query;
+  }
+  function addAndFocus(id) {
+    checkAdd(id); render(true);
+    var a = document.getElementById('addq'); if (a) a.focus({ preventScroll: true });
+  }
+
   app.addEventListener('input', function (e) {
     if (e.target.id === 'q') {
       state.query = e.target.value;
-      document.getElementById('results').innerHTML = searchResultsHtml();
+      searchUpdate();
+    } else if (e.target.id === 'addq') {
+      checkAddInput(e.target.value);
     } else if (e.target.id === 'imp') {
       state.pill.imprint = e.target.value;
       updatePill();
@@ -1149,6 +1374,7 @@
   });
 
   app.addEventListener('keydown', function (e) {
+    if (e.target.id === 'addq') { var id = checkAddKey(e); if (id) addAndFocus(id); return; }
     if (e.key === 'Enter' && e.target.id === 'gtin') { e.preventDefault(); var b = app.querySelector('[data-act="scansubmit"]'); if (b) b.click(); }
   });
 
