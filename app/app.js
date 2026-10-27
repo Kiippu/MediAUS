@@ -95,8 +95,9 @@
     lock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
   };
 
-  // Draws a tablet, capsule, ampoule, vial, inhaler, nebule, tube, bag, sachet or bottle. viewBox 80 x 50.
+  // Draws a tablet, capsule, ampoule, vial, inhaler, nebule, tube, bag, sachet, patch or bottle. viewBox 80 x 50.
   function drawPill(a, w) {
+    a = a || { shape: 'bottle', colors: ['white'] }; // form with no appearance on file yet
     var h = Math.round(w * 50 / 80);
     var c1 = hex(a.colors[0]), c2 = hex(a.colors[1] || a.colors[0]);
     var stroke = '#B9C6C9';
@@ -130,6 +131,8 @@
       body = '<path d="M8 15h48l8 4v12l-8 4H8z" fill="#E4E9EA" stroke="' + stroke + '" stroke-width="1.5"/><rect x="64" y="20" width="9" height="10" rx="1.5" fill="#5B6F75"/><rect x="18" y="20" width="30" height="10" rx="1.5" fill="#FFFFFF"/><rect x="21" y="23" width="18" height="2" fill="#3FC1B2"/>';
     } else if (a.shape === 'bag') {
       body = '<path d="M26 4h28a4 4 0 0 1 4 4v28l-8 6H30l-8-6V8a4 4 0 0 1 4-4z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/><rect x="36" y="42" width="8" height="6" rx="1" fill="#5B6F75"/><rect x="30" y="12" width="20" height="12" rx="1.5" fill="#FFFFFF" stroke="#C9D3D5" stroke-width="1"/><rect x="33" y="16" width="14" height="2" fill="#3FC1B2"/>';
+    } else if (a.shape === 'patch') {
+      body = '<rect x="18" y="6" width="44" height="38" rx="8" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/><rect x="26" y="14" width="28" height="22" rx="4" fill="none" stroke="#000" stroke-opacity="0.12" stroke-width="1.2"/>' + text;
     } else if (a.shape === 'sachet') {
       body = '<rect x="22" y="5" width="36" height="40" rx="3" fill="#FFFFFF" stroke="' + stroke + '" stroke-width="1.5"/><path d="M22 11h36M22 39h36" stroke="#C9D3D5" stroke-width="1" stroke-dasharray="2 2"/><circle cx="35" cy="24" r="3" fill="' + c1 + '"/><circle cx="43" cy="27" r="3" fill="' + c1 + '"/><circle cx="39" cy="20" r="2.5" fill="' + c1 + '"/>';
     } else {
@@ -443,6 +446,7 @@
   }
 
   function appearanceCards(f) {
+    if (!f.appearance.length) return '<span style="font-size:13px;color:#5B6F75">No product description on file yet: several brands exist. Check the pack.</span>';
     return f.appearance.map(function (a) {
       var rows = [];
       if (SHAPES.indexOf(a.shape) >= 0) {
@@ -963,7 +967,7 @@
     var picks = [
       { find: 'Cordarone X 200 mg', conf: 86 },
       { find: 'Lanoxin 250 microgram', conf: 58 },
-      { find: 'Metformin 500 mg', conf: 31 }
+      { find: 'Diabex 500 mg', conf: 31 }
     ];
     var cards = picks.map(function (p) {
       var x = PILLS.filter(function (y) { return y.a.label === p.find; })[0];

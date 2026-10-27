@@ -467,12 +467,12 @@ MEDIAUS.sources({
   },
   'S-aah-acute-adult': {
     title: 'Australian Asthma Handbook: immediate treatment of acute asthma in adults and adolescents in the ED', label: 'Australian Asthma Handbook: acute asthma, adults (ED)', short: 'Asthma Handbook',
-    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium', 'salbutamol'], read: '2026-10-27', status: 'read',
     url: 'https://www.asthmahandbook.org.au/pdf/6063', note: 'No version date shown.'
   },
   'S-aah-acute-child-6-11': {
     title: 'Australian Asthma Handbook: managing acute asthma in children 6–11 years in the ED', label: 'Australian Asthma Handbook: acute asthma, children 6–11 (ED)', short: 'Asthma Handbook',
-    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium', 'salbutamol'], read: '2026-10-27', status: 'read',
     url: 'https://www.asthmahandbook.org.au/acute-asthma/children-6-11-years/managing-acute-asthma-in-children-6-11-years-in-ed', note: 'No version date shown.'
   },
   'S-aah-acute-child-1-5': {
@@ -481,10 +481,212 @@ MEDIAUS.sources({
     url: 'https://www.asthmahandbook.org.au/acute-asthma', note: 'Page did not load for automated reading.'
   },
 
+  // ---------------------------------------------------------------- metformin (added 27 Oct 2026)
+  'S-diabex-pi-2026-08': {
+    title: 'Diabex Product Information', label: 'Diabex PI (Aug 2026)', short: 'Diabex PI',
+    publisher: 'Viatris', kind: 'PI', tier: 1, meds: ['metformin'], revised: '2026-08-21', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2010-PI-04544-3', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-diabex-xr-pi-2026-08': {
+    title: 'Diabex XR 500 and 1000 Product Information', label: 'Diabex XR PI (Aug 2026)', short: 'Diabex XR PI',
+    publisher: 'Viatris', kind: 'PI', tier: 1, meds: ['metformin'], revised: '2026-08-21', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2019-PI-01840-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-diaformin-pi-2026-10': {
+    title: 'Diaformin Viatris Product Information', label: 'Diaformin Viatris PI (Oct 2026)', short: 'Diaformin PI',
+    publisher: 'Viatris', kind: 'PI', tier: 1, meds: ['metformin'], revised: '2026-10-07', read: '2026-10-27', status: 'partly-read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2024-PI-02415-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Read sections 3, 4.3, 4.4 (renal), 4.6 and 10.'
+  },
+  'S-pbs-metformin': {
+    title: 'PBS item 2430X and 8607B: metformin 500 mg and 1 g tablets', label: 'PBS Schedule item 2430X and 8607B', short: 'PBS 2430X and 8607B',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['metformin'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/2430X-8607B'
+  },
+  'S-lactmed-metformin': {
+    title: 'LactMed: Metformin', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['metformin'], status: 'not-read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501020/', note: 'Not opened: NCBI showed a browser check (CAPTCHA) to automated reading.'
+  },
+  'S-mja-metformin-ckd-2019': {
+    title: 'Tanner C et al. Metformin: time to review its role and safety in chronic kidney disease. Med J Aust 2019;211(1):37–42', label: 'MJA review: metformin in chronic kidney disease (2019)', short: 'MJA 2019',
+    publisher: 'Medical Journal of Australia', kind: 'reference', tier: 2, meds: ['metformin'], revised: '2019-07', read: '2026-10-27', status: 'read',
+    url: 'https://mja.com.au/journal/2019/211/1/metformin-time-review-its-role-and-safety-chronic-kidney-disease', note: 'Summarises AMH dose limits by creatinine clearance.'
+  },
+
+  // ---------------------------------------------------------------- paracetamol (added 27 Oct 2026)
+  'S-panadol-pi-2025-07': {
+    title: 'Panadol Tablets and Mini Caps Product Information', label: 'Panadol PI (Haleon, Jul 2025)', short: 'Panadol PI',
+    publisher: 'Haleon', kind: 'PI', tier: 1, meds: ['paracetamol'], revised: '2025-07-10', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2025-PI-01066-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-panadol-osteo-pi-2025-07': {
+    title: 'Panadol Osteo Product Information', label: 'Panadol Osteo PI (Haleon, Jul 2025)', short: 'Panadol Osteo PI',
+    publisher: 'Haleon', kind: 'PI', tier: 1, meds: ['paracetamol'], revised: '2025-07-10', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2024-PI-02448-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-paracetamol-kabi-pi-2025-07': {
+    title: 'Paracetamol Kabi solution for infusion Product Information', label: 'Paracetamol Kabi IV PI (Fresenius Kabi, Jul 2025)', short: 'Paracetamol Kabi PI',
+    publisher: 'Fresenius Kabi', kind: 'PI', tier: 1, meds: ['paracetamol'], revised: '2025-07-21', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2014-PI-02174-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-rch-paracetamol': {
+    title: 'RCH Paediatric Injectable Guidelines: Paracetamol', label: 'RCH Paediatric Injectable Guidelines: Paracetamol', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['paracetamol'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/paracetamol', note: 'Web page; revision date not shown.'
+  },
+  'S-anmf-paracetamol-2022-02': {
+    title: 'ANMF Paracetamol, newborn use only', label: 'ANMF Paracetamol, newborn use only (v4.0, Feb 2022)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['paracetamol'], revised: '2022-02-03', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Paracetamol_%20ANMFv4.0_20220203.pdf'
+  },
+  'S-lactmed-paracetamol-2026-04': {
+    title: 'LactMed: Acetaminophen (paracetamol)', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['paracetamol'], revised: '2026-04-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501194/'
+  },
+  'S-pbs-paracetamol-665': {
+    title: 'PBS item 8814X and related: paracetamol 665 mg modified release tablets', label: 'PBS Schedule item 8814X and related', short: 'PBS 8814X and related',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['paracetamol'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/10598T-5343F-8814X'
+  },
+  'S-nps-child-fever': {
+    title: 'Treating my child’s pain or fever: paracetamol or ibuprofen?', label: 'NPS MedicineWise: child pain or fever, paracetamol or ibuprofen', short: 'NPS MedicineWise',
+    publisher: 'NPS MedicineWise', kind: 'guideline', tier: 3, meds: ['paracetamol', 'ibuprofen'], read: '2026-10-27', status: 'read',
+    url: 'https://www.nps.org.au/consumers/treating-my-child-s-pain-or-fever-paracetamol-or-ibuprofen', note: 'Consumer page; no review date shown.'
+  },
+
+  // ---------------------------------------------------------------- glyceryl-trinitrate (added 27 Oct 2026)
+  'S-nitrostat-pi-2025-06': {
+    title: 'Nitrostat sublingual tablets Product Information', label: 'Nitrostat PI (Jun 2025)', short: 'Nitrostat PI',
+    kind: 'PI', tier: 1, meds: ['glyceryl-trinitrate'], revised: '2025-06', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2025-PI-01744-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Section 10 says new PI; date from the document footer.'
+  },
+  'S-nitrolingual-pi-2026-02': {
+    title: 'Nitrolingual Pumpspray Product Information', label: 'Nitrolingual Pumpspray PI (Feb 2026)', short: 'Nitrolingual PI',
+    kind: 'PI', tier: 1, meds: ['glyceryl-trinitrate'], revised: '2026-02-24', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2021-PI-02143-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-transiderm-nitro-pi-2026-10': {
+    title: 'Transiderm-Nitro Product Information', label: 'Transiderm-Nitro PI (Oct 2026)', short: 'Transiderm-Nitro PI',
+    kind: 'PI', tier: 1, meds: ['glyceryl-trinitrate'], revised: '2026-10-09', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2023-PI-01915-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-dbl-gtn-pi-2022-01': {
+    title: 'DBL Glyceryl Trinitrate Concentrate Injection Product Information', label: 'DBL Glyceryl Trinitrate PI (Pfizer, Jan 2022)', short: 'DBL GTN PI',
+    publisher: 'Pfizer', kind: 'PI', tier: 1, meds: ['glyceryl-trinitrate'], revised: '2022-01-25', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2018-PI-01848-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-rch-gtn': {
+    title: 'RCH Paediatric Injectable Guidelines: Glyceryl trinitrate', label: 'RCH Paediatric Injectable Guidelines: Glyceryl trinitrate', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['glyceryl-trinitrate'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/glyceryl-trinitrate', note: 'Web page; revision date not shown.'
+  },
+  'S-lactmed-gtn-2024-10': {
+    title: 'LactMed: Nitroglycerin (glyceryl trinitrate)', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['glyceryl-trinitrate'], revised: '2024-10-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501516/'
+  },
+  'S-pbs-gtn': {
+    title: 'PBS item 8171C and related: glyceryl trinitrate spray and patches', label: 'PBS Schedule item 8171C and related', short: 'PBS 8171C and related',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['glyceryl-trinitrate'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/1515R-1516T-3475X-8027L-8028M-8119H-8171C'
+  },
+
+  // ---------------------------------------------------------------- salbutamol (added 27 Oct 2026)
+  'S-ventolin-mdi-pi-2026-04': {
+    title: 'Ventolin CFC-Free Inhaler Product Information', label: 'Ventolin Inhaler PI (GSK, Apr 2026)', short: 'Ventolin Inhaler PI',
+    publisher: 'GSK', kind: 'PI', tier: 1, meds: ['salbutamol'], revised: '2026-04-01', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2021-PI-01994-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-ventolin-nebules-pi-2025-06': {
+    title: 'Ventolin Respirator Solution and Nebules Product Information', label: 'Ventolin Nebules PI (GSK, Jun 2025)', short: 'Ventolin Nebules PI',
+    publisher: 'GSK', kind: 'PI', tier: 1, meds: ['salbutamol'], revised: '2025-06-30', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2010-PI-05107-3', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-ventolin-inj-pi-2024-02': {
+    title: 'Ventolin Sugar Free Syrup and Injection Product Information', label: 'Ventolin Syrup and Injection PI (GSK, Feb 2024)', short: 'Ventolin Injection PI',
+    publisher: 'GSK', kind: 'PI', tier: 1, meds: ['salbutamol'], revised: '2024-02-05', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2010-PI-04949-3', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-rch-salbutamol': {
+    title: 'RCH Paediatric Injectable Guidelines: Salbutamol', label: 'RCH Paediatric Injectable Guidelines: Salbutamol', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['salbutamol'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/salbutamol', note: 'Web page; revision date not shown.'
+  },
+  'S-anmf-salbutamol-2026-01': {
+    title: 'ANMF Salbutamol, newborn use only', label: 'ANMF Salbutamol, newborn use only (v3.0 errata, Jan 2026)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['salbutamol'], revised: '2026-01-22', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/Salbutamol_ANMFv3.0_20260122.pdf'
+  },
+  'S-lactmed-salbutamol': {
+    title: 'LactMed: Albuterol (salbutamol)', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['salbutamol'], status: 'not-read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501486/', note: 'Not opened: NCBI showed a browser check (CAPTCHA) to automated reading.'
+  },
+  'S-pbs-salbutamol': {
+    title: 'PBS item 12109H and related: salbutamol inhaler, nebules and oral liquid', label: 'PBS Schedule item 12109H and related', short: 'PBS 12109H and related',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['salbutamol'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/1103C-11095Y-11130T-12109H-13821K-2000G-2001H-8354Q'
+  },
+
+  // ---------------------------------------------------------------- atorvastatin (added 27 Oct 2026)
+  'S-lipitor-pi-2026-02': {
+    title: 'Lipitor Product Information', label: 'Lipitor PI (Feb 2026)', short: 'Lipitor PI',
+    kind: 'PI', tier: 1, meds: ['atorvastatin'], revised: '2026-02-27', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2021-PI-01263-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-pbs-8215J': {
+    title: 'PBS item 8215J: atorvastatin 40 mg tablets', label: 'PBS Schedule item 8215J', short: 'PBS 8215J',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['atorvastatin'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/8215J'
+  },
+  'S-lactmed-atorvastatin-2026-07': {
+    title: 'LactMed: Atorvastatin', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['atorvastatin'], revised: '2026-07-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501361/'
+  },
+
+  // ---------------------------------------------------------------- ibuprofen (added 27 Oct 2026)
+  'S-brufen-pi-2026-04': {
+    title: 'Brufen Product Information', label: 'Brufen PI (Viatris, Apr 2026)', short: 'Brufen PI',
+    publisher: 'Viatris', kind: 'PI', tier: 1, meds: ['ibuprofen'], revised: '2026-04-08', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2009-PI-00035-3', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-caldolor-pi-2026-02': {
+    title: 'Caldolor Product Information', label: 'Caldolor PI (Feb 2026)', short: 'Caldolor PI',
+    kind: 'PI', tier: 1, meds: ['ibuprofen'], revised: '2026-02-05', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2023-PI-01569-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-pedea-pi-2026-04': {
+    title: 'Pedea Product Information', label: 'Pedea PI (Apr 2026)', short: 'Pedea PI',
+    kind: 'PI', tier: 1, meds: ['ibuprofen'], revised: '2026-04-16', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2019-PI-01642-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-rch-ibuprofen': {
+    title: 'RCH Paediatric Injectable Guidelines: Ibuprofen', label: 'RCH Paediatric Injectable Guidelines: Ibuprofen', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['ibuprofen'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/ibuprofen', note: 'Web page; revision date not shown.'
+  },
+  'S-anmf-ibuprofen-2025-11': {
+    title: 'ANMF Ibuprofen, newborn use only', label: 'ANMF Ibuprofen, newborn use only (v3.0 errata, Nov 2025)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['ibuprofen'], revised: '2025-11-27', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/Ibuprofen_ANMFv3.0_20251127.pdf', note: 'Review due 23 Sep 2026.'
+  },
+  'S-lactmed-ibuprofen-2025-08': {
+    title: 'LactMed: Ibuprofen', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['ibuprofen'], revised: '2025-08-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK500986/'
+  },
+  'S-pbs-3192B': {
+    title: 'PBS item 3192B: ibuprofen 400 mg tablet', label: 'PBS Schedule item 3192B', short: 'PBS 3192B',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['ibuprofen'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/3192B'
+  },
+
   // ---------------------------------------------------------------- shared references and gaps
   'S-who-atc': {
     title: 'WHO ATC/DDD Index', label: 'WHO ATC/DDD Index', short: 'ATC index',
-    publisher: 'WHO Collaborating Centre for Drug Statistics Methodology', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'tacrolimus', 'piperacillin-tazobactam', 'lidocaine', 'empagliflozin', 'ketamine', 'ipratropium'], status: 'not-read',
+    publisher: 'WHO Collaborating Centre for Drug Statistics Methodology', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'tacrolimus', 'piperacillin-tazobactam', 'lidocaine', 'empagliflozin', 'ketamine', 'ipratropium', 'metformin', 'paracetamol', 'glyceryl-trinitrate', 'salbutamol', 'atorvastatin', 'ibuprofen'], status: 'not-read',
     url: 'https://atcddd.fhi.no/atc_ddd_index/'
   },
   'S-pbs-schedule': {
@@ -498,7 +700,7 @@ MEDIAUS.sources({
   },
   'S-amhcdc': {
     title: 'AMH Children’s Dosing Companion', label: 'AMH Children’s Dosing Companion', short: 'AMH CDC',
-    publisher: 'AMH', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'lidocaine'], status: 'paywalled'
+    publisher: 'AMH', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'lidocaine', 'paracetamol', 'glyceryl-trinitrate', 'salbutamol', 'atorvastatin', 'ibuprofen'], status: 'paywalled'
   },
   'S-tga-pregnancy-db': {
     title: 'TGA Prescribing medicines in pregnancy database', label: 'TGA pregnancy database', short: 'TGA pregnancy database',
@@ -507,7 +709,7 @@ MEDIAUS.sources({
   },
   'S-drtc': {
     title: 'Don’t Rush to Crush', label: 'Don’t Rush to Crush (SHPA)', short: 'Don’t Rush to Crush',
-    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['amiodarone', 'digoxin', 'amoxicillin', 'baclofen', 'tacrolimus', 'empagliflozin'], status: 'paywalled',
+    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['amiodarone', 'digoxin', 'amoxicillin', 'baclofen', 'tacrolimus', 'empagliflozin', 'metformin', 'paracetamol', 'atorvastatin'], status: 'paywalled',
     note: 'Crushing, dispersing and enteral tube use.'
   },
   'S-aidh': {
