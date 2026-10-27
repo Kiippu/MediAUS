@@ -22,6 +22,15 @@ async def main():
 
         await pg.goto('http://localhost:8090/', wait_until='networkidle')
         await pg.click('text=Get Started')
+        # what's new pop-up: once per version, then hidden features stay hidden
+        await pg.wait_for_selector('#wn-ok'); await shot('00-whats-new')
+        await pg.click('#wn-ok')
+        assert await pg.locator('#wn-ok').count() == 0, 'pop-up closes'
+        assert await pg.locator('text=Pill Identifier').count() == 0, 'pill identifier hidden'
+        assert await pg.locator('text=Scan Barcode').count() == 0, 'scanner hidden'
+        # search opens without focusing the input (no keyboard on phones)
+        await pg.click('nav >> text=Search'); assert await pg.evaluate("document.activeElement.id") != 'q', 'search not auto-focused'
+        await pg.click('nav >> text=Home')
         # search by route
         await pg.click('nav >> text=Search'); await pg.click('[data-act="route:Enteral tube"]'); await shot('01-search-tube')
         await pg.click('[data-act="route:IM"]'); await shot('02-search-im')
@@ -47,8 +56,10 @@ async def main():
         await pg.goto('http://localhost:8090/', wait_until='networkidle'); await pg.click('text=Get Started')
         await pg.click('[data-act="med:amoxicillin:cap"]'); await pg.click('[role=tab]:has-text("Interactions")'); await top(500); await shot('15-amox-int')
         await pg.click('[role=tab]:has-text("Administration")'); await pg.click('[data-act="rsel:open"]'); await top(300); await shot('16-amox-open')
-        # pill identifier + scanner smoke
-        await pg.click('[data-act="back"]'); await pg.click('text=Pill Identifier'); await pg.fill('#imp', 'u3a'); await top(600); await shot('17-pill-u3a')
+        # pill identifier hidden on the medicine page too
+        await pg.click('[role=tab]:has-text("Overview")')
+        assert await pg.locator('text=Save to List').count() == 1
+        assert await pg.locator('[data-act="go:pill"]').count() == 0, 'no Identify a pill button'
         # checker: type-to-add picker
         await pg.click('[data-act="back"]'); await pg.click('nav >> text=Interactions'); await shot('18-check')
         await pg.fill('#addq', 'cord'); await pg.keyboard.press('ArrowDown')
@@ -60,6 +71,9 @@ async def main():
         # every screen but home uses the shared header
         await pg.click('nav >> text=More'); await shot('20-profile')
         assert await pg.locator('h1:has-text("Profile")').count() == 1
+        # About reopens the pop-up
+        await pg.click('[data-act="whatsnew"]'); await pg.wait_for_selector('#wn-ok'); await pg.keyboard.press('Escape')
+        assert await pg.locator('#wn-ok').count() == 0, 'Esc closes the pop-up'
         print('errors:', errs)
         await b.close()
 

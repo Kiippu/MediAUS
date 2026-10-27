@@ -6,6 +6,31 @@
   var TEAL = '#1A6F67';
   var MUTED = '#5B6F75';
 
+  // ---------- version & features ----------
+  var APP_VERSION = '1.2.0';
+  // Hidden for the MVP while we focus on core data. Set true to bring back.
+  var FEATURES = { pill: false, scan: false };
+  var SEEN_KEY = 'mediaus.seenVersion';
+  // "What's new" pop-up, shown once per version.
+  var WHATS_NEW = {
+    items: [
+      '17 medicines, up from 3',
+      'Dosing and Administration grouped by Adults, Children and Newborns',
+      'Preparation steps for each route: reconstitute, dilute and give',
+      'A Sources trail on every fact: tap a source line to see the documents, sections and dates behind it',
+      'Search by route now includes SC, Intrathecal and Local',
+      'Pill identifier and barcode scanner hidden for now while we focus on core data'
+    ],
+    roadmap: [
+      ['Barcode scanner', 'Scan a medicine pack to open its page'],
+      ['Pill identifier', 'Identify a tablet or capsule by shape, colour and imprint'],
+      ['Webster pack scanner', 'Check the medicines in a Webster pack']
+    ]
+  };
+  function featureOn(screen) { return !((screen === 'pill' && !FEATURES.pill) || (screen === 'scan' && !FEATURES.scan)); }
+  function seenVersion() { try { return localStorage.getItem(SEEN_KEY); } catch (e) { return null; } }
+  function markSeen() { try { localStorage.setItem(SEEN_KEY, APP_VERSION); } catch (e) { /* ignore */ } }
+
   // ---------- state ----------
   var state = {
     screen: 'splash',
@@ -29,7 +54,8 @@
     prov: null,
     routeId: '',
     doseId: '',
-    scan: { phase: 'idle', code: '', manual: false, torch: false }
+    scan: { phase: 'idle', code: '', manual: false, torch: false },
+    whatsNew: false
   };
   var depth = 0;
 
@@ -47,7 +73,7 @@
   var PAIRS = D.PAIRS;
 
   var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'SC', 'Intrathecal', 'Local', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
-  var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', 'AI photo pill identifier', 'Barcode scanner for medicine packs', 'Ad-free experience'];
+  var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', FEATURES.pill && 'AI photo pill identifier', FEATURES.scan && 'Barcode scanner for medicine packs', 'Ad-free experience'].filter(Boolean);
   var TABS = [['overview', 'Overview'], ['dosage', 'Dosage'], ['admin', 'Administration'], ['interactions', 'Interactions'], ['pregnancy', 'Pregnancy'], ['more', 'More']];
   var SHAPES = ['round', 'oval', 'oblong', 'capsule'];
   var SWATCHES = ['white', 'ivory', 'yellow', 'blue', 'pink', 'orange', 'red', 'green', 'maroon'];
@@ -226,8 +252,8 @@
         '<div style="display:flex;flex-direction:column;gap:8px;flex:1"><span style="font-size:16px;font-weight:700;line-height:1.35">Australian Medication Information at your fingertips</span><span style="font-size:12px;line-height:1.5;color:#C3DADB">Evidence-based. Up to date. Built for healthcare professionals.</span></div>' +
         '<svg width="64" height="52" viewBox="0 0 430 345" aria-hidden="true" style="flex:none"><path d="' + AUS_PATH + '" fill="#3FC1B2" opacity="0.85"/></svg>' +
       '</div>' +
-      tile('<svg width="28" height="28" viewBox="0 0 80 50" aria-hidden="true"><circle cx="30" cy="25" r="16" fill="#FFFFFF" stroke="#0E5E59" stroke-width="3.5"/><path d="M48 11h10a14 14 0 0 1 0 28H48z" fill="#3FC1B2" stroke="#0E5E59" stroke-width="3.5"/></svg>', 'Pill Identifier', 'Describe or photograph a pill to identify it', 'go:pill', newBadge) +
-      tile('<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>', 'Scan Barcode', 'Point your camera at a medicine pack', 'go:scan', proBadge) +
+      (FEATURES.pill ? tile('<svg width="28" height="28" viewBox="0 0 80 50" aria-hidden="true"><circle cx="30" cy="25" r="16" fill="#FFFFFF" stroke="#0E5E59" stroke-width="3.5"/><path d="M48 11h10a14 14 0 0 1 0 28H48z" fill="#3FC1B2" stroke="#0E5E59" stroke-width="3.5"/></svg>', 'Pill Identifier', 'Describe or photograph a pill to identify it', 'go:pill', newBadge) : '') +
+      (FEATURES.scan ? tile('<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14"/></svg>', 'Scan Barcode', 'Point your camera at a medicine pack', 'go:scan', proBadge) : '') +
       tile('<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>', 'Browse Categories', 'Explore by class, condition or therapeutic area', 'go:search') +
       '<div style="display:flex;flex-direction:column;gap:10px;margin-top:4px"><h2 style="' + H2 + '">Recently Viewed</h2>' + recent + '</div>' +
       '</div>';
@@ -476,8 +502,8 @@
     return '<h2 style="' + H2 + '">Key Information</h2><div>' + rows + '</div>' +
       '<h2 style="' + H2 + ';margin-top:6px">What it looks like</h2>' + appearanceCards(f) +
       provLine(m._ids.overview.concat([f._f], f.appearance.map(function (a) { return a._f; })), 'Key information · ' + f.label) +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-        '<button data-act="go:pill" style="font-size:14px;font-weight:700;color:#1A6F67;background:#FFFFFF;border:1.5px solid #1A6F67;border-radius:14px;min-height:50px">Identify a pill</button>' +
+      '<div style="display:grid;grid-template-columns:' + (FEATURES.pill ? '1fr 1fr' : '1fr') + ';gap:10px">' +
+        (FEATURES.pill ? '<button data-act="go:pill" style="font-size:14px;font-weight:700;color:#1A6F67;background:#FFFFFF;border:1.5px solid #1A6F67;border-radius:14px;min-height:50px">Identify a pill</button>' : '') +
         '<button style="font-size:14px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:14px;min-height:50px">Save to List</button>' +
       '</div>';
   }
@@ -1186,7 +1212,7 @@
       '<div style="display:flex;flex-direction:column"><h2 style="margin:0 0 4px;font-size:16px;font-weight:700">App Settings</h2>' +
         row(ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>'), 'Appearance', 'System') +
         row(ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'), 'Region', 'Australia') +
-        row(ic('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/>'), 'About', 'Version 1.1.0') +
+        row(ic('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/>'), 'About', 'Version ' + APP_VERSION, 'whatsnew') +
       '</div>' +
       '<p style="margin:0;font-size:12px;line-height:1.5;color:#5B6F75">Prototype with sample data for review. Not for clinical use.</p>' +
       '</div>';
@@ -1313,6 +1339,34 @@
       sampleBadge() + '</div>';
   }
 
+  // ---------- what's new pop-up ----------
+  function whatsNewHtml() {
+    var tick = '<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="11" fill="#2DB3A3"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var dot = '<span aria-hidden="true" style="flex:none;width:18px;height:18px;margin-top:1px;border-radius:9px;border:2px dashed #8FB5B3"></span>';
+    var items = WHATS_NEW.items.map(function (t) {
+      return '<li style="display:flex;gap:10px;font-size:14px;line-height:1.45;color:#24414A">' + tick + '<span>' + esc(t) + '</span></li>';
+    }).join('');
+    var road = WHATS_NEW.roadmap.map(function (r) {
+      return '<li style="display:flex;gap:10px;font-size:14px;line-height:1.45">' + dot + '<span style="display:flex;flex-direction:column;gap:1px"><span style="font-weight:700;color:#142B33">' + esc(r[0]) + '</span><span style="font-size:13px;color:#5B6F75">' + esc(r[1]) + '</span></span></li>';
+    }).join('');
+    var UL = 'list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px';
+    return '<div data-act="wnclose" style="position:absolute;inset:0;z-index:20;background:rgba(12,42,48,.55);display:flex;align-items:center;justify-content:center;padding:16px">' +
+      '<div data-act="wnstay" role="dialog" aria-modal="true" aria-labelledby="wn-title" style="width:100%;max-width:400px;max-height:100%;overflow-y:auto;background:#FFFFFF;color:#142B33;border-radius:20px;padding:22px 20px 18px;display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 48px rgba(12,42,48,.3);cursor:auto">' +
+        '<div style="display:flex;align-items:center;gap:12px">' + logo(36) + '<div style="display:flex;flex-direction:column;gap:2px">' +
+          '<span style="font-size:11px;font-weight:800;letter-spacing:.6px;color:#0E5E59">WHAT’S NEW</span>' +
+          '<h2 id="wn-title" style="margin:0;font-size:19px;font-weight:800;letter-spacing:-0.3px">MediAUS ' + APP_VERSION + ': MVP</h2></div></div>' +
+        '<span style="font-size:14px;line-height:1.5;color:#24414A">This is the first MVP of MediAUS, focused on core medicine data.</span>' +
+        '<div style="display:flex;flex-direction:column;gap:10px"><h3 style="margin:0;font-size:15px;font-weight:700">In this version</h3><ul style="' + UL + '">' + items + '</ul></div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;background:#F3F8F8;border-radius:14px;padding:14px"><h3 style="margin:0;font-size:15px;font-weight:700">Coming later</h3><ul style="' + UL + '">' + road + '</ul></div>' +
+        '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Prototype with draft data. Not for clinical use.</span>' +
+        '<button id="wn-ok" data-act="wnclose" style="min-height:50px;border:0;border-radius:14px;background:#1A6F67;color:#FFFFFF;font-size:15px;font-weight:700">Got it</button>' +
+      '</div></div>';
+  }
+
+  function maybeWhatsNew() {
+    if (seenVersion() !== APP_VERSION) { state.whatsNew = true; render(true); }
+  }
+
   // ---------- render & navigation ----------
   var app = document.getElementById('app');
   var VIEWS = { splash: viewSplash, home: viewHome, search: viewSearch, med: viewMed, check: viewCheck, profile: viewProfile, plan: viewPlan, pill: viewPill, scan: viewScanLocked, prov: viewProv };
@@ -1330,6 +1384,10 @@
     if (scr === 'splash') app.innerHTML = viewSplash();
     else if (scr === 'scan' && scanUnlocked()) app.innerHTML = viewScan();
     else app.innerHTML = '<div class="scroll" id="scroll">' + (VIEWS[scr] || viewHome)() + '</div>' + (showNav ? navHtml() : '');
+    if (state.whatsNew && scr !== 'splash') {
+      app.insertAdjacentHTML('beforeend', whatsNewHtml());
+      var ok = document.getElementById('wn-ok'); if (ok) ok.focus({ preventScroll: true });
+    }
     var q = document.getElementById('q'); if (q) q.value = state.query;
     var aq = document.getElementById('addq'); if (aq) { aq.value = state.addq; if (state.addq) updateAddList(); }
     var imp = document.getElementById('imp'); if (imp) imp.value = state.pill.imprint;
@@ -1346,16 +1404,13 @@
 
   function navigate(screen, extra, opts) {
     var before = JSON.stringify(snapshot());
+    if (!featureOn(screen)) screen = 'home';
     state.screen = screen;
     if (extra) for (var k in extra) state[k] = extra[k];
     var changed = JSON.stringify(snapshot()) !== before;
     if (opts && opts.replace) history.replaceState(snapshot(), '');
     else if (changed) { history.pushState(snapshot(), ''); depth++; }
-    render();
-    if (screen === 'search' && !(opts && opts.noFocus)) {
-      var q = document.getElementById('q');
-      if (q) q.focus({ preventScroll: true });
-    }
+    render(); // no auto-focus on Search: it pops the keyboard on phones
   }
 
   function goBack() {
@@ -1366,7 +1421,7 @@
   window.addEventListener('popstate', function (e) {
     if (depth > 0) depth--;
     var s = e.state || { screen: 'home' };
-    if (s.screen === 'splash') s.screen = 'home';
+    if (s.screen === 'splash' || !featureOn(s.screen)) s.screen = 'home';
     state.screen = s.screen;
     if (s.tab) state.tab = s.tab;
     if (s.medId) state.medId = s.medId;
@@ -1387,7 +1442,10 @@
     var parts = el.getAttribute('data-act').split(':');
     var act = parts[0], arg = parts[1], arg2 = parts[2];
     switch (act) {
-      case 'start': navigate('home', null, { replace: true }); break;
+      case 'start': navigate('home', null, { replace: true }); maybeWhatsNew(); break;
+      case 'whatsnew': state.whatsNew = true; render(true); break;
+      case 'wnclose': markSeen(); state.whatsNew = false; render(true); break;
+      case 'wnstay': break;
       case 'go': navigate(arg); break;
       case 'med': navigate('med', { medId: arg, formId: arg2 || D.MEDS[arg].forms[0].id, tab: 'overview', routeId: '', doseId: '' }); break;
       case 'medtab': navigate('med', { medId: arg, formId: D.MEDS[arg].forms[0].id, tab: arg2, routeId: '', doseId: '' }); break;
@@ -1465,6 +1523,10 @@
       state.pill.imprint = e.target.value;
       updatePill();
     }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && state.whatsNew) { markSeen(); state.whatsNew = false; render(true); }
   });
 
   app.addEventListener('keydown', function (e) {

@@ -40,6 +40,7 @@ async def main():
 
         # the Trail screen
         await pg.click('text=Get Started')
+        if await pg.locator('#wn-ok').count(): await pg.click('#wn-ok')
         await pg.evaluate("a => { const b = document.createElement('button'); b.dataset.act = a; document.getElementById('app').appendChild(b); b.click(); }", 'medr:amiodarone:tab:swallow')
         await pg.click('[data-act^="prov:"] >> nth=0')
         t = await pg.inner_text('#app')

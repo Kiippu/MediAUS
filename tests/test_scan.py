@@ -1,3 +1,4 @@
+# Needs FEATURES.scan = true in app/app.js (the scanner is hidden for the MVP).
 import asyncio, os
 SHOTS = os.path.join(os.path.dirname(__file__), 'shots')
 CAM = os.path.join(os.path.dirname(__file__), 'fakecam.y4m')

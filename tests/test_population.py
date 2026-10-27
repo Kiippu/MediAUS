@@ -28,6 +28,7 @@ async def main():
         async def open_med(q, act):
             await pg.goto(URL, wait_until='networkidle')
             await pg.click('text=Get Started')
+            if await pg.locator('#wn-ok').count(): await pg.click('#wn-ok')
             await pg.click('nav >> text=Search')
             await pg.fill('#q', q)
             _, med, frm = act.split(':')
