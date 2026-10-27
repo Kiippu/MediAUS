@@ -1,10 +1,18 @@
 /* MediAUS service worker: network first, cache fallback, so updates show straight away while testing. */
-var CACHE = 'mediaus-v7';
+var CACHE = 'mediaus-v8';
 var ASSETS = [
   './',
   'index.html',
   'styles.css',
-  'data.js',
+  'data/core.js',
+  'data/sources.js',
+  'data/reviews.js',
+  'data/facts/amiodarone.js',
+  'data/facts/digoxin.js',
+  'data/facts/amoxicillin.js',
+  'data/facts/demo.js',
+  'data/meds.js',
+  'data/resolve.js',
   'app.js',
   'manifest.webmanifest',
   'icons/icon-192.png',

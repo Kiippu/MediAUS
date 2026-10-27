@@ -26,6 +26,7 @@
     photo: null,
     photoState: 'idle',
     pop: 'all',
+    prov: null,
     routeId: '',
     doseId: '',
     scan: { phase: 'idle', code: '', manual: false, torch: false }
@@ -41,23 +42,9 @@
     none:     { label: 'No action', bg: '#ECFDF3', bd: '#ABEFC6', icon: '#079455', fg: '#054F31', rank: 3 }
   };
 
-  var CHECK_MEDS = {
-    amiodarone: 'Amiodarone', digoxin: 'Digoxin', warfarin: 'Warfarin', amoxicillin: 'Amoxicillin',
-    furosemide: 'Furosemide', verapamil: 'Verapamil', simvastatin: 'Simvastatin', methotrexate: 'Methotrexate',
-    coc: 'Oral Contraceptive', paracetamol: 'Paracetamol'
-  };
-  var PAIRS = [
-    { a: 'amiodarone', b: 'digoxin', sev: 'major', title: 'Amiodarone + Digoxin', text: 'Digoxin levels rise by about 70%. Monitor levels and ECG; adjust the digoxin dose.' },
-    { a: 'amiodarone', b: 'warfarin', sev: 'major', title: 'Amiodarone + Warfarin', text: 'Bleeding risk rises. Monitor INR more often, during treatment and after stopping amiodarone.' },
-    { a: 'amiodarone', b: 'simvastatin', sev: 'major', title: 'Amiodarone + Simvastatin', text: 'Risk of muscle toxicity. Use a statin not metabolised by CYP3A4.' },
-    { a: 'digoxin', b: 'verapamil', sev: 'major', title: 'Digoxin + Verapamil', text: 'Higher digoxin levels and a slower heart rate. Reduce the digoxin dose.' },
-    { a: 'amoxicillin', b: 'methotrexate', sev: 'major', title: 'Amoxicillin + Methotrexate', text: 'Increased methotrexate toxicity, especially at high doses.' },
-    { a: 'amiodarone', b: 'verapamil', sev: 'moderate', title: 'Amiodarone + Verapamil', text: 'Slow heart rate and heart block.' },
-    { a: 'digoxin', b: 'furosemide', sev: 'moderate', title: 'Digoxin + Furosemide', text: 'Low potassium increases the risk of digoxin toxicity. Monitor potassium.' },
-    { a: 'amoxicillin', b: 'warfarin', sev: 'moderate', title: 'Amoxicillin + Warfarin', text: 'Rare INR rises. Monitor INR when starting or stopping amoxicillin.' },
-    { a: 'warfarin', b: 'paracetamol', sev: 'moderate', title: 'Warfarin + Paracetamol', text: 'Regular paracetamol can raise INR.' },
-    { a: 'amoxicillin', b: 'coc', sev: 'conflict', title: 'Amoxicillin + Oral Contraceptive', text: 'The PI says efficacy may be reduced; UK FSRH guidance says no extra precautions unless vomiting or diarrhoea. Check local guidance.' }
-  ];
+  // Checker names and pairs are demo facts (data/facts/demo.js).
+  var CHECK_MEDS = D.CHECK_MEDS;
+  var PAIRS = D.PAIRS;
 
   var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
   var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', 'AI photo pill identifier', 'Barcode scanner for medicine packs', 'Ad-free experience'];
@@ -75,7 +62,7 @@
       });
     });
   });
-  D.EXTRA_PILLS.forEach(function (a) { PILLS.push({ a: a, sub: 'Details coming soon' }); });
+  D.EXTRA_PILLS.forEach(function (a) { PILLS.push({ a: a, sub: 'Details coming soon' }); }); // demo facts
 
   // ---------- helpers ----------
   function esc(s) {
@@ -169,8 +156,19 @@
   }
 
   var H2 = 'margin:0;font-size:16px;font-weight:700';
-  var VERIFY_TAG = '<span style="font-size:10px;font-weight:800;color:#7A2E0E;background:#FFF4D6;border:1px solid #FEC84B;border-radius:6px;padding:1px 6px">To verify</span>';
-  function srcLine(t) { return '<span style="font-size:12px;color:#5B6F75;line-height:1.5">Sources: ' + esc(t) + '</span>'; }
+  var VERIFY_TAG = '<span style="white-space:nowrap;font-size:10px;font-weight:800;color:#7A2E0E;background:#FFF4D6;border:1px solid #FEC84B;border-radius:6px;padding:1px 6px">To verify</span>';
+  var DEMO_TAG = '<span style="white-space:nowrap;font-size:10px;font-weight:800;color:#5C3D00;background:#FFF4D6;border:1px solid #F2B53A;border-radius:6px;padding:1px 6px">Demo data</span>';
+  // Tag for a fact's status: To verify, or Demo data.
+  function tagOf(x) { return x && x.verify ? VERIFY_TAG : x && x.demo ? DEMO_TAG : ''; }
+  // Source line under a block, built from the cites of the facts shown in it. Tapping opens each line's trail.
+  var provBlocks = [];
+  function provLine(ids, title, empty) {
+    var line = D.prov.citeLine(ids), look = D.prov.lookInLine(ids);
+    var txt = (line ? 'Sources: ' + line : '') + (look ? (line ? '. ' : '') + 'To check: ' + look : '');
+    provBlocks.push({ ids: ids, title: title });
+    return '<button data-act="prov:' + (provBlocks.length - 1) + '" style="text-align:left;border:0;background:transparent;padding:4px 0;min-height:44px;font-size:12px;color:#5B6F75;line-height:1.5">' +
+      esc(txt || empty || 'No document found yet.') + ' <span style="color:#1A6F67;font-weight:700;white-space:nowrap">Trail ›</span></button>';
+  }
   var CARD = 'background:#FFFFFF;border:1.5px solid #E1E8E9;border-radius:14px';
 
   // ---------- splash ----------
@@ -260,7 +258,7 @@
   function positionsHtml(list) {
     return '<div style="display:flex;flex-direction:column;gap:8px">' + list.map(function (p) {
       return '<div style="border-left:3px solid #BDB4FE;background:#FAFAFF;border-radius:0 10px 10px 0;padding:8px 12px;display:flex;flex-direction:column;gap:2px">' +
-        '<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + (p.pop ? groupTag(popLabel(p)) : '') + '<span style="font-size:11px;font-weight:800;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(p.src) + '</span></span>' +
+        '<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + (p.pop ? groupTag(popLabel(p)) : '') + '<span style="font-size:11px;font-weight:800;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(p.src) + '</span>' + tagOf(p) + '</span>' +
         '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div>';
     }).join('') + '</div>';
   }
@@ -446,7 +444,7 @@
       }
       return '<div style="' + CARD + ';padding:14px;display:flex;flex-direction:column;gap:10px">' +
         '<div style="display:flex;gap:14px;align-items:center"><span style="flex:none;width:92px;height:62px;border-radius:12px;background:#F3F6F6;display:flex;align-items:center;justify-content:center">' + drawPill(a, 80) + '</span>' +
-        '<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px;font-weight:700">' + esc(a.label) + (a.verify ? VERIFY_TAG : '') + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(a.desc) + '</span></div></div>' +
+        '<div style="display:flex;flex-direction:column;gap:4px"><span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px;font-weight:700">' + esc(a.label) + tagOf(a) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(a.desc) + '</span></div></div>' +
         (rows.length ? '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px">' + rows.map(function (r) { return '<span style="display:flex;flex-direction:column;font-size:13px"><span style="font-size:11px;font-weight:600;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">' + r[0] + '</span><span style="font-weight:600">' + esc(r[1]) + '</span></span>'; }).join('') + '</div>' : '') +
         (a.src ? '<span style="font-size:11px;color:#5B6F75">Appearance source: ' + esc(a.src) + '</span>' : '') +
         '</div>';
@@ -463,7 +461,7 @@
     }).join('');
     return '<h2 style="' + H2 + '">Key Information</h2><div>' + rows + '</div>' +
       '<h2 style="' + H2 + ';margin-top:6px">What it looks like</h2>' + appearanceCards(f) +
-      srcLine(m.src.overview) +
+      provLine(m._ids.overview.concat([f._f], f.appearance.map(function (a) { return a._f; })), 'Key information · ' + f.label) +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
         '<button data-act="go:pill" style="font-size:14px;font-weight:700;color:#1A6F67;background:#FFFFFF;border:1.5px solid #1A6F67;border-radius:14px;min-height:50px">Identify a pill</button>' +
         '<button style="font-size:14px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:14px;min-height:50px">Save to List</button>' +
@@ -505,16 +503,16 @@
     var body = d.rows.map(function (r) {
       return '<tr>' + cols.map(function (i) { return r[i]; }).map(function (c, i) {
         var tag = i === 0 ? 'th scope="row"' : 'td';
-        return '<' + tag + ' style="text-align:left;vertical-align:top;padding:10px 12px;font-size:13px;line-height:1.4;border-bottom:1px solid #EEF2F3;' + (i === 0 ? 'position:sticky;left:0;background:#FFFFFF;font-weight:700;color:#142B33;min-width:104px;' : 'min-width:' + (narrow ? '90' : '150') + 'px;color:#24414A;') + '">' + esc(c) + '</' + tag.split(' ')[0] + '>';
+        return '<' + tag + ' style="text-align:left;vertical-align:top;padding:10px 12px;font-size:13px;line-height:1.4;border-bottom:1px solid #EEF2F3;' + (i === 0 ? 'position:sticky;left:0;background:#FFFFFF;font-weight:700;color:#142B33;min-width:104px;' : 'min-width:' + (narrow ? '90' : '150') + 'px;color:#24414A;') + '">' + esc(c.text) + (tagOf(c) ? ' ' + tagOf(c) : '') + '</' + tag.split(' ')[0] + '>';
       }).join('') + '</tr>';
     }).join('');
-    var notes = (d.notes || []).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('');
+    var notes = (d.notes || []).map(function (n) { return '<li>' + esc(n.text) + (tagOf(n) ? ' ' + tagOf(n) : '') + '</li>'; }).join('');
     return '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><h2 style="' + H2 + '">Dosage · ' + esc(f.label) + '</h2>' + (narrow ? '' : '<span style="font-size:11px;color:#5B6F75">Scroll table →</span>') + '</div>' +
       (sets.length > 1 ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:#5B6F75">Route</span>' + chipRow(sets, d.id, 'dsel') + '</div>' : '<span style="font-size:13px;color:#5B6F75">Route: ' + esc(d.label) + '</span>') +
       (split ? popSwitch(groups) : '') +
       (split ? '<span style="font-size:14px;font-weight:700;color:#142B33">Showing: ' + (g === 'all' ? 'all groups' : GROUPS[g]) + '</span>' : '') +
       '<div style="overflow-x:auto;border:1.5px solid #E1E8E9;border-radius:12px"><table style="border-collapse:separate;border-spacing:0;width:100%;min-width:' + (narrow ? '0' : '560px') + '"><caption class="sr">' + esc(d.label) + ' doses for ' + esc(f.label) + '</caption><thead>' + head + '</thead><tbody>' + body + '</tbody></table></div>' +
-      (d.src ? srcLine(d.src) : '') +
+      provLine(d._ids, 'Dosage · ' + f.label + ' · ' + d.label) +
       (notes ? '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + notes + '</ul>' : '') +
       '<button data-act="tab:admin" style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1.5px solid #1A6F67;background:#FFFFFF;color:#1A6F67;border-radius:14px;padding:0 16px;min-height:50px;font-size:14px;font-weight:700">How to give this form' + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A6F67" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>';
   }
@@ -539,7 +537,7 @@
     };
   }
   function prepEntryHtml(e, showTag) {
-    var tag = showTag ? groupTag(popLabel(e)) : '';
+    var tag = (showTag ? groupTag(popLabel(e)) : '') + tagOf(e);
     var src = e.src ? '<span style="font-size:11px;color:#5B6F75">Source: ' + esc(e.src) + '</span>' : '';
     var wrap = function (inner, style) { return '<div style="display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;' + style + '">' + inner + '</div>'; };
     if (e.missing) return wrap('<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + tag + '<span style="font-size:11px;font-weight:800;color:#344054;text-transform:uppercase;letter-spacing:.4px">Not found yet</span></span><span style="font-size:13px;line-height:1.45;color:#344054">' + esc(e.missing) + '</span>', 'background:#F2F4F7;border:1px dashed #98A2B3');
@@ -590,12 +588,12 @@
       if (open) {
         var who = r.pops ? '<div style="display:flex;flex-direction:column;gap:6px">' + (g === 'all' ? pops : [g]).map(function (p) {
           var x = r.pops[p] || { status: 'unverified', note: 'Not found in the sources read.' };
-          return '<div style="display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;font-weight:800;color:#142B33">' + GROUPS[p] + '</span>' + rPill(x.status) + '</span>' + (x.note ? '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(x.note) + '</span>' : '') + '</div>';
+          return '<div style="display:flex;flex-direction:column;gap:3px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;font-weight:800;color:#142B33">' + GROUPS[p] + '</span>' + rPill(x.status) + tagOf(x) + '</span>' + (x.note ? '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(x.note) + '</span>' : '') + '</div>';
         }).join('') + '</div>' : '';
         var na = gp && gp.status === 'na';
         var pos = (r.positions || []).filter(function (p) { return forPop(p, g); });
         var brands = r.brands ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:700;color:#5B6F75;text-transform:uppercase;letter-spacing:.4px">By brand</span>' + r.brands.map(function (b) {
-          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:14px;font-weight:700">' + esc(b.brand) + '</span><span style="font-size:11px;color:#5B6F75">' + esc(b.note) + '</span></span>' + rPill(b.status) + '</div>';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:#F7F9F9"><span style="display:flex;flex-direction:column;gap:1px"><span style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:700">' + esc(b.brand) + tagOf(b) + '</span><span style="font-size:11px;color:#5B6F75">' + esc(b.note) + '</span></span>' + rPill(b.status) + '</div>';
         }).join('') + '</div>' : '';
         body = '<div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:12px">' +
           (r.summary ? '<span style="font-size:13px;line-height:1.5;color:#24414A">' + esc(r.summary) + '</span>' : '') +
@@ -605,7 +603,7 @@
             (pos.length ? '<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:700;color:#4A1FB8;text-transform:uppercase;letter-spacing:.4px">' + esc(r.positionsTitle || 'What each source says') + '</span>' + positionsHtml(pos) + '</div>' : '') +
             brands +
             (r.items ? itemsByGroupHtml(r.items, g, gl, pops, r.pops) : '')) +
-          '<span style="font-size:12px;color:#5B6F75;line-height:1.5">' + (r.status === 'unverified' ? (r.src === '—' ? 'No document found yet.' : 'To check: ' + esc(r.src.replace(/^Needs /, ''))) : 'Sources: ' + esc(r.src)) + '</span></div>';
+          provLine(r._ids, f.label + ' · ' + r.label) + '</div>';
       }
       return '<div style="' + CARD + ';border-color:' + (open ? '#9CC5C0' : '#E1E8E9') + ';overflow:hidden">' + head + body + '</div>';
     }).join('');
@@ -624,16 +622,16 @@
     var cards = m.interactions.important.map(function (p) {
       var d = sevDeco(p.sev);
       return '<div style="display:flex;gap:12px;align-items:flex-start;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:14px;padding:14px">' + d.icon +
-        '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:14px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span>' + d.tag + '</div><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div>';
+        '<div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:14px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span>' + d.tag + '</div><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + (tagOf(p) ? ' ' + tagOf(p) : '') + '</span></div></div>';
     }).join('');
     var other = m.interactions.other.map(function (o) {
       var v = SEV[o.sev];
-      return '<li><span>' + esc(o.text) + ' <span style="white-space:nowrap;font-size:11px;font-weight:700;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:1px 7px">' + v.label + '</span></span>' + (o.positions ? '<div style="margin-top:6px">' + positionsHtml(o.positions) + '</div>' : '') + '</li>';
+      return '<li><span>' + esc(o.text) + (tagOf(o) ? ' ' + tagOf(o) : '') + ' <span style="white-space:nowrap;font-size:11px;font-weight:700;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:1px 7px">' + v.label + '</span></span>' + (o.positions ? '<div style="margin-top:6px">' + positionsHtml(o.positions) + '</div>' : '') + '</li>';
     }).join('');
     return '<h2 style="' + H2 + '">Important Interactions</h2>' + cards +
       '<h2 style="' + H2 + ';margin-top:6px">Other Notable Interactions</h2>' +
       '<ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.45">' + other + '</ul>' +
-      srcLine(m.src.interactions) +
+      provLine(m._ids.interactions, 'Interactions') +
       '<button data-act="checkwith" style="font-size:15px;font-weight:700;color:#FFFFFF;background:#1A6F67;border:0;border-radius:14px;min-height:50px">Check with other medicines</button>';
   }
 
@@ -647,16 +645,16 @@
 
   function tabPregnancy() {
     var m = med();
-    function card(t, title, strong, text, extra) {
+    function card(t, title, strong, text, extra, tag) {
       var c = TONES[t];
       return '<div style="display:flex;gap:12px;background:' + c.bg + ';border:1.5px solid ' + c.bd + ';border-radius:16px;padding:14px"><span style="flex:none;width:40px;height:40px;border-radius:20px;background:#FFFFFF;display:flex;align-items:center;justify-content:center">' + ICON.drop(c.icon) + '</span>' +
-        '<div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:15px;font-weight:700;color:' + c.fg + '">' + title + '</span><span style="font-size:14px;font-weight:600">' + esc(strong) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(text) + '</span>' + (extra || '') + '</div></div>';
+        '<div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:15px;font-weight:700;color:' + c.fg + '">' + title + (tag || '') + '</span><span style="font-size:14px;font-weight:600">' + esc(strong) + '</span><span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(text) + '</span>' + (extra || '') + '</div></div>';
     }
     var bf = m.breastfeeding;
     return '<h2 style="' + H2 + '">Pregnancy &amp; Breastfeeding</h2>' +
-      card(m.pregnancy.tone, 'Pregnancy', m.pregnancy.label || ('TGA Category ' + m.pregnancy.cat), m.pregnancy.text + ' Categories describe the evidence, not a safety ranking.') +
-      card(bf.tone, 'Breastfeeding', bf.status, bf.text, bf.positions ? positionsHtml(bf.positions) : '') +
-      srcLine(m.src.pregnancy) +
+      card(m.pregnancy.tone, 'Pregnancy', m.pregnancy.label || ('TGA Category ' + m.pregnancy.cat), m.pregnancy.text + ' Categories describe the evidence, not a safety ranking.', '', tagOf(m.pregnancy)) +
+      card(bf.tone, 'Breastfeeding', bf.status, bf.text, bf.positions ? positionsHtml(bf.positions) : '', tagOf(bf)) +
+      provLine(m._ids.pregnancy, 'Pregnancy and breastfeeding') +
       '<div style="display:flex;gap:10px;align-items:flex-start;border:1.5px solid #D6E3EE;background:#F7FAFC;border-radius:14px;padding:12px 14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D5FA8" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg><span style="font-size:13px;line-height:1.5;color:#24414A">Always consider the individual clinical situation. For advice in NSW, MotherSafe: <a href="tel:0293826539" style="font-weight:600">(02) 9382 6539</a></span></div>';
   }
 
@@ -664,7 +662,7 @@
     var m = med();
     function block(color, fill, glyph, title, items) {
       return '<div style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:' + color + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="' + fill + '"/>' + glyph + '</svg>' + title + '</span>' +
-        '<ul style="margin:0;padding-left:46px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul></div>';
+        '<ul style="margin:0;padding-left:46px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.45;color:#24414A">' + items.map(function (i) { return '<li>' + esc(i.text) + (tagOf(i) ? ' ' + tagOf(i) : '') + '</li>'; }).join('') + '</ul></div>';
     }
     var X = '<path d="M8 8l8 8M16 8l-8 8" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>';
     var BANG = '<path d="M12 6.5v7M12 17v.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>';
@@ -673,7 +671,7 @@
       block('#93370D', '#F79009', BANG, 'Use with Caution', m.caution) +
       block('#93370D', '#E8590C', BANG, 'Warnings', m.warnings) +
       block('#0E5E59', '#1A8A7E', PULSE, 'Monitoring', m.monitoring) +
-      srcLine(m.src.more) +
+      provLine(m._ids.more, 'Contraindications, cautions, warnings, monitoring') +
       '<a href="https://www.tga.gov.au/resources/artg" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;background:#EEF5FC;border:1.5px solid #C2DAF3;border-radius:14px;padding:12px 14px;text-decoration:none;color:#142B33"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D5FA8" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg><span style="display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Full prescribing information</span><span style="font-size:12px;color:#1D5FA8">View TGA product information (PI)</span></span></a>';
   }
 
@@ -685,15 +683,14 @@
     return PAIRS.filter(function (p) { return sel.indexOf(p.a) >= 0 && sel.indexOf(p.b) >= 0; })
       .sort(function (a, b) { return SEV[a.sev].rank - SEV[b.sev].rank; });
   }
-  // PAIRS are demo text. Look for the same pair in data.js so the card can name a real source.
+  // PAIRS are demo facts. Look for the same pair in a medicine's interactions so the card can name a real source.
   function pairEvidence(p) {
     var out = [];
     [[p.a, p.b], [p.b, p.a]].forEach(function (x) {
       var m = D.MEDS[x[0]]; if (!m) return;
-      var other = CHECK_MEDS[x[1]].toLowerCase();
       var all = m.interactions.important.concat(m.interactions.other);
-      var hit = all.filter(function (i) { return ((i.title || '') + ' ' + i.text).toLowerCase().indexOf(other) >= 0; })[0];
-      if (hit) out.push({ med: m, item: hit, verify: /to verify/i.test(hit.text) || hit.verify });
+      var hit = all.filter(function (i) { return i['with'].indexOf(x[1]) >= 0; })[0];
+      if (hit) out.push({ med: m, item: hit, verify: hit.verify });
     });
     return out;
   }
@@ -814,7 +811,7 @@
     var d = sevDeco(p.sev), ev = pairEvidence(p);
     var conflict = ev.filter(function (e) { return e.item.positions; })[0];
     var srcRows = ev.length ? ev.map(function (e) {
-      return '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">' + esc(e.med.name) + ' entry: </span>' + esc(e.med.src.interactions) + (e.verify ? ' ' + VERIFY_TAG : '') + '</span>';
+      return '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">' + esc(e.med.name) + ' entry: </span>' + esc(D.prov.citeLine(e.item._ids) || 'To check: ' + D.prov.lookInLine(e.item._ids)) + (e.verify ? ' ' + VERIFY_TAG : '') + '</span>';
     }).join('') : '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">No source yet.</span> Check the PI for each medicine.</span>';
     var open = [p.a, p.b].filter(function (id) { return D.MEDS[id]; }).map(function (id) {
       return '<button data-act="medtab:' + id + ':interactions" style="font-size:12px;font-weight:700;color:#0E5E59;background:#FFFFFF;border:1px solid ' + d.v.bd + ';border-radius:10px;padding:0 12px;min-height:36px">Open ' + esc(D.MEDS[id].name) + '</button>';
@@ -871,7 +868,7 @@
   function pillResultCard(x, label, labelColor, extra) {
     var a = x.a;
     var inner = '<span style="flex:none;width:76px;height:52px;border-radius:10px;background:#F3F6F6;display:flex;align-items:center;justify-content:center">' + drawPill(a, 66) + '</span>' +
-      '<span style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:700">' + esc(a.label) + '</span>' + (a.verify ? VERIFY_TAG : '') + '<span style="font-size:11px;font-weight:700;color:' + labelColor + '">' + label + '</span></span>' +
+      '<span style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:700">' + esc(a.label) + '</span>' + tagOf(a) + '<span style="font-size:11px;font-weight:700;color:' + labelColor + '">' + label + '</span></span>' +
       '<span style="font-size:12px;color:#5B6F75">' + esc(a.desc) + '</span>' + (extra || '') +
       '<span style="font-size:12px;font-weight:600;color:#1A6F67">' + esc(x.sub) + '</span></span>' + (x.medId ? ICON.chevron : '');
     var style = 'text-align:left;display:flex;align-items:center;gap:12px;' + CARD + ';padding:10px 12px';
@@ -1223,10 +1220,89 @@
       '</nav>';
   }
 
+  // ---------- provenance: every line in a block, its sources, dates and sign-off ----------
+  var FSTATUS = {
+    draft:   { label: 'Draft', fg: '#344054', bg: '#F2F4F7', bd: '#D0D5DD', help: 'Sourced, not yet signed off' },
+    verify:  { label: 'To verify', fg: '#7A2E0E', bg: '#FFF4D6', bd: '#FEC84B', help: 'Not yet confirmed against a document' },
+    signed:  { label: 'Signed off', fg: '#054F31', bg: '#ECFDF3', bd: '#ABEFC6', help: 'Checked by the SME' },
+    gap:     { label: 'Gap', fg: '#344054', bg: '#FFFFFF', bd: '#98A2B3', help: 'No document found yet' },
+    demo:    { label: 'Demo data', fg: '#5C3D00', bg: '#FFF4D6', bd: '#F2B53A', help: 'Invented for testing' },
+    retired: { label: 'Retired', fg: '#5B6F75', bg: '#FFFFFF', bd: '#D0D5DD', help: 'No longer shown' }
+  };
+  var SRCSTATUS = { 'read': 'Read', 'partly-read': 'Partly read', 'not-read': 'Not read yet', 'paywalled': 'Paid, not read', 'not-recorded': 'Not recorded', 'demo': 'Not a source' };
+  var FIELDS = { name: 'Name', cls: 'Class', chips: 'Groups', brands: 'Brands', atc: 'ATC code', schedule: 'Schedule', pbs: 'PBS' };
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmtDate(s) {
+    if (!s) return '';
+    var p = String(s).split('-');
+    return (p[2] ? +p[2] + ' ' : '') + (p[1] ? MONTHS[+p[1] - 1] + ' ' : '') + p[0];
+  }
+  function chip(v) { return '<span style="flex:none;font-size:10px;font-weight:800;color:' + v.fg + ';background:' + v.bg + ';border:1px solid ' + v.bd + ';border-radius:6px;padding:1px 6px">' + v.label + '</span>'; }
+  // One readable line for any fact.
+  function factText(id) {
+    var P = D.prov, f = P.fact(id), r = function (t) { return P.render(t, f); }, st = function (u) { return (RSTATUS[u] || RSTATUS.unverified).label; };
+    switch (id.split('-')[0]) {
+      case 'IDN': return FIELDS[f.field] + ': ' + (Array.isArray(f.value) ? f.value.join(', ') : f.value);
+      case 'FRM': return f.unit + ' · ' + f.strengths;
+      case 'APP': return f.label + '. ' + f.desc;
+      case 'RTE': return f.label + ': ' + st(f.use) + (f.summary ? '. ' + r(f.summary) : '');
+      case 'ROU': return GROUPS[f.pop] + ': ' + st(f.use) + (f.note ? '. ' + r(f.note) : '');
+      case 'BRD': return f.brand + ': ' + st(f.use) + '. ' + r(f.note);
+      case 'PRP': return cap(f.step) + ': ' + (f.missing !== undefined ? r(f.missing) : f.none !== undefined ? r(f.none) : f.pump ? pumpText(f.pump).text : r(f.text));
+      case 'ADM': return f.label + ': ' + r(f.text);
+      case 'POS': return (f.heading ? r(f.heading) + ': ' : '') + r(f.text);
+      case 'INT': return (f.title ? f.title + '. ' : '') + r(f.text);
+      case 'PRG': return (f.label || 'Category ' + f.cat) + '. ' + r(f.text);
+      case 'BRF': return f.label + '. ' + r(f.text);
+      default: return r(f.text || f.name || f.title || f.product || '');
+    }
+  }
+  function viewProv() {
+    var P = D.prov, blk = state.prov || { ids: [], title: '' }, ids = blk.ids;
+    var counts = {};
+    ids.forEach(function (id) { var s = P.fact(id).status; counts[s] = (counts[s] || 0) + 1; });
+    var summary = Object.keys(FSTATUS).filter(function (k) { return counts[k]; }).map(function (k) { return counts[k] + ' ' + FSTATUS[k].label.toLowerCase(); }).join(' · ');
+    var lines = ids.map(function (id) {
+      var f = P.fact(id), v = FSTATUS[f.status] || FSTATUS.draft;
+      var cites = (f.cites || []).map(function (c) {
+        var s = P.source(c.src);
+        return '<li>' + esc(s.label) + (c.loc ? ', section ' + esc(c.loc) : '') + (c.note ? ' (' + esc(c.note) + ')' : '') +
+          (c.broad ? ' <span style="color:#7A2E0E">· from the block’s source list; section not pinned yet</span>' : '') + '</li>';
+      }).join('');
+      var look = (f.lookIn || []).map(function (x) { var k = typeof x === 'string' ? { src: x } : x; return esc(P.source(k.src).title) + (k.loc ? ' section ' + esc(k.loc) : ''); }).join(' · ');
+      var rv = f.review && P.reviews[f.review];
+      return '<div style="' + CARD + ';padding:12px 14px;display:flex;flex-direction:column;gap:6px">' +
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="font-size:11px;font-weight:700;color:#5B6F75;font-family:ui-monospace,Menlo,monospace">' + esc(id) + '</span>' + chip(v) +
+          (f.pop !== undefined ? groupTag(popLabel(f)) : '') + '</div>' +
+        '<span style="font-size:13px;line-height:1.45;color:#142B33">' + esc(factText(id)) + '</span>' +
+        (cites ? '<ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.5;color:#24414A">' + cites + '</ul>' : '') +
+        (look ? '<span style="font-size:12px;line-height:1.5;color:#344054"><span style="font-weight:700">Where to look: </span>' + look + '</span>' : '') +
+        (f.derived ? '<span style="font-size:12px;color:#5B6F75">' + esc(f.derived) + '</span>' : '') +
+        '<span style="font-size:11px;color:#5B6F75">Last changed ' + esc(fmtDate(f.changed)) + ' · ' + (rv ? 'Signed off by ' + esc(rv.by) + ', ' + esc(fmtDate(rv.on)) : 'Not signed off yet') + '</span></div>';
+    }).join('');
+    var docs = P.citesOf(ids).map(function (g) { return g.src; });
+    P.lookInsOf(ids).forEach(function (k) { if (docs.indexOf(k.src) < 0) docs.push(k.src); });
+    var docHtml = docs.map(function (id) {
+      var s = P.source(id), meta = [s.publisher, s.kind, s.revised ? 'revised ' + fmtDate(s.revised) : '', s.read ? 'read ' + fmtDate(s.read) : '', SRCSTATUS[s.status] && s.status !== 'read' ? SRCSTATUS[s.status] : '', s.tier ? 'tier ' + s.tier : ''].filter(Boolean).join(' · ');
+      return '<div style="display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid #EEF2F3">' +
+        '<span style="font-size:13px;font-weight:700;color:#142B33">' + esc(s.title) + '</span>' +
+        '<span style="font-size:12px;color:#5B6F75">' + esc(meta) + '</span>' +
+        (s.note ? '<span style="font-size:12px;color:#5B6F75">' + esc(s.note) + '</span>' : '') +
+        (s.url ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#1A6F67;min-height:32px;display:flex;align-items:center">Open document</a>' : '') + '</div>';
+    }).join('');
+    return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:12px">' +
+      pageHeader('Sources', { back: true }) +
+      '<h1 style="margin:0;font-size:20px;font-weight:800;letter-spacing:-0.3px">' + esc(blk.title) + '</h1>' +
+      '<span style="font-size:13px;line-height:1.5;color:#24414A">Each card is one record in the data: what it says, the documents behind it, and when it last changed. ' + ids.length + (ids.length === 1 ? ' line' : ' lines') + (summary ? ': ' + summary : '') + '.</span>' +
+      lines +
+      (docHtml ? '<div style="display:flex;flex-direction:column"><h2 style="' + H2 + ';margin:6px 0 4px">Documents</h2>' + docHtml + '</div>' : '') +
+      sampleBadge() + '</div>';
+  }
+
   // ---------- render & navigation ----------
   var app = document.getElementById('app');
-  var VIEWS = { splash: viewSplash, home: viewHome, search: viewSearch, med: viewMed, check: viewCheck, profile: viewProfile, plan: viewPlan, pill: viewPill, scan: viewScanLocked };
-  var TITLES = { home: 'MediAUS', search: 'Search', check: 'Interactions', profile: 'Profile', plan: 'Upgrade', pill: 'Pill Identifier', scan: 'Scan Barcode' };
+  var VIEWS = { splash: viewSplash, home: viewHome, search: viewSearch, med: viewMed, check: viewCheck, profile: viewProfile, plan: viewPlan, pill: viewPill, scan: viewScanLocked, prov: viewProv };
+  var TITLES = { home: 'MediAUS', search: 'Search', check: 'Interactions', profile: 'Profile', plan: 'Upgrade', pill: 'Pill Identifier', scan: 'Scan Barcode', prov: 'Sources' };
 
   function render(keepScroll) {
     var scr = state.screen;
@@ -1235,6 +1311,7 @@
     var dark = scr === 'splash' || scr === 'plan' || (scr === 'scan' && scanUnlocked());
     app.className = 'app' + (dark ? ' is-dark' : '');
     document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0C2A30' : '#FFFFFF');
+    provBlocks = [];
     var showNav = scr === 'home' || scr === 'search' || scr === 'check' || scr === 'profile';
     if (scr === 'splash') app.innerHTML = viewSplash();
     else if (scr === 'scan' && scanUnlocked()) app.innerHTML = viewScan();
@@ -1251,7 +1328,7 @@
     afterRender();
   }
 
-  function snapshot() { return { screen: state.screen, tab: state.tab, medId: state.medId, formId: state.formId }; }
+  function snapshot() { return { screen: state.screen, tab: state.tab, medId: state.medId, formId: state.formId, prov: state.screen === 'prov' ? state.prov : null }; }
 
   function navigate(screen, extra, opts) {
     var before = JSON.stringify(snapshot());
@@ -1280,6 +1357,8 @@
     if (s.tab) state.tab = s.tab;
     if (s.medId) state.medId = s.medId;
     if (s.formId) state.formId = s.formId;
+    if (s.prov) state.prov = s.prov;
+    if (state.screen === 'prov' && !state.prov) state.screen = 'home';
     render();
   });
 
@@ -1305,6 +1384,7 @@
       case 'pop': state.pop = arg; render(true); break;
       case 'tab': state.tab = arg; history.replaceState(snapshot(), ''); render(true); break;
       case 'back': goBack(); break;
+      case 'prov': if (provBlocks[+arg]) navigate('prov', { prov: provBlocks[+arg] }); break;
       case 'checkwith':
         if (state.selected.indexOf(state.medId) < 0 && CHECK_MEDS[state.medId]) state.selected = [state.medId].concat(state.selected);
         navigate('check');

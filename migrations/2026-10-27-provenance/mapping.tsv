@@ -1,0 +1,517 @@
+id	status	cites (*=broad)	look in	original text
+IDN-0001	draft	ARTG*, PBS 2344J*		Amiodarone
+IDN-0002	draft	ARTG*, PBS 2344J*		Antiarrhythmic (class III)
+IDN-0003	draft	ARTG*, PBS 2344J*		Antiarrhythmic,Class III
+IDN-0004	draft	ARTG*, PBS 2344J*		Cordarone X®, Aratac®
+IDN-0005	draft	ARTG*, PBS 2344J*		C01BD01
+IDN-0006	draft	ARTG*, PBS 2344J*		S4 (Prescription only)
+IDN-0007	draft	ARTG*, PBS 2344J*		Yes (tablets; restricted benefit)
+PRG-0001	draft	Cordarone X PI*		The PI lists amiodarone as contraindicated in pregnancy. Best avoided for 3 months before and throughout pregnancy.
+BRF-0001	draft	LactMed*, Cordarone X PI*		Amiodarone passes into breast milk.
+POS-0001	draft	Cordarone X PI		Contraindicated. Use alternative infant feeding if amiodarone must be given.
+POS-0002	draft	LactMed		Some experts allow breastfeeding with periodic monitoring of the baby’s heart and thyroid, most reasonably after a single dose.
+FRM-0001	draft	ARTG*, PBS 2344J*		200 mg tablet | 100 mg, 200 mg
+APP-0001	draft	Cordarone X PI		White to off-white, biconvex. “200” and an “action potential” emblem on one side; scored on the other.
+APP-0002	draft	Cordarone X PI		White to off-white, biconvex. “100” and an “action potential” emblem on one side; scored on the other.
+APP-0003	draft	Aratac PI		White. “AM”, a breakline and “200” on one side; “G” on the other.
+APP-0004	draft	Aratac PI		White. “AM”, a breakline and “100” on one side; “G” on the other.
+RTE-0001	draft	Cordarone X PI 4.2, 4.4, 4.5, PCH		Swallowed | The licensed route for adults. The PI gives the oral doses but does not say whether to take with water or food.
+ROU-0001	draft	PI 4.2		adult: PI 4.2
+ROU-0002	draft	PI, PCH		child: PI: not recommended in children (safety not established). PCH: used from 4 weeks of age.
+ROU-0003	draft	ANMF		newborn: Use the pharmacy-made suspension (ANMF).
+ADM-0001	draft	PI 4.5, PCH		Avoid grapefruit and grapefruit juice during treatment (PI 4.5, PCH).
+ADM-0002	draft	PI 4.2		The scored 100 mg tablet is used to find the lowest effective maintenance dose (PI 4.2).
+ADM-0003	draft	PCH		Give consistently with or without food (PCH).
+RTE-0002	draft	PCH, Cordarone X PI 4.4		Crushed and dispersed in water, by mouth | Described for children by Perth Children’s Hospital.
+ROU-0004	gap		Don’t Rush to Crush	adult: Not found. Check Don’t Rush to Crush.
+ROU-0005	draft	PI, PCH		child: PI: not recommended in children. PCH: tablets may be crushed and dispersed in water.
+ROU-0006	draft	ANMF		newborn: Use the pharmacy-made suspension (ANMF).
+ADM-0004	draft	PCH		Tablets may be crushed and dispersed in water (PCH).
+ADM-0005	draft	PCH		Give consistently with or without food. Avoid grapefruit (PCH).
+RTE-0003	gap	Cordarone X PI, PCH, ANMF, SESLHD	Don’t Rush to Crush	Via enteral tube (NG or PEG) | Not covered by the PI, PCH, ANMF or SESLHD documents.
+ROU-0007	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0008	gap		Don’t Rush to Crush	child: Check Don’t Rush to Crush.
+ROU-0009	gap	ANMF	Don’t Rush to Crush	newborn: Not covered by ANMF.
+RTE-0004	draft	PCH, ANMF, Cordarone X PI 4.4		Pharmacy-made oral suspension (5 mg/mL) | Compounded by pharmacy only when tablets are unsuitable or contraindicated.
+ROU-0010	gap			adult: No adult source found.
+ROU-0011	draft	PI, PCH		child: PI: not recommended in children. PCH: pharmacy supplies a 5 mg/mL suspension.
+ROU-0012	draft	PI, ANMF		newborn: PI: not recommended in children. ANMF: 5 mg/mL suspension on cardiology advice.
+ADM-0006	draft	PCH, ANMF		Store at 2–8°C. Do not freeze (PCH, ANMF).
+ADM-0007	draft	ANMF		May be given with or without feeds (ANMF).
+DOS-0001	draft	Cordarone X PI*, ANMF*		Loading, week 1
+DOS-0002	draft	Cordarone X PI*		200 mg three times daily
+DOS-0003	gap		PCH	Specialist only. Check PCH.
+DOS-0004	draft	Cordarone X PI*, ANMF*		Loading, week 2
+DOS-0005	draft	Cordarone X PI*		200 mg twice daily
+DOS-0006	gap		PCH	Specialist only. Check PCH.
+DOS-0007	draft	Cordarone X PI*, ANMF*		Maintenance
+DOS-0008	draft	Cordarone X PI*		200 mg daily or less. Use the scored 100 mg tablet to find the lowest effective dose.
+DOS-0009	gap		PCH	Specialist only. Check PCH.
+DOS-0010	draft	ANMF*		SVT or JET: 5–10 mg/kg once daily, as a pharmacy-made 5 mg/mL suspension. Max 15 mg/kg/day.
+DOS-0011	draft	Cordarone X PI*, ANMF*		Higher adult maintenance doses are rarely needed.
+DOS-0012	draft	Cordarone X PI		The PI does not recommend amiodarone in children; child doses come from hospital guidelines.
+DOS-0013	draft	ANMF		Newborns: cardiology-directed use only (ANMF).
+FRM-0002	draft	ARTG*, PBS 2344J*		150 mg/3 mL ampoule | 150 mg/3 mL (50 mg/mL)
+APP-0005	draft	Cordarone X PI		Clear, pale yellow solution in a 3 mL ampoule. Discard if cloudy or if a precipitate is present. Contains benzyl alcohol and polysorbate 80.
+RTE-0005	draft	Cordarone X PI 4.2, 4.3, 4.4, 6.2, SESLHD, PCH, RCH, ANMF		IV infusion | The preferred IV method. Glucose 5% only. Central line recommended for repeated or continuous infusion, to avoid thrombophlebitis.
+ROU-0013	draft	PI 4.2, SESLHD		adult: PI 4.2. Critical care areas (SESLHD).
+ROU-0014	draft	PI, PCH		child: PI: not recommended in children. PCH (4 weeks to 18 years) and RCH: used in critical care.
+ROU-0015	draft	PI, ANMF, RCH		newborn: PI: injection contraindicated in neonates (benzyl alcohol). ANMF: used on cardiology advice. RCH: caution (benzyl alcohol).
+PRP-0001	draft	Cordarone X PI 4.2, 4.3, 4.4, 6.2*, SESLHD*, PCH*, RCH*, ANMF*		Not needed: already a solution (150 mg/3 mL ampoule).
+PRP-0002	draft	PI 4.2, RCH, ANMF		Glucose 5% only. Incompatible with sodium chloride 0.9%.
+PRP-0003	draft	PI 4.2		Loading dose in 250 mL glucose 5%.
+PRP-0004	draft	SESLHD		Loading 300 mg: central, in 50 mL (6 mg/mL); peripheral, remove 100 mL from a 250 mL bag and add 300 mg (max 2 mg/mL). Maintenance 450 mg: in 250 mL peripheral, or in 50 mL central.
+PRP-0005	draft	RCH		Dilute to 1–6 mg/mL. Standard central: 150 mg/50 mL (under 10 kg), 300 mg/50 mL (10 to under 40 kg), 600 mg/100 mL (40 kg+). Standard peripheral: 100 mg/50 mL (under 40 kg), 200 mg/100 mL (40 kg+).
+PRP-0006	draft	PCH		Use non-PVC bags or syringes.
+PRP-0007	draft	ANMF		Under 2 kg: 1 mL (50 mg) + 49 mL glucose 5% = 1 mg/mL. 2 kg or more: 2 mL (100 mg) + 48 mL = 2 mg/mL. Prepare loading and maintenance doses in separate syringes.
+PRP-0008	draft	PI 4.2		5 mg/kg over 20 minutes to 2 hours. Repeat: up to 1200 mg in up to 500 mL per 24 hours, rate adjusted to response.
+PRP-0009	draft	PI 4.2		{"ml":250,"min":[20,120]}
+PRP-0010	draft	SESLHD		Loading 300 mg: over 30 minutes central, or 1 hour peripheral. Maintenance 900 mg over 24 hours: 450 mg in 250 mL at 21 mL/h peripheral, or 450 mg in 50 mL at 4.2 mL/h central. Max 1200 mg in 24 hours.
+PRP-0011	draft	PCH		Loading 5 mg/kg (max 300 mg) by syringe driver over 20–120 minutes. Continuous infusion only if needed, up to 15 microgram/kg/minute (max 1200 mg/day).
+PRP-0012	draft	RCH		Pump or syringe driver. Complete within 12 hours of preparation.
+PRP-0013	draft	ANMF		VF/VT: 5 mg/kg over 1 hour, then 5–25 microgram/kg/minute. SVT/JET: 6 mg/kg over 4 hours, then 5–15 microgram/kg/minute. Rate (mL/h) = dose (microgram/kg/min) × weight (kg) × 0.06 at 1 mg/mL, or × 0.03 at 2 mg/mL.
+ADM-0008	draft	PI 6.2		Nothing else in the same syringe, bag or line. Heparin and aminophylline are physically incompatible (PI 6.2).
+ADM-0009	draft	PI 4.2, RCH		Prepare immediately before use in glass or plasticiser-free rigid containers. Use within 12 hours (PI 4.2, RCH).
+ADM-0010	draft	PI 4.2, ANMF		Non-DEHP sets. Drop size can shrink, so use a volumetric pump (PI 4.2, ANMF).
+ADM-0011	draft	PI 4.2, SESLHD		Central line for repeated or continuous infusion (PI 4.2). Dedicated line (SESLHD).
+ADM-0012	draft	SESLHD		Infusions over 2 hours: 0.22 micron in-line filter (SESLHD).
+ADM-0013	draft	RCH		0.2 micron low protein binding in-line filter (RCH).
+ADM-0014	draft	PCH		Critical care only: NICU, PCC, theatre, ED (PCH).
+ADM-0015	draft	ANMF		On the advice of the cardiology team; dose prescribed by a paediatric cardiologist (ANMF).
+RTE-0006	draft	SESLHD, RCH, PCH, ANMF		IV infusion via a peripheral line | Used when there is no central access. High risk of thrombophlebitis. Maximum 2 mg/mL in all groups.
+ROU-0016	draft	SESLHD		adult: SESLHD: loading and maintenance at 2 mg/mL or less.
+ROU-0017	draft	RCH		child: RCH: over 2 mg/mL central line only.
+ROU-0018	draft	ANMF		newborn: ANMF: only if central access is unavailable.
+PRP-0014	draft	SESLHD*, RCH*, PCH*, ANMF*		Not needed: already a solution.
+PRP-0015	draft	SESLHD, RCH, ANMF		Glucose 5% only. Maximum 2 mg/mL peripherally.
+PRP-0016	draft	SESLHD		Loading: 300 mg in 150 mL (remove 100 mL from a 250 mL bag). Maintenance: 450 mg in 250 mL.
+PRP-0017	draft	RCH		100 mg/50 mL (under 40 kg) or 200 mg/100 mL (40 kg+), both 2 mg/mL.
+PRP-0018	draft	ANMF		0.6–2 mg/mL.
+PRP-0019	draft	SESLHD		Loading over 1 hour. Maintenance at 21 mL/h.
+PRP-0020	draft	PCH		At the prescribed rate by syringe driver. Repeated doses via a central line are recommended.
+PRP-0021	draft	ANMF		As for IV infusion.
+ADM-0016	draft	SESLHD		Infusions over 2 hours: 0.22 micron in-line filter (SESLHD).
+ADM-0017	draft	PCH		0.22 micron filter recommended to reduce phlebitis (PCH).
+RTE-0007	draft	Cordarone X PI 4.2, 4.3, 4.4		Slow IV injection (emergency) | Generally not advised because of severe hypotension and circulatory collapse. Only in extreme emergency, when other therapies have failed.
+ROU-0019	draft	PI		adult: PI: intensive care only.
+ROU-0020	draft	PI		child: Not covered outside cardiac arrest. PI: not recommended in children.
+ROU-0021	draft	PI		newborn: PI: contraindicated in neonates (benzyl alcohol).
+PRP-0022	draft	Cordarone X PI 4.2, 4.3, 4.4*		Not needed: already a solution.
+PRP-0023	draft	PI 4.2		150–300 mg in 10–20 mL glucose 5%.
+PRP-0024	draft	PI 4.2, 4.4		Over 1–2 minutes. Do not repeat within 15 minutes of the first injection.
+ADM-0018	draft	PI 4.2		Intensive care only, with continuous ECG and blood pressure monitoring (PI 4.2).
+RTE-0008	draft	ANZCOR 11.5, ANZCOR 12.2, PCH, RCH, ANMF		IV or intraosseous in cardiac arrest | Shock-refractory VF or pulseless VT, during CPR. National resuscitation guidelines.
+ROU-0022	draft	ANZCOR 11.5		adult: ANZCOR 11.5
+ROU-0023	draft	ANZCOR 12.2, PCH, RCH		child: ANZCOR 12.2, PCH, RCH. Sources differ on how to give it.
+ROU-0024	draft	ANMF		newborn: ANMF
+PRP-0025	draft	ANZCOR 11.5*, ANZCOR 12.2*, PCH*, RCH*, ANMF*		Not needed: already a solution.
+PRP-0026	gap	ANZCOR 11.5	local protocol	Not stated in ANZCOR 11.5. Check the local resuscitation protocol.
+PRP-0027	draft	PCH		30 kg or less: 150 mg in glucose 5% to 30 mL (5 mg/mL). Over 30 kg needing more than 150 mg: dose in 10–20 mL glucose 5%. Give only the dose needed.
+PRP-0028	draft	RCH		May be given undiluted.
+PRP-0029	draft	ANMF		Undiluted.
+PRP-0030	draft	ANZCOR 11.5		300 mg IV or IO after the 3rd shock. A further 150 mg may be considered after the 5th shock. Flush with at least 20–30 mL.
+PRP-0031	draft	ANZCOR 12.2		5 mg/kg (max 300 mg) IV or IO bolus. Flush with sodium chloride 0.9% or glucose 5%. Further doses on specialist advice.
+PRP-0032	draft	ANMF		5 mg/kg rapid bolus during CPR.
+POS-0003	draft	PCH		Rapid IV injection after the 3rd shock; repeat after the 5th if needed. Diluted as above.
+POS-0004	draft	RCH		Undiluted over at least 3 minutes, then a glucose 5% flush.
+ADM-0019	draft	ANZCOR, ANZCOR 12.2		IV preferred. Intraosseous if no IV access, at the same dose (ANZCOR).
+ADM-0020	draft	ANZCOR 11.5		Avoid in torsades de pointes (ANZCOR 11.5).
+ADM-0021	draft	ANZCOR 12.2		Lidocaine 1 mg/kg IV or IO if amiodarone is not available (ANZCOR 12.2).
+RTE-0009	draft	PCH		Given by mouth | Do not give the injection solution by mouth: it is an irritant.
+ROU-0025	draft	PCH		adult: PCH advice (children). No adult source found; it applies to the solution itself.
+ROU-0026	draft	PCH		child: PCH
+ROU-0027	draft	PCH		newborn: PCH advice (children). Not covered by ANMF.
+RTE-0010	draft	Cordarone X PI, RCH		Intramuscular (IM) | The PI does not mention IM.
+ROU-0028	gap	Cordarone X PI		adult: Not in the PI.
+ROU-0029	draft	RCH		child: RCH: not recommended.
+ROU-0030	gap	ANMF		newborn: Not covered by ANMF.
+RTE-0011	draft	Cordarone X PI, RCH		Subcutaneous (SC) | The PI does not mention SC.
+ROU-0031	gap	Cordarone X PI		adult: Not in the PI.
+ROU-0032	draft	RCH		child: RCH: not recommended.
+ROU-0033	gap	ANMF		newborn: Not covered by ANMF.
+DOS-0014	draft	Cordarone X PI*, SESLHD*, PCH*, ANMF*		Loading
+DOS-0015	draft	PI, SESLHD		5 mg/kg over 20 min–2 h in 250 mL glucose 5% (PI). SESLHD: 300 mg over 30–60 min.
+DOS-0016	draft	PCH		5 mg/kg (max 300 mg) over 20–120 min. May repeat 1–5 mg/kg. Max 15 mg/kg/day or 900 mg/day, whichever is less (PCH).
+DOS-0017	draft	ANMF		VF/VT: 5 mg/kg over 1 h. SVT/JET: 6 mg/kg over 4 h (ANMF).
+DOS-0018	draft	Cordarone X PI*, SESLHD*, PCH*, ANMF*		Maintenance
+DOS-0019	draft	PI, SESLHD		Up to 1200 mg (about 15 mg/kg) in up to 500 mL per 24 h (PI). SESLHD: 900 mg over 24 h.
+DOS-0020	draft	PCH		Up to 15 microgram/kg/min. Max 1200 mg/day (PCH).
+DOS-0021	draft	ANMF		VF/VT: 5–25 microgram/kg/min. SVT/JET: 5–15 microgram/kg/min. Max 15 mg/kg/day (ANMF).
+DOS-0022	draft	Cordarone X PI*, SESLHD*, PCH*, ANMF*		Use within 12 hours of preparation.
+DOS-0023	draft	Cordarone X PI		The PI does not recommend amiodarone in children and contraindicates the injection in neonates (benzyl alcohol). Child and newborn doses come from hospital guidelines.
+DOS-0024	draft	Cordarone X PI*		Extreme emergency
+DOS-0025	draft	Cordarone X PI*		150–300 mg in 10–20 mL glucose 5% over 1–2 min. Not within 15 min of a previous injection.
+DOS-0026	gap	Cordarone X PI*		Not covered. For cardiac arrest see that dose set.
+DOS-0027	draft	PI		Contraindicated (PI).
+DOS-0028	draft	Cordarone X PI*		Intensive care only, with continuous ECG and blood pressure monitoring.
+DOS-0029	draft	ANZCOR 11.5*, ANZCOR 12.2*, PCH*, ANMF*		First dose
+DOS-0030	draft	ANZCOR 11.5*		300 mg IV or IO after the 3rd shock
+DOS-0031	draft	ANZCOR 12.2, PCH		5 mg/kg (max 300 mg) IV or IO (ANZCOR 12.2). PCH: after the 3rd shock.
+DOS-0032	draft	ANMF*		5 mg/kg rapid bolus, undiluted
+DOS-0033	draft	ANZCOR 11.5*, ANZCOR 12.2*, PCH*, ANMF*		Repeat
+DOS-0034	draft	ANZCOR 11.5*		A further 150 mg may be considered after the 5th shock
+DOS-0035	draft	PCH, ANZCOR 12.2		PCH: repeat after the 5th shock if needed. ANZCOR 12.2: further doses on specialist advice.
+DOS-0036	draft	ANZCOR 11.5*, ANZCOR 12.2*, PCH*, ANMF*		Recurrent VF/pulseless VT
+DOS-0037	draft	ANZCOR 11.5*		Infusion of 15 mg/kg over 24 h may be considered
+DOS-0038	draft	ANZCOR 11.5*, ANZCOR 12.2*, PCH*, ANMF*		Adults: flush with 20–30 mL. Children: flush with sodium chloride 0.9% or glucose 5%.
+DOS-0039	draft	ANZCOR, ANZCOR 12.2		Lidocaine 1 mg/kg is an alternative (ANZCOR).
+INT-0001	draft	Cordarone X PI*		Digoxin levels rise by about 70%. Monitor ECG and digoxin levels, and adjust the digoxin dose.
+INT-0002	draft	Cordarone X PI*		Warfarin. Monitor INR more often, during treatment and after stopping amiodarone.
+INT-0003	draft	Cordarone X PI*		Simvastatin and other statins metabolised by CYP3A4. Use a statin that is not.
+INT-0004	draft	Cordarone X PI*		Contraindicated with medicines that can cause torsades de pointes.
+INT-0005	draft	Cordarone X PI*		Sofosbuvir. Not recommended. If unavoidable, cardiac monitoring (48 hours continuous for high-risk patients).
+INT-0006	draft	Cordarone X PI*		Grapefruit juice (higher amiodarone levels; avoid)
+INT-0007	draft	Cordarone X PI*		Heparin, aminophylline (physically incompatible in the infusion set)
+INT-0008	verify	Cordarone X PI*		Beta-blockers, verapamil, diltiazem (slow heart rate, heart block) — to verify
+INT-0009	verify	Cordarone X PI*		Ciclosporin, tacrolimus (higher levels) — to verify
+SAF-0001	draft	Cordarone X PI*		Hypersensitivity to iodine or amiodarone
+SAF-0002	draft	Cordarone X PI*		Pregnancy and breastfeeding
+SAF-0003	draft	Cordarone X PI*		Current or past thyroid dysfunction
+SAF-0004	draft	Cordarone X PI*		Sinus bradycardia, sino-atrial block or significant AV conduction disorders, unless a pacemaker is fitted
+SAF-0005	draft	Cordarone X PI*		Use with medicines that can cause torsades de pointes
+SAF-0006	draft	Cordarone X PI*		Injection only: hypotension, severe respiratory failure, cardiomyopathy or heart failure, circulatory collapse, bi- or tri-fascicular block without a pacemaker, neonates (benzyl alcohol)
+SAF-0007	draft	Cordarone X PI*		Liver disease
+SAF-0008	draft	Cordarone X PI*		Lung disease
+SAF-0009	draft	Cordarone X PI*		Low potassium (check before starting)
+SAF-0010	draft	Cordarone X PI*		Older adults
+SAF-0011	draft	Cordarone X PI*		Lung toxicity: report new cough or breathlessness
+SAF-0012	draft	Cordarone X PI*		Thyroid over- or under-activity
+SAF-0013	draft	Cordarone X PI*		Liver injury: reduce the dose or stop if transaminases are over 3 times the upper limit of normal
+SAF-0014	draft	Cordarone X PI*		Corneal deposits occur in almost all patients; optic neuropathy or neuritis needs withdrawal
+SAF-0015	draft	Cordarone X PI*		Long half-life, usually 14–59 days: effects and interactions continue for weeks to months after stopping
+SAF-0016	draft	Cordarone X PI*		Thyroid (usTSH): before, during and for several months after treatment
+SAF-0017	draft	Cordarone X PI*		Liver function: at the start, then regularly
+SAF-0018	draft	Cordarone X PI*		Chest X-ray: regularly during long-term therapy, and if breathless
+SAF-0019	draft	Cordarone X PI*		Eyes: regular checks (slit lamp, visual acuity, ophthalmoscopy)
+SAF-0020	draft	Cordarone X PI*		ECG and potassium before starting; regular ECGs during long-term therapy
+SAF-0021	draft	SESLHD		IV use: continuous ECG and blood pressure; defibrillator available (SESLHD)
+IDN-0008	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		Digoxin
+IDN-0009	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		Cardiac glycoside
+IDN-0010	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		Cardiac glycoside,Rate control
+IDN-0011	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		Lanoxin®, Lanoxin PG®, Sigmaxin®, Sigmaxin PG®
+IDN-0012	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		C01AA05
+IDN-0013	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		S4 (Prescription only)
+IDN-0014	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		Yes (restricted benefit)
+PRG-0002	verify		TGA pregnancy database	Taken by many pregnant women with no proven increase in harm to the baby. (Category to verify in the TGA database.)
+BRF-0002	draft	LactMed*		Small amounts pass into breast milk and are not expected to affect the baby. After an IV dose, waiting 2 hours before breastfeeding reduces the baby’s exposure.
+FRM-0003	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		250 microgram tablet | 62.5 microgram, 250 microgram
+APP-0006	draft	healthdirect, healthdirect		White, round, biconvex, uncoated. Scored and marked “X3A” on the top face; plain underneath.
+APP-0007	draft	healthdirect, healthdirect		Blue, round, biconvex, uncoated. Marked “U3A” on the top face; plain underneath.
+APP-0008	verify		Lanoxin PI	Sample appearance, not yet verified.
+APP-0009	verify		Lanoxin PI	Sample appearance, not yet verified.
+RTE-0012	draft	healthdirect, healthdirect, PCH, ANMF	Lanoxin PI, Sigmaxin PI	Swallowed | Oral route on the ARTG. Adult doses still need the Lanoxin or Sigmaxin PI.
+ROU-0034	draft	ARTG, healthdirect	Lanoxin PI, Sigmaxin PI	adult: ARTG. Adult details to verify (Lanoxin or Sigmaxin PI).
+ROU-0035	gap	PCH		child: PCH lists only the elixir and injection. Tablet use in children not found.
+ADM-0022	verify	ANMF		With or without food, at a consistent time relative to meals. Source covers newborns (ANMF); confirm for tablets.
+ADM-0023	verify	healthdirect*, healthdirect*, PCH*, ANMF*		Many services count the apical pulse before each dose and withhold if under 60/min.
+ADM-0024	draft	PCH, ANMF		PCH and ANMF do not require routine pre-dose pulse checks in children.
+RTE-0013	gap	PCH	Don’t Rush to Crush	Crushed and dispersed, by mouth | PCH lists only the elixir and injection; no tablet guidance found. Consider the elixir.
+ROU-0036	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0037	draft	PCH		child: Use the elixir (PCH).
+RTE-0014	gap		Don’t Rush to Crush	Via enteral tube (NG or PEG) | Not covered by any document read.
+ROU-0038	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0039	gap		Don’t Rush to Crush	child: Check Don’t Rush to Crush.
+DOS-0040	draft	PCH*		Rapid loading
+DOS-0041	verify		Lanoxin PI	500 microgram, then 250 microgram every 6 h to a total of 1–1.5 mg (to verify)
+DOS-0042	draft	PCH		4 weeks to 10 years: 10–20 microgram/kg in total, max 750 microgram. Over 10 years: 10–20 microgram/kg, max 750–1500 microgram (PCH, enteral).
+DOS-0043	draft	PCH*		Maintenance
+DOS-0044	verify		Lanoxin PI	62.5–250 microgram once daily (to verify)
+DOS-0045	draft	PCH		Initially 3–5 microgram/kg (max 125 microgram) twice daily. Up to 10 microgram/kg (max 250 microgram) twice daily (PCH, enteral).
+DOS-0046	draft	PCH*		Kidney impairment
+DOS-0047	verify		Lanoxin PI	Reduce the dose; guided by levels (to verify)
+DOS-0048	verify	PCH*		Reduce the dose (to verify)
+DOS-0049	draft	PCH		PCH doses are for enteral use; PCH lists the elixir, not tablets.
+DOS-0050	draft	PCH*		Take levels at least 6 hours after a dose.
+DOS-0051	draft	PCH*		Newborn doses: see the oral liquid.
+FRM-0004	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		50 microgram/mL elixir | 50 microgram/mL
+APP-0010	verify		Lanoxin Paediatric Elixir CMI	Oral liquid in 60 mL and 100 mL bottles. Contains ethanol (about 10.6%), propylene glycol and sucrose.
+RTE-0015	draft	healthdirect, PCH, ANMF		By mouth | Oral liquid on the ARTG (Lanoxin Paediatric Elixir).
+ROU-0040	verify	ARTG		adult: ARTG. For adults who can’t swallow tablets; doses as for tablets (to verify).
+ROU-0041	draft	PCH		child: PCH, from 4 weeks of age.
+ROU-0042	draft	ANMF		newborn: ANMF
+ADM-0025	draft	ANMF		With or without feeds, at a consistent time (ANMF).
+ADM-0026	verify	healthdirect*, PCH*, ANMF*		Use an oral syringe, never a spoon or cup. Tenfold dosing errors are a known risk.
+ADM-0027	draft	healthdirect*, PCH*, ANMF*		Contains ethanol and propylene glycol.
+ADM-0028	draft	healthdirect*, PCH*, ANMF*		Below 25°C, protected from light.
+RTE-0016	gap	PCH, ANMF	Don’t Rush to Crush	Via enteral tube (NG or PEG) | PCH covers enteral use but gives no tube instructions; ANMF does not mention tubes.
+ROU-0043	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0044	draft	PCH		child: PCH: enteral doses, no tube instructions.
+ROU-0045	gap	ANMF	Don’t Rush to Crush	newborn: Not in ANMF.
+DOS-0052	draft	PCH*, ANMF*		Loading
+DOS-0053	verify		Lanoxin PI	As for tablets (to verify)
+DOS-0054	draft	PCH		4 weeks to 10 years: 10–20 microgram/kg in total, max 750 microgram (PCH).
+DOS-0055	draft	ANMF		10 microgram/kg every 8 h for 3 doses, preterm and term (ANMF).
+DOS-0056	draft	PCH*, ANMF*		Maintenance
+DOS-0057	verify		Lanoxin PI	As for tablets (to verify)
+DOS-0058	draft	PCH, ANMF		Initially 3–5 microgram/kg (max 125 microgram) twice daily, up to 10 microgram/kg (max 250 microgram) twice daily (PCH). 2–24 months: 8–10 microgram/kg/day (ANMF).
+DOS-0059	draft	ANMF		Preterm (to 36+6 weeks): 5–7.5 microgram/kg/day. Term: 8 microgram/kg/day. Up to 12 (ANMF).
+DOS-0060	draft	ANMF		Maximum 250 microgram daily in children (ANMF).
+DOS-0061	draft	PCH*, ANMF*		Newborn maintenance starts 8 hours after the last loading dose.
+DOS-0062	draft	ANMF		Kidney impairment: reduce by at least half (ANMF).
+FRM-0005	draft	ARTG*, ARTG*, ARTG*, PBS 1322N*, PBS 2605D*, PBS 3164M*		500 microgram/2 mL ampoule | Adult 500 microgram/2 mL; Infants 50 microgram/2 mL
+APP-0011	draft	healthdirect, healthdirect		Clear, colourless liquid in a 2 mL ampoule (250 microgram/mL).
+APP-0012	draft	healthdirect, healthdirect		Clear, colourless liquid in a 2 mL ampoule (25 microgram/mL). Ten times weaker than the adult injection.
+RTE-0017	draft	healthdirect, healthdirect, RCH, PCH, ANMF		IV injection | Both products are listed as intravenous on the ARTG. The infant injection is ten times weaker than the adult injection.
+ROU-0046	draft	ARTG, healthdirect	Lanoxin PI	adult: ARTG. Preparation and rate not verified: needs the Lanoxin Adult PI.
+ROU-0047	draft	RCH, PCH		child: RCH, PCH
+ROU-0048	draft	ANMF		newborn: ANMF (Lanoxin Infants only)
+PRP-0033	draft	healthdirect*, healthdirect*, RCH*, PCH*, ANMF*		Not needed: already a solution.
+PRP-0034	gap		Lanoxin PI, AIDH	Not found. Check the Lanoxin Adult PI or the Australian Injectable Drugs Handbook.
+PRP-0035	draft	RCH		Lanoxin Infants: undiluted (preferred) or to 5 microgram/mL. Lanoxin Adult: dilute to 62.5 microgram/mL or weaker.
+PRP-0036	draft	RCH		Fluids: glucose 5% or sodium chloride 0.9%. At 2.5 microgram/mL or weaker, also glucose 5% with sodium chloride 0.45%, or Hartmann’s.
+PRP-0037	draft	RCH, PCH		Two-syringe technique: draw up in one syringe, add to a second syringe of diluent. Do not flush the dead space.
+PRP-0038	draft	ANMF		Lanoxin Infants only: add 2 mL (50 microgram) to 8 mL sodium chloride 0.9% or glucose 5% = 5 microgram/mL.
+PRP-0039	draft	ANMF		Fluids: glucose 5%, Hartmann’s, sodium chloride 0.9% or 0.45%.
+PRP-0040	gap		Lanoxin PI	Not found. Check the Lanoxin Adult PI.
+PRP-0041	draft	RCH, PCH		Over at least 5 minutes.
+PRP-0042	draft	ANMF		Over at least 10 minutes.
+ADM-0029	draft	ANMF, RCH		The adult injection is 10 times stronger than the infant injection. Check before drawing up (ANMF, RCH).
+ADM-0030	draft	RCH, PCH		Rapid injection can cause hypertension and coronary vasoconstriction (RCH, PCH).
+ADM-0031	draft	PCH, RCH		Avoid extravasation (PCH, RCH).
+ADM-0032	draft	RCH, PCH		Only where cardiac monitoring and resuscitation are available (RCH). PCH: PCC, theatre and ED only.
+ADM-0033	draft	RCH		Take levels at least 6 hours after the dose (RCH).
+ADM-0034	draft	ANMF		Continuous cardiac monitoring during IV infusion (ANMF).
+RTE-0018	draft	ANMF, RCH, PCH, healthdirect, healthdirect		Intramuscular (IM) | Sources differ by group. Both products are listed on the ARTG as IV only.
+ROU-0049	gap	healthdirect	Lanoxin PI	adult: ARTG lists IV only. Lanoxin Adult PI not read.
+ROU-0050	draft	RCH, PCH		child: RCH, PCH: not recommended. If unavoidable, Lanoxin Infants only, undiluted by deep IM.
+ROU-0051	draft	ANMF		newborn: ANMF: do not give IM.
+PRP-0043	draft	ANMF*, RCH*, PCH*, healthdirect*, healthdirect*		Not needed: already a solution.
+PRP-0044	draft	RCH, PCH		Not needed: given undiluted if unavoidable.
+PRP-0045	draft	RCH, PCH		Lanoxin Infants only, deep IM, then massage the site.
+POS-0005	draft	ANMF		Do not give IM: unpredictable absorption and local irritation.
+POS-0006	draft	RCH, PCH		Not recommended (tissue damage, severe pain). Lanoxin Infants only may be given undiluted by deep IM if unavoidable, then massage the site.
+POS-0007	draft	ARTG, healthdirect		Route listed as intravenous only.
+RTE-0019	draft	RCH, PCH		Subcutaneous (SC) | Not recommended.
+ROU-0052	gap			adult: Not found.
+ROU-0053	draft	RCH, PCH		child: RCH, PCH
+ROU-0054	gap	ANMF		newborn: Not in ANMF.
+RTE-0020	gap			Given by mouth | Not mentioned in any document read. Use the elixir.
+ROU-0055	gap			adult: Not found.
+ROU-0056	gap			child: Not found.
+ROU-0057	gap			newborn: Not found.
+DOS-0063	draft	PCH*, ANMF*		Loading
+DOS-0064	gap		Lanoxin PI	To verify: Lanoxin Adult PI
+DOS-0065	gap	PCH*	PCH	To verify: PCH IV loading dose
+DOS-0066	draft	ANMF*		7.5 microgram/kg every 8 h for 3 doses
+DOS-0067	draft	PCH*, ANMF*		Maintenance
+DOS-0068	verify		Lanoxin PI	Usually switch to oral (to verify)
+DOS-0069	draft	ANMF		2–24 months: 6–7.5 microgram/kg/day, up to 9 (ANMF)
+DOS-0070	draft	ANMF*		Preterm 3.8–5.6; term 6 microgram/kg/day
+DOS-0071	draft	PCH*, ANMF*		Switching
+DOS-0072	gap		Lanoxin PI	To verify
+DOS-0073	draft	PCH		IV to enteral: may need 20–30% more (PCH)
+DOS-0074	draft	ANMF		IV dose is 75% of the oral dose (ANMF)
+DOS-0075	draft	PCH*, ANMF*		Maximum 250 microgram daily in children.
+DOS-0076	draft	ANMF		ANMF Digoxin v2.0 was due for review in April 2026.
+INT-0010	draft	Cordarone X PI		Amiodarone. Digoxin levels rise by about 70%. Monitor levels and ECG; adjust the dose.
+INT-0011	verify		Lanoxin PI	Verapamil. Reduce the digoxin dose and watch heart rate. (To verify)
+INT-0012	verify		Lanoxin PI	Loop and thiazide diuretics such as furosemide. Monitor potassium. (To verify)
+INT-0013	verify		Lanoxin PI	Clarithromycin, erythromycin. (To verify)
+INT-0014	verify		Lanoxin PI	IV calcium (arrhythmia risk) — to verify
+INT-0015	verify		Lanoxin PI	Spironolactone (can raise levels and affect level testing) — to verify
+INT-0016	verify		Lanoxin PI	Antacids, cholestyramine (reduce absorption; separate doses) — to verify
+SAF-0022	verify		Lanoxin PI	Second- or third-degree heart block without a pacemaker (to verify)
+SAF-0023	verify		Lanoxin PI	Ventricular fibrillation (to verify)
+SAF-0024	verify		Lanoxin PI	Wolff–Parkinson–White syndrome with AF (to verify)
+SAF-0025	verify		Lanoxin PI	Hypertrophic obstructive cardiomyopathy (to verify)
+SAF-0026	draft	ANMF*, PCH*		Kidney impairment (reduce the dose)
+SAF-0027	draft	ANMF*, PCH*		Electrolyte disturbance, hypoxia or hypothyroidism (toxicity at lower levels)
+SAF-0028	draft	ANMF*, PCH*		Older adults
+SAF-0029	draft	ANMF*, PCH*		Narrow therapeutic range: toxicity is more common above 2 microgram/L, and can occur lower in older people or with electrolyte problems
+SAF-0030	draft	ANMF*, PCH*		In children, arrhythmias including slow heart rate are the earliest sign of too much digoxin
+SAF-0031	draft	RCH		Injection contains propylene glycol and ethanol (RCH)
+SAF-0032	verify		Lanoxin PI	Toxicity signs: nausea, vomiting, poor appetite, confusion, visual changes, slow or irregular pulse (to verify)
+SAF-0033	verify		Lanoxin PI	Antidote for severe toxicity: digoxin immune Fab (to verify)
+SAF-0034	draft	ANMF*, PCH*		Kidney function and electrolytes before starting
+SAF-0035	draft	ANMF*, PCH*		Digoxin level at least 6 hours after a dose
+SAF-0036	draft	ANMF*, PCH*		Resting heart rate, rhythm and signs of toxicity
+SAF-0037	draft	ANMF*, PCH*		Continuous cardiac monitoring during IV infusion
+IDN-0015	draft	ARTG*, PBS*		Amoxicillin
+IDN-0016	draft	ARTG*, PBS*		Penicillin antibiotic
+IDN-0017	draft	ARTG*, PBS*		Antibiotic,Penicillin
+IDN-0018	draft	ARTG*, PBS*		Alphamox®, Cilamox®, Fisamox®, Ibiamox®
+IDN-0019	draft	ARTG*, PBS*		J01CA04
+IDN-0020	draft	ARTG*, PBS*		S4 (Prescription only)
+IDN-0021	draft	ARTG*, PBS*		Yes
+PRG-0003	draft	Alphamox PI*		No teratogenic effects in animal studies. Use when the benefits outweigh the risks. Effects during labour and delivery are not fully known.
+BRF-0003	draft	LactMed, Alphamox PI		Acceptable in nursing mothers (LactMed). Small amounts pass into milk; occasional rash, diarrhoea or thrush in the baby. The PI advises caution.
+FRM-0006	draft	ARTG*, PBS*		500 mg capsule | 250 mg, 500 mg
+APP-0013	draft	Alphamox PI		Hard gelatin capsule (size 0el): opaque ivory body, opaque green cap, containing white granular powder.
+APP-0014	draft	Alphamox PI		Smaller hard gelatin capsule (size 2): ivory body, green cap, containing almost white granular powder.
+RTE-0021	draft	Alphamox CMI, Alphamox PI		Swallowed | 
+ROU-0058	draft	Alphamox PI		adult: Alphamox PI
+ROU-0059	draft	Alphamox PI		child: Alphamox PI (doses under 20 kg)
+ADM-0035	draft	Alphamox CMI*, Alphamox PI*		Swallow whole with a glass of water.
+ADM-0036	draft	Alphamox CMI*, Alphamox PI*		With or without food.
+ADM-0037	draft	Alphamox CMI*, Alphamox PI*		Complete the course even if symptoms improve.
+RTE-0022	gap	Alphamox CMI	Don’t Rush to Crush	Opened, contents mixed with food or water | The CMI says to swallow whole. No document supports opening the capsule. Use the oral liquid if swallowing is a problem.
+ROU-0060	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0061	gap		Don’t Rush to Crush	child: Use the oral liquid.
+RTE-0023	gap		Don’t Rush to Crush	Via enteral tube (NG or PEG) | Not covered by any document read. Consider the oral liquid.
+ROU-0062	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0063	gap		Don’t Rush to Crush	child: Check Don’t Rush to Crush.
+DOS-0077	draft	Alphamox PI*		Upper respiratory, urinary or skin infection
+DOS-0078	draft	Alphamox PI*		250 mg every 8 h
+DOS-0079	draft	Alphamox PI*		Under 20 kg: 20 mg/kg/day in 3 divided doses
+DOS-0080	draft	Alphamox PI*		Severe infection
+DOS-0081	draft	Alphamox PI*		500 mg every 8 h
+DOS-0082	draft	Alphamox PI*		Under 20 kg: 40 mg/kg/day in 3 divided doses
+DOS-0083	draft	Alphamox PI*		Lower respiratory infection
+DOS-0084	draft	Alphamox PI*		500 mg every 8 h
+DOS-0085	draft	Alphamox PI*		Under 20 kg: 40 mg/kg/day in 3 divided doses
+DOS-0086	draft	Alphamox PI*		Uncomplicated lower UTI (non-pregnant women)
+DOS-0087	draft	Alphamox PI*		3 g single dose
+DOS-0088	draft	Alphamox PI*		Children over 20 kg
+DOS-0089	draft	Alphamox PI*		Use adult doses
+DOS-0090	draft	Alphamox PI*		Kidney impairment: reduce the total daily dose depending on severity. Peritoneal dialysis: maximum 500 mg/day. Removed by haemodialysis.
+DOS-0091	draft	Alphamox PI*		Neonates: data too limited for a dose recommendation.
+DOS-0092	verify		eTG	Australian guidelines such as eTG may recommend higher doses.
+FRM-0007	draft	ARTG*, PBS*		125 mg/5 mL oral liquid | 125 mg/5 mL (Cilamox, sugar free)
+APP-0015	verify		Cilamox PI	Sugar-free powder for oral liquid. Mixed with water before use.
+RTE-0024	draft	healthdirect	Cilamox PI	By mouth | Powder for oral liquid on the ARTG.
+ROU-0064	draft	ARTG, Alphamox PI		adult: ARTG; Alphamox PI doses
+ROU-0065	draft	ARTG, Alphamox PI		child: ARTG; Alphamox PI doses under 20 kg
+ROU-0066	draft	Alphamox PI		newborn: Alphamox PI: data too limited for a neonatal dose.
+ADM-0038	verify	healthdirect*	Cilamox PI	Add water as shown on the bottle and shake well. Check the storage and discard date on the label.
+ADM-0039	verify	healthdirect*	Cilamox PI	Shake before each dose. Use an oral syringe, not a household spoon.
+RTE-0025	gap		Don’t Rush to Crush	Via enteral tube (NG or PEG) | Not covered by any document read.
+ROU-0067	gap		Don’t Rush to Crush	adult: Check Don’t Rush to Crush.
+ROU-0068	gap		Don’t Rush to Crush	child: Check Don’t Rush to Crush.
+ROU-0069	gap		Don’t Rush to Crush	newborn: Not found.
+DOS-0093	draft	Alphamox PI*		Upper respiratory, urinary or skin infection
+DOS-0094	draft	Alphamox PI*		250 mg (10 mL of 125 mg/5 mL) every 8 h
+DOS-0095	draft	Alphamox PI*		Under 20 kg: 20 mg/kg/day in 3 divided doses
+DOS-0096	gap	Alphamox PI*	ANMF	No dose in the PI (data too limited). Check ANMF.
+DOS-0097	draft	Alphamox PI*		Severe or lower respiratory infection
+DOS-0098	draft	Alphamox PI*		500 mg every 8 h
+DOS-0099	draft	Alphamox PI*		Under 20 kg: 40 mg/kg/day in 3 divided doses
+DOS-0100	draft	Alphamox PI*		Children over 20 kg
+DOS-0101	draft	Alphamox PI*		Use adult doses
+DOS-0102	draft	Alphamox PI*		Round child volumes to what the oral syringe can measure.
+FRM-0008	draft	ARTG*, PBS*		1 g vial | 1 g (Fisamox, Ibiamox)
+APP-0016	draft	Fisamox PI		Fine white to off-white powder. May turn briefly pink or slightly opalescent when reconstituted.
+APP-0017	draft	healthdirect		Clear glass vial containing a white or almost white powder.
+RTE-0026	draft	Fisamox PI 4.2, 6.4, RCH		Slow IV injection | Powder: reconstitute, then give slowly. Rapid injection can cause seizures.
+ROU-0070	draft	Fisamox PI 4.2		adult: Fisamox PI 4.2
+ROU-0071	draft	Fisamox PI 4.2, RCH		child: Fisamox PI 4.2 (doses under 20 kg); RCH
+ROU-0072	draft	RCH, Fisamox PI		newborn: RCH gives a maximum strength. The PI has no neonatal data.
+BRD-0001	draft	PI 4.2		Fisamox: PI 4.2
+BRD-0002	draft	healthdirect		Ibiamox: ARTG route: intravenous
+PRP-0046	draft	Fisamox PI 4.2		Dissolve 1 g in 20 mL water for injections (about 50 mg/mL, worked out). Use immediately.
+PRP-0047	draft	RCH		Add 9.2 mL water for injections to 1 g = 100 mg/mL (the powder adds 0.8 mL). Shake well. Use immediately.
+PRP-0048	draft	Fisamox PI 4.2		No further dilution stated: give the reconstituted solution.
+PRP-0049	draft	RCH		Doses up to 30 mg/kg: dilute to 50 mg/mL.
+PRP-0050	draft	RCH		Up to 100 mg/mL if necessary.
+PRP-0051	draft	Fisamox PI 4.2		Over at least 3–4 minutes, preferably 10–15 minutes.
+PRP-0052	draft	RCH		Doses up to 30 mg/kg over 5–15 minutes.
+PRP-0053	gap	Fisamox PI	ANMF	Rate not found. The PI has no neonatal data. Check ANMF Amoxicillin.
+ADM-0040	draft	PI 4.2, RCH		Faster injection can cause seizures (PI 4.2, RCH).
+ADM-0041	draft	PI 4.2, RCH		May turn briefly pink or slightly opalescent when reconstituted (PI 4.2, RCH).
+RTE-0027	draft	Fisamox PI 4.2, 6.2, 6.4, RCH		IV infusion | Powder: reconstitute, dilute in an IV fluid, then infuse. Each fluid has a maximum strength and storage time.
+ROU-0073	draft	Fisamox PI 4.2, 6.4		adult: Fisamox PI 4.2, 6.4
+ROU-0074	draft	Fisamox PI 4.2, RCH		child: Fisamox PI 4.2 (doses under 20 kg); RCH
+ROU-0075	draft	RCH, Fisamox PI		newborn: RCH gives a maximum strength. The PI has no neonatal data.
+BRD-0003	draft	PI 4.2		Fisamox: PI 4.2
+BRD-0004	draft	healthdirect		Ibiamox: ARTG route: intravenous
+PRP-0054	draft	Fisamox PI 4.2		Dissolve 1 g in 20 mL water for injections.
+PRP-0055	draft	RCH		Add 9.2 mL water for injections to 1 g = 100 mg/mL. Shake well.
+PRP-0056	draft	Fisamox PI 6.4		Most common IV fluids. Maximum strength and storage at 2–8°C: sodium chloride 0.9% up to 10 mg/mL for 72 h, or up to 30 mg/mL for 8 h; Lactated Ringer’s up to 20 mg/mL for 24 h; glucose 5% up to 20 mg/mL for 4 h; glucose 5% with sodium chloride 0.45% up to 30 mg/mL for 4 h.
+PRP-0057	draft	Fisamox PI 4.2		Avoid glucose and other carbohydrate fluids where possible. If needed, inject into the drip tubing or use a small volume.
+PRP-0058	gap	Fisamox PI	AIDH	Bag volume not stated in the Fisamox PI. Check the Australian Injectable Drugs Handbook.
+PRP-0059	draft	RCH		Over 30 mg/kg: to 50 mg/mL or weaker. Up to 30 mg/kg: to a convenient volume. Sodium chloride 0.9% at 50 mg/mL or weaker; glucose 5%, glucose 5% with sodium chloride 0.9%, or Hartmann’s at 30 mg/mL or weaker.
+PRP-0060	draft	RCH		Up to 100 mg/mL if necessary.
+PRP-0061	draft	Fisamox PI 4.2, 6.4		Over 30–60 minutes.
+PRP-0062	gap			Pump rate (mL/h) not shown: no source states the bag volume.
+PRP-0063	draft	RCH		Doses over 30 mg/kg: over at least 30 minutes. Up to 30 mg/kg in a convenient volume: over 30 minutes.
+PRP-0064	gap		ANMF	Rate not found. Check ANMF Amoxicillin.
+ADM-0042	draft	PI 6.2		Blood products, protein hydrolysates and lipid emulsions (PI 6.2).
+ADM-0043	draft	PI, RCH		Do not mix with gentamicin or other aminoglycosides (PI, RCH).
+ADM-0044	draft	PI 6.4		Use refrigerated solutions straight away once at room temperature (PI 6.4).
+RTE-0028	draft	Fisamox PI 4.2, RCH, healthdirect, Ibiamox CMI		Intramuscular (IM) | Licensed for Fisamox. Sources differ for Ibiamox. Painful.
+ROU-0076	draft	Fisamox PI 4.2		adult: Fisamox PI 4.2
+ROU-0077	draft	Fisamox PI 4.2, RCH		child: Fisamox PI 4.2. RCH: suitable but painful.
+ROU-0078	gap			newborn: Not found.
+BRD-0005	draft	PI 4.2		Fisamox: PI 4.2
+BRD-0006	draft	ARTG (healthdirect), Ibiamox CMI (2015)		Ibiamox: ARTG (healthdirect): IV only. Ibiamox CMI (2015): IM or IV.
+PRP-0065	draft	Fisamox PI 4.2		Add 5.2 mL water for injections to 1 g; shake vigorously. If painful, lignocaine 1% or procaine 0.5% may replace the water.
+PRP-0066	draft	RCH		5.2 mL water for injections = 167 mg/mL, or 3.2 mL lidocaine 1% = 250 mg/mL.
+PRP-0067	draft	RCH		Not needed: give undiluted.
+PRP-0068	draft	Fisamox PI 4.2		Split doses over 500 mg between injection sites.
+ADM-0045	draft	PI 4.2, RCH		IM injection is painful (PI 4.2, RCH).
+RTE-0029	draft	RCH, Fisamox PI		Subcutaneous (SC) | Not recommended. The Fisamox PI does not mention SC.
+ROU-0079	gap	Fisamox PI		adult: Not in the PI.
+ROU-0080	draft	RCH		child: RCH
+ROU-0081	gap			newborn: Not found.
+RTE-0030	gap			Given by mouth | Not mentioned in any document read. Use the capsules or oral liquid.
+ROU-0082	gap			adult: Not found.
+ROU-0083	gap			child: Not found.
+ROU-0084	gap			newborn: Not found.
+DOS-0103	draft	Fisamox PI*		Upper respiratory, urinary or skin infection
+DOS-0104	draft	Fisamox PI*		250 mg every 6–8 h
+DOS-0105	draft	Fisamox PI*		Under 20 kg: 20 mg/kg/day, divided every 6–8 h
+DOS-0106	gap	Fisamox PI*	ANMF	No dose in the PI (no neonatal data). Check ANMF.
+DOS-0107	draft	Fisamox PI*		Severe or lower respiratory infection
+DOS-0108	draft	Fisamox PI*		500 mg every 6–8 h
+DOS-0109	draft	Fisamox PI*		Under 20 kg: 40 mg/kg/day, divided every 6–8 h
+DOS-0110	draft	Fisamox PI*		Septicaemia (slow IV or infusion)
+DOS-0111	draft	Fisamox PI*		1 g every 6 h
+DOS-0112	draft	Fisamox PI*		Under 20 kg: 20–40 mg/kg every 6 h
+DOS-0113	draft	Fisamox PI*		Children over 20 kg
+DOS-0114	draft	Fisamox PI*		Use adult doses
+DOS-0115	draft	Fisamox PI*		Kidney impairment (adults, IV): CrCl over 30 mL/min no change; 10–30 mL/min 1 g, then 500 mg–1 g every 12–24 h; under 10 mL/min 1 g, then 500 mg–1 g every 24 h.
+DOS-0116	draft	Fisamox PI*		Haemodialysis: 1 g at the end of dialysis, then 500 mg–1 g every 12–24 h.
+INT-0017	draft	Alphamox PI*, Fisamox PI*, FSRH*		Methotrexate. Penicillins may reduce its excretion.
+INT-0018	draft	Alphamox PI*, Fisamox PI*, FSRH*		Probenecid. Use is not recommended: it raises and prolongs amoxicillin levels.
+INT-0019	draft	Alphamox PI*, Fisamox PI*, FSRH*		Warfarin. Rare INR rises. Monitor INR when starting or stopping amoxicillin.
+INT-0020	draft	Alphamox PI*, Fisamox PI*, FSRH*		Gentamicin (do not mix in the same injection)
+INT-0021	draft	Alphamox PI*, Fisamox PI*, FSRH*		Allopurinol (more rash expected)
+INT-0022	draft	Alphamox PI*, Fisamox PI*, FSRH*		Tetracyclines and other bacteriostatic antibiotics (may interfere with amoxicillin’s effect)
+INT-0023	draft	Alphamox PI, FSRH		Combined oral contraceptive
+POS-0008	draft	Alphamox PI		May reduce oestrogen reabsorption and contraceptive efficacy.
+POS-0009	draft	FSRH		No extra precautions needed for non-enzyme-inducing antibiotics, unless vomiting or diarrhoea.
+SAF-0038	draft	Alphamox PI*		Any history of hypersensitivity to β-lactam antibiotics, including penicillins and cephalosporins
+SAF-0039	draft	Alphamox PI*		Kidney impairment (reduce the total daily dose)
+SAF-0040	verify	Alphamox PI*		Glandular fever (higher chance of rash) — to verify
+SAF-0041	draft	Alphamox PI*		Rapid IV injection can cause seizures
+SAF-0042	verify	Alphamox PI*		Can cause diarrhoea; severe or bloody diarrhoea needs medical advice — to verify
+SAF-0043	draft	Alphamox PI*		Stop and seek help if a rash, swelling or breathing difficulty develops
+SAF-0044	draft	Alphamox PI*		Watch for allergic reaction after the first dose
+SAF-0045	verify	Alphamox PI*		Kidney function for long or high-dose courses — to verify
+OTH-0001	demo	Demo		Metformin
+OTH-0002	demo	Demo		Paracetamol
+OTH-0003	demo	Demo		Glyceryl trinitrate
+OTH-0004	demo	Demo		Salbutamol
+OTH-0005	demo	Demo		Atorvastatin
+OTH-0006	demo	Demo		Ibuprofen
+APP-0018	demo	Demo		Sample appearance, not yet verified.
+APP-0019	demo	Demo		Sample appearance, not yet verified.
+APP-0020	demo	Demo		Sample appearance, not yet verified.
+APP-0021	demo	Demo		Sample appearance, not yet verified.
+BAR-0001	demo	Demo		9300001010017
+BAR-0002	demo	Demo		9300001010024
+BAR-0003	demo	Demo		9300001010031
+BAR-0004	demo	Demo		9300001020016
+BAR-0005	demo	Demo		9300001020023
+BAR-0006	demo	Demo		9300001020030
+BAR-0007	demo	Demo		9300001030015
+BAR-0008	demo	Demo		9300001030022
+CKM-0001	demo	Demo		Amiodarone
+CKM-0002	demo	Demo		Digoxin
+CKM-0003	demo	Demo		Warfarin
+CKM-0004	demo	Demo		Amoxicillin
+CKM-0005	demo	Demo		Furosemide
+CKM-0006	demo	Demo		Verapamil
+CKM-0007	demo	Demo		Simvastatin
+CKM-0008	demo	Demo		Methotrexate
+CKM-0009	demo	Demo		Oral Contraceptive
+CKM-0010	demo	Demo		Paracetamol
+CHK-0001	demo	Demo		Digoxin levels rise by about 70%. Monitor levels and ECG; adjust the digoxin dose.
+CHK-0002	demo	Demo		Bleeding risk rises. Monitor INR more often, during treatment and after stopping amiodarone.
+CHK-0003	demo	Demo		Risk of muscle toxicity. Use a statin not metabolised by CYP3A4.
+CHK-0004	demo	Demo		Higher digoxin levels and a slower heart rate. Reduce the digoxin dose.
+CHK-0005	demo	Demo		Increased methotrexate toxicity, especially at high doses.
+CHK-0006	demo	Demo		Slow heart rate and heart block.
+CHK-0007	demo	Demo		Low potassium increases the risk of digoxin toxicity. Monitor potassium.
+CHK-0008	demo	Demo		Rare INR rises. Monitor INR when starting or stopping amoxicillin.
+CHK-0009	demo	Demo		Regular paracetamol can raise INR.
+CHK-0010	demo	Demo		The PI says efficacy may be reduced; UK FSRH guidance says no extra precautions unless vomiting or diarrhoea. Check local guidance.

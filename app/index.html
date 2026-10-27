@@ -20,7 +20,16 @@
 <body>
 <main id="app" class="app" aria-live="polite"></main>
 <noscript>MediAUS needs JavaScript turned on.</noscript>
-<script src="data.js"></script>
+<!-- data: registry, sources, facts, skeletons, then the resolver -->
+<script src="data/core.js"></script>
+<script src="data/sources.js"></script>
+<script src="data/reviews.js"></script>
+<script src="data/facts/amiodarone.js"></script>
+<script src="data/facts/digoxin.js"></script>
+<script src="data/facts/amoxicillin.js"></script>
+<script src="data/facts/demo.js"></script>
+<script src="data/meds.js"></script>
+<script src="data/resolve.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
