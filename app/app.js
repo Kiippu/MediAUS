@@ -733,21 +733,29 @@
   // Add picker: type to filter, so it scales past a handful of medicines.
   var SEV_ORDER = ['major', 'moderate', 'minor', 'conflict', 'none'];
 
-  function checkHits(sel) {
-    return PAIRS.filter(function (p) { return sel.indexOf(p.a) >= 0 && sel.indexOf(p.b) >= 0; })
-      .sort(function (a, b) { return SEV[a.sev].rank - SEV[b.sev].rank; });
-  }
-  // PAIRS are demo facts. Look for the same pair in a medicine's interactions so the card can name a real source.
-  function pairEvidence(p) {
+  // A pair's statements: what each medicine's own interaction facts say about the other ('with' tags).
+  function pairFacts(a, b) {
     var out = [];
-    [[p.a, p.b], [p.b, p.a]].forEach(function (x) {
+    [[a, b], [b, a]].forEach(function (x) {
       var m = D.MEDS[x[0]]; if (!m) return;
-      var all = m.interactions.important.concat(m.interactions.other);
-      var hit = all.filter(function (i) { return i['with'].indexOf(x[1]) >= 0; })[0];
-      if (hit) out.push({ med: m, item: hit, verify: hit.verify });
+      m.interactions.important.concat(m.interactions.other).forEach(function (i) {
+        if ((i['with'] || []).indexOf(x[1]) >= 0) out.push({ med: m, item: i });
+      });
     });
-    return out;
+    return out.sort(function (p, q) { return SEV[p.item.sev].rank - SEV[q.item.sev].rank; });
   }
+  // Every selected pair with something listed. Facts first; a demo pair only when no fact covers it.
+  function checkHits(sel) {
+    var hits = [];
+    for (var i = 0; i < sel.length; i++) for (var j = i + 1; j < sel.length; j++) {
+      var a = sel[i], b = sel[j], st = pairFacts(a, b);
+      if (st.length) { hits.push({ a: a, b: b, sev: st[0].item.sev, statements: st }); continue; }
+      var demo = PAIRS.filter(function (p) { return (p.a === a && p.b === b) || (p.a === b && p.b === a); })[0];
+      if (demo) hits.push({ a: a, b: b, sev: demo.sev, demo: demo });
+    }
+    return hits.sort(function (p, q) { return SEV[p.sev].rank - SEV[q.sev].rank; });
+  }
+
   // Everything the picker can add: all built medicines, then checker-only demo entries, then search-only ones.
   var CHECK_LIST = (function () {
     var list = [], seen = {};
@@ -770,7 +778,7 @@
   function checkHero(sel, hits) {
     var title, sub, sevs = '';
     if (sel.length < 2) { title = 'Add two or more medicines'; sub = 'Every pair in your list is checked.'; }
-    else if (!hits.length) { title = 'No interactions listed'; sub = 'None in our sample data for these ' + sel.length + '. That is not proof there are none.'; }
+    else if (!hits.length) { title = 'No interactions listed'; sub = 'None listed in MediAUS for these ' + sel.length + '. That is not proof there are none.'; }
     else {
       title = hits.length + (hits.length === 1 ? ' interaction' : ' interactions') + ' across ' + sel.length + ' medicines';
       sub = 'Most serious first. Each one names its source.';
@@ -872,21 +880,27 @@
   }
 
   function pairCard(p) {
-    var d = sevDeco(p.sev), ev = pairEvidence(p);
-    var conflict = ev.filter(function (e) { return e.item.positions; })[0];
-    var srcRows = ev.length ? ev.map(function (e) {
-      return '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">' + esc(e.med.name) + ' entry: </span>' + esc(D.prov.citeLine(e.item._ids) || 'To check: ' + D.prov.lookInLine(e.item._ids)) + (e.verify ? ' ' + VERIFY_TAG : '') + '</span>';
-    }).join('') : '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">No source yet.</span> Check the PI for each medicine.</span>';
+    var d = sevDeco(p.sev), many = p.statements && p.statements.length > 1;
+    var body = p.statements ? p.statements.map(function (st, k) {
+      var it = st.item, v = SEV[it.sev], own = it.sev !== p.sev;
+      return '<div style="display:flex;flex-direction:column;gap:4px;' + (k ? 'border-top:1px solid ' + d.v.bd + ';padding-top:10px' : '') + '">' +
+        '<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px"><span style="font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:' + d.v.fg + '">' + esc(st.med.name) + ' entry</span>' +
+          (own ? '<span style="font-size:11px;font-weight:700;color:' + v.fg + ';background:#FFFFFF;border:1px solid ' + v.bd + ';border-radius:6px;padding:1px 7px">' + v.label + '</span>' : '') + (tagOf(it) || '') + '</span>' +
+        (it.title ? '<span style="font-size:14px;font-weight:700;color:#142B33">' + esc(it.title) + '</span>' : '') +
+        '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(it.text) + '</span>' +
+        (it.positions ? positionsHtml(it.positions) : '') +
+        provLine(it._ids, st.med.name + ': interaction') + '</div>';
+    }).join('') :
+      '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.demo.text) + '</span>' +
+      '<span style="font-size:12px;line-height:1.5;color:#24414A"><span style="font-weight:700">Demo pair.</span> Not in either medicine’s entry yet. Check the PI for each.</span>';
     var open = [p.a, p.b].filter(function (id) { return D.MEDS[id]; }).map(function (id) {
       return '<button data-act="medtab:' + id + ':interactions" style="font-size:12px;font-weight:700;color:#0E5E59;background:#FFFFFF;border:1px solid ' + d.v.bd + ';border-radius:10px;padding:0 12px;min-height:36px">Open ' + esc(D.MEDS[id].name) + '</button>';
     }).join('');
     return '<div style="display:flex;flex-direction:column;gap:10px;background:' + d.v.bg + ';border:1.5px solid ' + d.v.bd + ';border-radius:16px;padding:14px">' +
-      '<div style="display:flex;gap:10px;align-items:flex-start">' + d.icon +
-        '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><span style="font-size:15px;font-weight:700;color:' + d.v.fg + '">' + esc(p.title) + '</span>' + d.tag + '</div>' +
-        '<span style="font-size:13px;line-height:1.45;color:#24414A">' + esc(p.text) + '</span></div></div>' +
-      (conflict ? positionsHtml(conflict.item.positions) : '') +
-      '<div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid ' + d.v.bd + ';padding-top:10px">' + srcRows + '</div>' +
-      (open ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + open + '</div>' : '') + '</div>';
+      '<div style="display:flex;gap:10px;align-items:center">' + d.icon +
+        '<span style="flex:1;min-width:0;font-size:15px;font-weight:700;color:' + d.v.fg + '">' + esc(checkName(p.a)) + ' + ' + esc(checkName(p.b)) + '</span>' + d.tag + '</div>' +
+      (many ? '<span style="font-size:12px;color:#24414A">Both entries list this. Each is shown with its own source.</span>' : '') +
+      body + (open ? '<div style="display:flex;flex-wrap:wrap;gap:6px">' + open + '</div>' : '') + '</div>';
   }
 
   function viewCheck() {
@@ -901,11 +915,11 @@
         (hits.length ? hits.map(pairCard).join('') : '') +
         (quiet.length ? '<details style="' + CARD + ';border-radius:14px;padding:0 14px"><summary style="cursor:pointer;min-height:48px;display:flex;align-items:center;font-size:13px;font-weight:600;color:#24414A">' + quiet.length + (quiet.length === 1 ? ' pair' : ' pairs') + ' with nothing listed</summary>' +
           '<div style="display:flex;flex-direction:column;gap:6px;padding:0 0 12px;font-size:13px;color:#24414A">' + quiet.map(function (q) { return '<span>' + esc(q) + '</span>'; }).join('') +
-          '<span style="font-size:12px;color:#5B6F75">Not in our sample data. Confirm with a pharmacist.</span></div></details>' : '') + '</div>';
+          '<span style="font-size:12px;color:#5B6F75">Neither entry lists the other. Confirm with a pharmacist.</span></div></details>' : '') + '</div>';
     return '<div style="padding:18px 18px 24px;display:flex;flex-direction:column;gap:14px">' +
       pageHeader('Interactions') +
       checkHero(sel, hits) + checkList(sel, hits) + results +
-      '<div style="display:flex;flex-direction:column;gap:6px">' + sampleBadge() + '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Checker pairs are demo data. Real pair data is on the MVP to-do list.</span></div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px">' + sampleBadge() + '<span style="font-size:12px;line-height:1.5;color:#5B6F75">Pairs come from each medicine’s interactions list. Medicines without a full entry only match what other entries say about them.</span></div>' +
       '</div>';
   }
 

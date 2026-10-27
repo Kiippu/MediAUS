@@ -79,6 +79,14 @@ async def main():
         await pg.fill('#addq', 'diabex'); await pg.wait_for_timeout(100)
         assert 'Brand: Diabex' in await pg.inner_text('#addlist'), 'brand match'
         await pg.fill('#addq', '')
+        # pairs come from each medicine's own interaction facts, both directions
+        t = await pg.inner_text('#app')
+        assert 'Both entries list this' in t and 'Raises digoxin levels' in t, 'amiodarone + digoxin from both entries'
+        await pg.fill('#addq', 'ibuprofen'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
+        await pg.fill('#addq', 'metformin'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
+        t = await pg.inner_text('#app')
+        assert 'NSAIDs: may affect kidney function' in t, 'metformin + ibuprofen from the metformin entry'
+        await pg.locator('text=Potential Interactions').scroll_into_view_if_needed(); await shot('19b-check-pairs')
         # every screen but home uses the shared header
         await pg.click('nav >> text=More'); await shot('20-profile')
         assert await pg.locator('h1:has-text("Profile")').count() == 1
