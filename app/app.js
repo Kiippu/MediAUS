@@ -46,7 +46,7 @@
   var CHECK_MEDS = D.CHECK_MEDS;
   var PAIRS = D.PAIRS;
 
-  var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
+  var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'SC', 'Intrathecal', 'Local', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
   var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', 'AI photo pill identifier', 'Barcode scanner for medicine packs', 'Ad-free experience'];
   var TABS = [['overview', 'Overview'], ['dosage', 'Dosage'], ['admin', 'Administration'], ['interactions', 'Interactions'], ['pregnancy', 'Pregnancy'], ['more', 'More']];
   var SHAPES = ['round', 'oval', 'oblong', 'capsule'];
@@ -95,7 +95,7 @@
     lock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
   };
 
-  // Draws a tablet, capsule, ampoule, vial or bottle. viewBox 80 x 50.
+  // Draws a tablet, capsule, ampoule, vial, inhaler, nebule, tube, bag, sachet or bottle. viewBox 80 x 50.
   function drawPill(a, w) {
     var h = Math.round(w * 50 / 80);
     var c1 = hex(a.colors[0]), c2 = hex(a.colors[1] || a.colors[0]);
@@ -122,6 +122,16 @@
     } else if (a.shape === 'vial') {
       body = '<rect x="31" y="3" width="18" height="7" rx="2" fill="#5B6F75"/><path d="M32 10h16v4l2 2v30a3 3 0 0 1-3 3H33a3 3 0 0 1-3-3V16l2-2z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/>' +
         '<rect x="32" y="34" width="16" height="13" rx="1.5" fill="' + c1 + '" stroke="#C9D3D5" stroke-width="1"/><rect x="31" y="20" width="18" height="10" fill="#E5F4F2"/>';
+    } else if (a.shape === 'inhaler') {
+      body = '<rect x="30" y="3" width="14" height="30" rx="4" fill="#C9D3D5" stroke="#9FB2B6" stroke-width="1.2"/><path d="M27 30h20v10a3 3 0 0 1-3 3H27z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/><path d="M44 34h12a3 3 0 0 1 3 3v6H44z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/>';
+    } else if (a.shape === 'nebule') {
+      body = '<path d="M36 3h8v6l3 3v30a4 4 0 0 1-4 4h-6a4 4 0 0 1-4-4V12l3-3z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/><path d="M34 26h12v16a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 34 42z" fill="' + c1 + '" stroke="#C9D3D5" stroke-width="1"/>';
+    } else if (a.shape === 'tube') {
+      body = '<path d="M8 15h48l8 4v12l-8 4H8z" fill="#E4E9EA" stroke="' + stroke + '" stroke-width="1.5"/><rect x="64" y="20" width="9" height="10" rx="1.5" fill="#5B6F75"/><rect x="18" y="20" width="30" height="10" rx="1.5" fill="#FFFFFF"/><rect x="21" y="23" width="18" height="2" fill="#3FC1B2"/>';
+    } else if (a.shape === 'bag') {
+      body = '<path d="M26 4h28a4 4 0 0 1 4 4v28l-8 6H30l-8-6V8a4 4 0 0 1 4-4z" fill="#F4F8F9" stroke="' + stroke + '" stroke-width="1.5"/><rect x="36" y="42" width="8" height="6" rx="1" fill="#5B6F75"/><rect x="30" y="12" width="20" height="12" rx="1.5" fill="#FFFFFF" stroke="#C9D3D5" stroke-width="1"/><rect x="33" y="16" width="14" height="2" fill="#3FC1B2"/>';
+    } else if (a.shape === 'sachet') {
+      body = '<rect x="22" y="5" width="36" height="40" rx="3" fill="#FFFFFF" stroke="' + stroke + '" stroke-width="1.5"/><path d="M22 11h36M22 39h36" stroke="#C9D3D5" stroke-width="1" stroke-dasharray="2 2"/><circle cx="35" cy="24" r="3" fill="' + c1 + '"/><circle cx="43" cy="27" r="3" fill="' + c1 + '"/><circle cx="39" cy="20" r="2.5" fill="' + c1 + '"/>';
     } else {
       body = '<rect x="33" y="2" width="14" height="7" rx="1.5" fill="#F2F2F2" stroke="' + stroke + '" stroke-width="1.2"/><path d="M31 9h18v4l3 3v30a3 3 0 0 1-3 3H31a3 3 0 0 1-3-3V16l3-3z" fill="#9C5A1E" stroke="#6E3D12" stroke-width="1.2"/>' +
         '<rect x="30" y="22" width="20" height="16" rx="1.5" fill="#FFFFFF"/><rect x="33" y="26" width="14" height="2" fill="#3FC1B2"/><rect x="33" y="31" width="10" height="2" fill="#C9D3D5"/>';
@@ -286,7 +296,7 @@
       icon: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>' },
     { id: 'infection', label: 'Infections', match: ['antibiotic'],
       icon: '<circle cx="12" cy="12" r="5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>' },
-    { id: 'pain', label: 'Pain & fever', match: ['analgesic'],
+    { id: 'pain', label: 'Pain & fever', match: ['analgesic', 'anaesthetic'],
       icon: '<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/><path d="M12 11v6"/>' },
     { id: 'diabetes', label: 'Diabetes', match: ['diabetes'],
       icon: '<path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11z"/>' },

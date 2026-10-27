@@ -227,10 +227,279 @@ MEDIAUS.sources({
   },
   'S-etg': {
     title: 'Therapeutic Guidelines (eTG): Antibiotic', label: 'Therapeutic Guidelines (eTG)', short: 'eTG',
-    publisher: 'Therapeutic Guidelines Ltd', kind: 'reference', tier: 2, meds: ['amoxicillin'], status: 'paywalled'
+    publisher: 'Therapeutic Guidelines Ltd', kind: 'reference', tier: 2, meds: ['amoxicillin', 'piperacillin-tazobactam'], status: 'paywalled'
+  },
+
+  // ---------------------------------------------------------------- baclofen (added 27 Oct 2026)
+  'S-lioresal-tab-pi-2025-06': {
+    title: 'Lioresal Tablets Product Information', label: 'Lioresal Tablets PI (Novartis, Jun 2025)', short: 'Lioresal PI',
+    publisher: 'Novartis', kind: 'PI', tier: 1, meds: ['baclofen'], revised: '2025-06-06', read: '2026-10-27', status: 'read',
+    url: 'https://www.medsinfo.com.au/api/documents/Lioresal_Tablets_PI?format=pdf'
+  },
+  'S-clofen-pi-2024-11': {
+    title: 'Clofen Product Information', label: 'Clofen PI (Viatris, Nov 2024)', short: 'Clofen PI',
+    publisher: 'Alphapharm (Viatris)', kind: 'PI', tier: 1, meds: ['baclofen'], revised: '2024-11-04', read: '2026-10-27', status: 'read',
+    url: 'https://apps.medicines.org.au/files/afpclofe.pdf'
+  },
+  'S-lioresal-it-pi-2024-02': {
+    title: 'Lioresal Intrathecal Product Information', label: 'Lioresal Intrathecal PI (Novartis, Feb 2024)', short: 'Lioresal Intrathecal PI',
+    publisher: 'Novartis', kind: 'PI', tier: 1, meds: ['baclofen'], revised: '2024-02-22', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/documents/Lioresal_Intrathecal_PI?format=pdf'
+  },
+  'S-pbs-baclofen': {
+    title: 'PBS item 2729P and related: baclofen tablets and intrathecal injections', label: 'PBS Schedule item 2729P and related', short: 'PBS 2729P and related',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['baclofen'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/11126N-11128Q-11194E-11195F-13359D-13522Q-2729P-2730Q-5617P-6284R'
+  },
+  'S-lactmed-baclofen': {
+    title: 'LactMed: Baclofen', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['baclofen'], status: 'not-read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501201/', note: 'Not opened: NCBI showed a browser check (CAPTCHA) to automated reading.'
+  },
+  'S-pch-baclofen': {
+    title: 'Perth Children’s Hospital monograph: Baclofen', label: 'Perth Children’s Hospital monograph: Baclofen', short: 'PCH',
+    publisher: 'Perth Children’s Hospital', kind: 'monograph', tier: 3, meds: ['baclofen'], status: 'not-read',
+    url: 'https://www.pch.health.wa.gov.au/~/media/Files/Hospitals/PCH/General-documents/Health-professionals/MedicationMonographs/Baclofen.pdf', note: 'Not opened: the site blocks automated reading. Expected to give child oral doses.'
+  },
+
+  // ---------------------------------------------------------------- pantoprazole (added 27 Oct 2026)
+  'S-somac-pi-2026-07': {
+    title: 'Somac Product Information (tablets and granules)', label: 'Somac PI (Takeda, Jul 2026)', short: 'Somac PI',
+    publisher: 'Takeda', kind: 'PI', tier: 1, meds: ['pantoprazole'], revised: '2026-07-07', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/documents/Somac_PI?format=pdf'
+  },
+  'S-somac-iv-pi-2026-07': {
+    title: 'Somac IV Product Information', label: 'Somac IV PI (Takeda, Jul 2026)', short: 'Somac IV PI',
+    publisher: 'Takeda', kind: 'PI', tier: 1, meds: ['pantoprazole'], revised: '2026-07-07', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/documents/Somac_Injection_PI?format=pdf'
+  },
+  'S-pbs-8008L': {
+    title: 'PBS item 8008L: pantoprazole 40 mg enteric tablets', label: 'PBS Schedule item 8008L', short: 'PBS 8008L',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['pantoprazole'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/8008L'
+  },
+  'S-lactmed-pantoprazole-2026-06': {
+    title: 'LactMed: Pantoprazole', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['pantoprazole'], revised: '2026-06-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501280/'
+  },
+  'S-rch-pantoprazole': {
+    title: 'RCH Paediatric Injectable Guidelines: Pantoprazole', label: 'RCH Paediatric Injectable Guidelines: Pantoprazole', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['pantoprazole'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/pantoprazole', note: 'Web page; revision date not shown.'
+  },
+  'S-anmf-pantoprazole-2021-03': {
+    title: 'ANMF Pantoprazole, newborn use only (v2.0)', label: 'ANMF Pantoprazole, newborn use only (v2.0, Mar 2021)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['pantoprazole'], revised: '2021-03-25', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/neomed21pantoprazole.pdf', note: 'Review was due 25 Mar 2026; no newer version found.'
+  },
+
+  // ---------------------------------------------------------------- tacrolimus (added 27 Oct 2026)
+  'S-prograf-pi-2026-09': {
+    title: 'Prograf and Advagraf XL Product Information', label: 'Prograf and Advagraf XL PI (Astellas, Sep 2026)', short: 'Prograf PI',
+    publisher: 'Astellas', kind: 'PI', tier: 1, meds: ['tacrolimus'], revised: '2026-09-30', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2019-PI-01808-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Also on medsinfo.'
+  },
+  'S-pbs-5299X': {
+    title: 'PBS item 5299X: tacrolimus 500 microgram modified release capsule', label: 'PBS Schedule item 5299X', short: 'PBS 5299X',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['tacrolimus'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/5299X'
+  },
+  'S-lactmed-tacrolimus-2026-03': {
+    title: 'LactMed: Tacrolimus', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['tacrolimus'], revised: '2026-03-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501104/'
+  },
+  'S-rch-tacrolimus': {
+    title: 'RCH Paediatric Injectable Guidelines: Tacrolimus', label: 'RCH Paediatric Injectable Guidelines: Tacrolimus', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['tacrolimus'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/tacrolimus', note: 'Web page; revision date not shown.'
+  },
+
+  // ---------------------------------------------------------------- piperacillin-tazobactam (added 27 Oct 2026)
+  'S-tazocin-ef-pi-2024-06': {
+    title: 'Tazocin EF Product Information', label: 'Tazocin EF PI (Pfizer, Jun 2024)', short: 'Tazocin EF PI',
+    publisher: 'Pfizer', kind: 'PI', tier: 1, meds: ['piperacillin-tazobactam'], revised: '2024-06-03', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/searchapi/Tazocin_EF_PI?format=pdf'
+  },
+  'S-piptaz-kabi-pi-2026-10': {
+    title: 'Piperacillin/Tazobactam Kabi Product Information', label: 'Piperacillin/Tazobactam Kabi PI (Fresenius Kabi, Oct 2026)', short: 'Kabi PI',
+    publisher: 'Fresenius Kabi', kind: 'PI', tier: 1, meds: ['piperacillin-tazobactam'], revised: '2026-10-13', read: '2026-10-27', status: 'partly-read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2020-PI-01024-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Read sections 2–4.2, 7 and 10.'
+  },
+  'S-rch-piptaz': {
+    title: 'RCH Paediatric Injectable Guidelines: Piperacillin + tazobactam', label: 'RCH Paediatric Injectable Guidelines: Piperacillin + tazobactam', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['piperacillin-tazobactam'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/piperacillin-tazobactam', note: 'Web page; revision date not shown.'
+  },
+  'S-qld-piptaz-2026-03': {
+    title: 'Queensland Clinical Guidelines neonatal monograph: Piperacillin and tazobactam (NMedQ26.122-V1-R31)', label: 'Queensland neonatal monograph: Piperacillin and tazobactam (Mar 2026)', short: 'Qld neonatal',
+    publisher: 'Queensland Clinical Guidelines', kind: 'monograph', tier: 3, meds: ['piperacillin-tazobactam'], revised: '2026-03-25', read: '2026-10-27', status: 'read',
+    url: 'https://www.health.qld.gov.au/__data/assets/pdf_file/0028/1490545/nmq-pip-taz.pdf'
+  },
+  'S-anmf-piptaz-2020-11': {
+    title: 'ANMF Piperacillin-tazobactam, newborn use only (v2.0)', label: 'ANMF Piperacillin-tazobactam, newborn use only (v2.0, Nov 2020)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['piperacillin-tazobactam'], revised: '2020-11-16', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/neomed20peperacillintazobactamfull.pdf', note: 'Review was due 16 Nov 2025; no newer version found.'
+  },
+  'S-lactmed-piptaz-2021-02': {
+    title: 'LactMed: Piperacillin and Tazobactam', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['piperacillin-tazobactam'], revised: '2021-02-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501068/'
+  },
+
+  // ---------------------------------------------------------------- lidocaine (added 27 Oct 2026)
+  'S-xylocaine-pi-2025-06': {
+    title: 'Xylocaine and Xylocaine with Adrenaline Product Information', label: 'Xylocaine PI (Aspen, Jun 2025)', short: 'Xylocaine PI',
+    publisher: 'Aspen', kind: 'PI', tier: 1, meds: ['lidocaine'], revised: '2025-06-10', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2017-PI-01946-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-xylocard-pi-2024-08': {
+    title: 'Xylocard Product Information', label: 'Xylocard PI (Aspen, Aug 2024)', short: 'Xylocard PI',
+    publisher: 'Aspen', kind: 'PI', tier: 1, meds: ['lidocaine'], revised: '2024-08-26', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2017-PI-02257-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-xylocaine-viscous-pi-2024-07': {
+    title: 'Xylocaine Viscous Product Information', label: 'Xylocaine Viscous PI (Aspen, Jul 2024)', short: 'Xylocaine Viscous PI',
+    publisher: 'Aspen', kind: 'PI', tier: 1, meds: ['lidocaine'], revised: '2024-07-24', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2024-PI-02299-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-xylocaine-jelly-pi-2024-07': {
+    title: 'Xylocaine 2% Jelly Product Information', label: 'Xylocaine 2% Jelly PI (Aspen, Jul 2024)', short: 'Xylocaine Jelly PI',
+    publisher: 'Aspen', kind: 'PI', tier: 1, meds: ['lidocaine'], revised: '2024-07-24', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2024-PI-01616-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser.'
+  },
+  'S-rch-lidocaine': {
+    title: 'RCH Paediatric Injectable Guidelines: Lidocaine (lignocaine)', label: 'RCH Paediatric Injectable Guidelines: Lidocaine (lignocaine)', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['lidocaine'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/lidocaine', note: 'Web page; revision date not shown.'
+  },
+  'S-anmf-lidocaine-2023-02': {
+    title: 'ANMF Lidocaine (lignocaine) for local anaesthesia, newborn use only (v1.0)', label: 'ANMF Lidocaine, local anaesthesia, newborn use only (v1.0, Feb 2023)', short: 'ANMF',
+    publisher: 'Australian Neonatal Medicines Formulary', kind: 'monograph', tier: 2, meds: ['lidocaine'], revised: '2023-02-09', read: '2026-10-27', status: 'read',
+    url: 'https://www.seslhd.health.nsw.gov.au/sites/default/files/groups/Royal_Hospital_for_Women/Neonatal/Neomed/Lidocaine20230209.pdf'
+  },
+  'S-lactmed-lidocaine-2024-12': {
+    title: 'LactMed: Lidocaine', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['lidocaine'], revised: '2024-12-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501230/'
+  },
+  'S-pbs-4308R': {
+    title: 'PBS item 4308R: lidocaine 2% oral liquid (Xylocaine Viscous)', label: 'PBS Schedule item 4308R', short: 'PBS 4308R',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['lidocaine'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/4308R'
+  },
+
+  // ---------------------------------------------------------------- empagliflozin (added 27 Oct 2026)
+  'S-jardiance-pi-2026-02': {
+    title: 'Jardiance Product Information', label: 'Jardiance PI (Boehringer Ingelheim, Feb 2026)', short: 'Jardiance PI',
+    publisher: 'Boehringer Ingelheim', kind: 'PI', tier: 1, meds: ['empagliflozin'], revised: '2026-02-19', read: '2026-10-27', status: 'read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2014-PI-01783-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Same text as the medsinfo copy (PI0145-23).'
+  },
+  'S-pbs-14018T': {
+    title: 'PBS item 14018T: empagliflozin 10 mg tablet', label: 'PBS Schedule item 14018T', short: 'PBS 14018T',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['empagliflozin'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/14018T'
+  },
+  'S-lactmed-empagliflozin-2026-05': {
+    title: 'LactMed: Empagliflozin', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['empagliflozin'], revised: '2026-05-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK500972/'
+  },
+  'S-ads-sglt2-2022-01': {
+    title: 'ADS Alert update January 2022: SGLT2 inhibitor use and periprocedural ketoacidosis', label: 'Australian Diabetes Society alert (Jan 2022)', short: 'ADS alert',
+    publisher: 'Australian Diabetes Society', kind: 'guideline', tier: 2, meds: ['empagliflozin'], revised: '2022-01', read: '2026-10-27', status: 'read',
+    url: 'https://www.diabetessociety.com.au/downloads/202202092021ADS_DKA_SGLT2i_Alert_highlightedchanges_Jan22.pdf'
+  },
+
+  // ---------------------------------------------------------------- ketamine (added 27 Oct 2026)
+  'S-ketalar-pi-2021-09': {
+    title: 'Ketalar Product Information', label: 'Ketalar PI (Pfizer, Sep 2021)', short: 'Ketalar PI',
+    publisher: 'Pfizer', kind: 'PI', tier: 1, meds: ['ketamine'], revised: '2021-09-30', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/documents/Ketalar_PI?format=pdf'
+  },
+  'S-ketamine-baxter-pi-2026-02': {
+    title: 'Ketamine-Baxter Product Information', label: 'Ketamine-Baxter PI (Feb 2026)', short: 'Ketamine-Baxter PI',
+    publisher: 'Baxter', kind: 'PI', tier: 1, meds: ['ketamine'], revised: '2026-02-24', read: '2026-10-27', status: 'partly-read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2018-PI-02521-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Read 4.2 (start), 6.5 and 10.'
+  },
+  'S-ketamine-interpharma-pi-2022-08': {
+    title: 'Ketamine Interpharma Product Information', label: 'Ketamine Interpharma PI (Aug 2022)', short: 'Ketamine Interpharma PI',
+    publisher: 'InterPharma', kind: 'PI', tier: 1, meds: ['ketamine'], revised: '2022-08-03', read: '2026-10-27', status: 'partly-read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2019-PI-02404-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Read sections 2–4.2 (start), 7 and 10.'
+  },
+  'S-biomed-ketamine-pi-2025-10': {
+    title: 'Biomed Ketamine Product Information', label: 'Biomed Ketamine PI (Oct 2025)', short: 'Biomed Ketamine PI',
+    publisher: 'Biomed', kind: 'PI', tier: 1, meds: ['ketamine'], revised: '2025-10-21', read: '2026-10-27', status: 'partly-read',
+    url: 'https://www.ebs.tga.gov.au/ebs/picmi/picmirepository.nsf/pdf?OpenAgent&id=CP-2020-PI-01836-1', note: 'TGA eBS PDF: accept the licence page first. Read in the built-in browser. Read sections 2–4.2 (start), 6.5 and 10. Infusion rates not yet read.'
+  },
+  'S-rch-ketamine': {
+    title: 'RCH Paediatric Injectable Guidelines: Ketamine', label: 'RCH Paediatric Injectable Guidelines: Ketamine', short: 'RCH',
+    publisher: 'Royal Children’s Hospital Melbourne', kind: 'guideline', tier: 3, meds: ['ketamine'], read: '2026-10-27', status: 'read',
+    url: 'https://pig.rch.org.au/pages/ketamine', note: 'Web page; revision date not shown.'
+  },
+  'S-lactmed-ketamine-2026-02': {
+    title: 'LactMed: Ketamine', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['ketamine'], revised: '2026-02-15', read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK500566/'
+  },
+
+  // ---------------------------------------------------------------- ipratropium (added 27 Oct 2026)
+  'S-atrovent-mdi-pi-2022-08': {
+    title: 'Atrovent Metered Dose Inhaler Product Information', label: 'Atrovent inhaler PI (Boehringer Ingelheim, Aug 2022)', short: 'Atrovent PI',
+    publisher: 'Boehringer Ingelheim', kind: 'PI', tier: 1, meds: ['ipratropium'], revised: '2022-08-17', read: '2026-10-27', status: 'read',
+    url: 'https://apps.medicines.org.au/files/bypatrcf.pdf'
+  },
+  'S-atrovent-neb-pi-2019-11': {
+    title: 'Atrovent Nebulising Solutions Product Information', label: 'Atrovent nebulising solutions PI (Boehringer Ingelheim, Nov 2019)', short: 'Atrovent UDV PI',
+    publisher: 'Boehringer Ingelheim', kind: 'PI', tier: 1, meds: ['ipratropium'], revised: '2019-11-28', read: '2026-10-27', status: 'read',
+    url: 'https://medsinfo.com.au/api/searchapi/Atrovent_Nebulising_Solutions_PI?format=pdf'
+  },
+  'S-pbs-8671J': {
+    title: 'PBS item 8671J: ipratropium 21 microgram/actuation inhaler', label: 'PBS Schedule item 8671J', short: 'PBS 8671J',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    url: 'https://www.pbs.gov.au/medicine/item/8671J'
+  },
+  'S-lactmed-ipratropium': {
+    title: 'LactMed: Ipratropium', label: 'LactMed (US National Library of Medicine)', short: 'LactMed',
+    publisher: 'US National Library of Medicine', kind: 'database', tier: 4, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    url: 'https://www.ncbi.nlm.nih.gov/books/NBK501483/', note: 'Revision date not shown on the page.'
+  },
+  'S-aah-acute-adult': {
+    title: 'Australian Asthma Handbook: immediate treatment of acute asthma in adults and adolescents in the ED', label: 'Australian Asthma Handbook: acute asthma, adults (ED)', short: 'Asthma Handbook',
+    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    url: 'https://www.asthmahandbook.org.au/pdf/6063', note: 'No version date shown.'
+  },
+  'S-aah-acute-child-6-11': {
+    title: 'Australian Asthma Handbook: managing acute asthma in children 6–11 years in the ED', label: 'Australian Asthma Handbook: acute asthma, children 6–11 (ED)', short: 'Asthma Handbook',
+    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium'], read: '2026-10-27', status: 'read',
+    url: 'https://www.asthmahandbook.org.au/acute-asthma/children-6-11-years/managing-acute-asthma-in-children-6-11-years-in-ed', note: 'No version date shown.'
+  },
+  'S-aah-acute-child-1-5': {
+    title: 'Australian Asthma Handbook: managing acute asthma in children 1–5 years', label: 'Australian Asthma Handbook: acute asthma, children 1–5', short: 'Asthma Handbook',
+    publisher: 'National Asthma Council Australia', kind: 'guideline', tier: 2, meds: ['ipratropium'], status: 'not-read',
+    url: 'https://www.asthmahandbook.org.au/acute-asthma', note: 'Page did not load for automated reading.'
   },
 
   // ---------------------------------------------------------------- shared references and gaps
+  'S-who-atc': {
+    title: 'WHO ATC/DDD Index', label: 'WHO ATC/DDD Index', short: 'ATC index',
+    publisher: 'WHO Collaborating Centre for Drug Statistics Methodology', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'tacrolimus', 'piperacillin-tazobactam', 'lidocaine', 'empagliflozin', 'ketamine', 'ipratropium'], status: 'not-read',
+    url: 'https://atcddd.fhi.no/atc_ddd_index/'
+  },
+  'S-pbs-schedule': {
+    title: 'PBS Schedule search', label: 'PBS Schedule', short: 'PBS',
+    publisher: 'Australian Government', kind: 'PBS', tier: 1, meds: ['piperacillin-tazobactam', 'ketamine'], status: 'not-read',
+    url: 'https://www.pbs.gov.au/pbs/home', note: 'No item found yet for this medicine.'
+  },
+  'S-amh': {
+    title: 'Australian Medicines Handbook', label: 'Australian Medicines Handbook (AMH)', short: 'AMH',
+    publisher: 'AMH', kind: 'reference', tier: 2, meds: ['lidocaine', 'ketamine'], status: 'paywalled'
+  },
+  'S-amhcdc': {
+    title: 'AMH Children’s Dosing Companion', label: 'AMH Children’s Dosing Companion', short: 'AMH CDC',
+    publisher: 'AMH', kind: 'reference', tier: 2, meds: ['baclofen', 'pantoprazole', 'lidocaine'], status: 'paywalled'
+  },
   'S-tga-pregnancy-db': {
     title: 'TGA Prescribing medicines in pregnancy database', label: 'TGA pregnancy database', short: 'TGA pregnancy database',
     publisher: 'TGA', kind: 'database', tier: 1, meds: ['amiodarone', 'digoxin', 'amoxicillin'], status: 'not-read',
@@ -238,12 +507,12 @@ MEDIAUS.sources({
   },
   'S-drtc': {
     title: 'Don’t Rush to Crush', label: 'Don’t Rush to Crush (SHPA)', short: 'Don’t Rush to Crush',
-    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['amiodarone', 'digoxin', 'amoxicillin'], status: 'paywalled',
+    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['amiodarone', 'digoxin', 'amoxicillin', 'baclofen', 'tacrolimus', 'empagliflozin'], status: 'paywalled',
     note: 'Crushing, dispersing and enteral tube use.'
   },
   'S-aidh': {
     title: 'Australian Injectable Drugs Handbook', label: 'Australian Injectable Drugs Handbook (SHPA)', short: 'AIDH',
-    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['digoxin', 'amoxicillin'], status: 'paywalled'
+    publisher: 'SHPA', kind: 'reference', tier: 2, meds: ['digoxin', 'amoxicillin', 'piperacillin-tazobactam', 'ketamine'], status: 'paywalled'
   },
   'S-local-resus': {
     title: 'Local resuscitation protocol', label: 'Local resuscitation protocol', short: 'local protocol',

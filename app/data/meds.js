@@ -652,6 +652,1235 @@ MEDIAUS.med({
   }
 });
 
+MEDIAUS.med({
+  id: 'baclofen',
+  identity: {
+    name: 'IDN-0022',
+    cls: 'IDN-0023',
+    chips: 'IDN-0024',
+    brands: 'IDN-0025',
+    atc: 'IDN-0026',
+    schedule: 'IDN-0027',
+    pbs: 'IDN-0028'
+  },
+  pregnancy: 'PRG-0004',
+  breastfeeding: {
+    main: 'BRF-0004'
+  },
+  forms: [
+    {
+      id: 'tab',
+      label: 'Tablet',
+      pops: ['adult', 'child'],
+      info: 'FRM-0009',
+      appearance: ['APP-0022', 'APP-0023', 'APP-0024', 'APP-0025'],
+      routes: [
+        {
+          id: 'swallow',
+          cat: 'Oral',
+          head: 'RTE-0031',
+          pops: {
+            adult: 'ROU-0085',
+            child: 'ROU-0086'
+          },
+          items: ['ADM-0047', 'ADM-0048', 'ADM-0046']
+        },
+        {
+          id: 'crush',
+          cat: 'Oral',
+          head: 'RTE-0032',
+          pops: {
+            adult: 'ROU-0087',
+            child: 'ROU-0088'
+          }
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0033',
+          pops: {
+            adult: 'ROU-0089',
+            child: 'ROU-0090'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0117', 'DOS-0118', 'DOS-0119'],
+            ['DOS-0120', 'DOS-0121', null],
+            ['DOS-0122', 'DOS-0123', null],
+            ['DOS-0124', 'DOS-0125', null]
+          ],
+          notes: ['DOS-0126', 'DOS-0127', 'DOS-0128', 'DOS-0129']
+        }
+      ]
+    },
+    {
+      id: 'it',
+      label: 'Intrathecal injection',
+      pops: ['adult', 'child'],
+      info: 'FRM-0010',
+      appearance: ['APP-0026'],
+      routes: [
+        {
+          id: 'test',
+          cat: 'Intrathecal',
+          head: 'RTE-0034',
+          pops: {
+            adult: 'ROU-0091',
+            child: 'ROU-0092'
+          },
+          prep: {
+            reconstitute: ['PRP-0069'],
+            dilute: ['PRP-0070'],
+            give: ['PRP-0071']
+          }
+        },
+        {
+          id: 'pump',
+          cat: 'Intrathecal',
+          head: 'RTE-0035',
+          pops: {
+            adult: 'ROU-0093',
+            child: 'ROU-0094'
+          },
+          prep: {
+            reconstitute: ['PRP-0069'],
+            dilute: ['PRP-0070'],
+            give: ['PRP-0072']
+          },
+          items: ['ADM-0049', 'ADM-0050']
+        },
+        {
+          id: 'iv',
+          cat: 'IV',
+          head: 'RTE-0036',
+          pops: {
+            adult: 'ROU-0095',
+            child: 'ROU-0096'
+          }
+        },
+        {
+          id: 'im',
+          cat: 'IM',
+          head: 'RTE-0037',
+          pops: {
+            adult: 'ROU-0097',
+            child: 'ROU-0098'
+          }
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0038',
+          pops: {
+            adult: 'ROU-0099',
+            child: 'ROU-0100'
+          }
+        },
+        {
+          id: 'epidural',
+          cat: 'Epidural',
+          head: 'RTE-0039',
+          pops: {
+            adult: 'ROU-0101',
+            child: 'ROU-0102'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'it',
+          label: 'Intrathecal',
+          head: ['Use', 'Adult', 'Child'],
+          rows: [
+            ['DOS-0130', 'DOS-0131', 'DOS-0132'],
+            ['DOS-0133', 'DOS-0134', null],
+            ['DOS-0135', 'DOS-0136', null],
+            ['DOS-0137', 'DOS-0138', 'DOS-0139']
+          ],
+          notes: ['DOS-0140', 'DOS-0141', 'DOS-0142']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0024', 'INT-0025', 'INT-0026', 'INT-0027'],
+    other: ['INT-0028', 'INT-0029', 'INT-0030', 'INT-0031', 'INT-0032']
+  },
+  safety: {
+    contraindications: ['SAF-0046', 'SAF-0047', 'SAF-0048'],
+    caution: ['SAF-0049', 'SAF-0050', 'SAF-0051', 'SAF-0052', 'SAF-0053', 'SAF-0054', 'SAF-0055'],
+    warnings: ['SAF-0056', 'SAF-0057', 'SAF-0058', 'SAF-0059'],
+    monitoring: ['SAF-0060', 'SAF-0061', 'SAF-0062', 'SAF-0063']
+  }
+});
+
+MEDIAUS.med({
+  id: 'pantoprazole',
+  identity: {
+    name: 'IDN-0029',
+    cls: 'IDN-0030',
+    chips: 'IDN-0031',
+    brands: 'IDN-0032',
+    atc: 'IDN-0033',
+    schedule: 'IDN-0034',
+    pbs: 'IDN-0035'
+  },
+  pregnancy: 'PRG-0005',
+  breastfeeding: {
+    main: 'BRF-0005'
+  },
+  forms: [
+    {
+      id: 'tab',
+      label: 'Enteric-coated tablet',
+      pops: ['adult', 'child'],
+      info: 'FRM-0011',
+      appearance: ['APP-0027', 'APP-0028'],
+      routes: [
+        {
+          id: 'swallow',
+          cat: 'Oral',
+          head: 'RTE-0040',
+          pops: {
+            adult: 'ROU-0103',
+            child: 'ROU-0104'
+          },
+          items: ['ADM-0051', 'ADM-0052', 'ADM-0053']
+        },
+        {
+          id: 'crush',
+          cat: 'Oral',
+          head: 'RTE-0041',
+          pops: {
+            adult: 'ROU-0105',
+            child: 'ROU-0106'
+          }
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0042',
+          pops: {
+            adult: 'ROU-0107',
+            child: 'ROU-0108'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0143', 'DOS-0144', 'DOS-0145'],
+            ['DOS-0146', 'DOS-0147', 'DOS-0148'],
+            ['DOS-0149', 'DOS-0150', null],
+            ['DOS-0151', 'DOS-0152', null],
+            ['DOS-0153', 'DOS-0154', null],
+            ['DOS-0155', 'DOS-0156', null],
+            ['DOS-0157', 'DOS-0158', null],
+            ['DOS-0159', 'DOS-0160', null]
+          ],
+          notes: ['DOS-0161', 'DOS-0162', 'DOS-0163', 'DOS-0164']
+        }
+      ]
+    },
+    {
+      id: 'gran',
+      label: 'Enteric-coated granules',
+      pops: ['adult', 'child'],
+      info: 'FRM-0012',
+      appearance: ['APP-0029'],
+      routes: [
+        {
+          id: 'mouth',
+          cat: 'Oral',
+          head: 'RTE-0043',
+          pops: {
+            adult: 'ROU-0109',
+            child: 'ROU-0110'
+          },
+          items: ['ADM-0054', 'ADM-0055', 'ADM-0056', 'ADM-0057']
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0044',
+          pops: {
+            adult: 'ROU-0111',
+            child: 'ROU-0112'
+          },
+          items: ['ADM-0058']
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0165', 'DOS-0166', 'DOS-0167']
+          ],
+          notes: ['DOS-0168']
+        }
+      ]
+    },
+    {
+      id: 'inj',
+      label: 'Powder for injection',
+      pops: ['adult', 'child', 'newborn'],
+      info: 'FRM-0013',
+      appearance: ['APP-0030'],
+      routes: [
+        {
+          id: 'ivinj',
+          cat: 'IV',
+          head: 'RTE-0045',
+          pops: {
+            adult: 'ROU-0115',
+            child: 'ROU-0113',
+            newborn: 'ROU-0114'
+          },
+          prep: {
+            reconstitute: ['PRP-0073'],
+            dilute: ['PRP-0074'],
+            give: ['PRP-0075', 'PRP-0076', 'PRP-0077']
+          }
+        },
+        {
+          id: 'ivinf',
+          cat: 'IV',
+          head: 'RTE-0046',
+          pops: {
+            adult: 'ROU-0116',
+            child: 'ROU-0113',
+            newborn: 'ROU-0114'
+          },
+          prep: {
+            reconstitute: ['PRP-0073'],
+            dilute: ['PRP-0078', 'PRP-0079', 'PRP-0080'],
+            give: ['PRP-0081', 'PRP-0082', 'PRP-0083']
+          },
+          items: ['ADM-0059', 'ADM-0060']
+        },
+        {
+          id: 'im',
+          cat: 'IM',
+          head: 'RTE-0047',
+          pops: {
+            adult: 'ROU-0117',
+            child: 'ROU-0118',
+            newborn: 'ROU-0119'
+          }
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0048',
+          pops: {
+            adult: 'ROU-0120',
+            child: 'ROU-0121',
+            newborn: 'ROU-0122'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'iv',
+          label: 'IV',
+          head: ['Use', 'Adult', 'Child (by weight)', 'Newborn (by weight)'],
+          rows: [
+            ['DOS-0169', 'DOS-0170', 'DOS-0171', 'DOS-0172'],
+            ['DOS-0173', 'DOS-0174', null, null]
+          ],
+          notes: ['DOS-0175', 'DOS-0176']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0033', 'INT-0034', 'INT-0035', 'INT-0036'],
+    other: ['INT-0037', 'INT-0038', 'INT-0039', 'INT-0040']
+  },
+  safety: {
+    contraindications: ['SAF-0064', 'SAF-0065', 'SAF-0066'],
+    caution: ['SAF-0067', 'SAF-0068', 'SAF-0069'],
+    warnings: ['SAF-0070', 'SAF-0071', 'SAF-0072', 'SAF-0073', 'SAF-0074', 'SAF-0075'],
+    monitoring: ['SAF-0076', 'SAF-0077', 'SAF-0078']
+  }
+});
+
+MEDIAUS.med({
+  id: 'tacrolimus',
+  identity: {
+    name: 'IDN-0036',
+    cls: 'IDN-0037',
+    chips: 'IDN-0038',
+    brands: 'IDN-0039',
+    atc: 'IDN-0040',
+    schedule: 'IDN-0041',
+    pbs: 'IDN-0042'
+  },
+  pregnancy: 'PRG-0006',
+  breastfeeding: {
+    main: 'BRF-0006',
+    positions: ['POS-0010', 'POS-0011']
+  },
+  forms: [
+    {
+      id: 'cap',
+      label: 'Capsule (twice daily)',
+      pops: ['adult', 'child'],
+      info: 'FRM-0014',
+      appearance: ['APP-0031', 'APP-0032', 'APP-0033'],
+      routes: [
+        {
+          id: 'swallow',
+          cat: 'Oral',
+          head: 'RTE-0049',
+          pops: {
+            adult: 'ROU-0123',
+            child: 'ROU-0124'
+          },
+          items: ['ADM-0061', 'ADM-0062', 'ADM-0063', 'ADM-0064']
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0050',
+          pops: {
+            adult: 'ROU-0125',
+            child: 'ROU-0126'
+          },
+          items: ['ADM-0065', 'ADM-0066']
+        },
+        {
+          id: 'open',
+          cat: 'Oral',
+          head: 'RTE-0051',
+          pops: {
+            adult: 'ROU-0127',
+            child: 'ROU-0128'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral (Prograf, twice daily)',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0177', 'DOS-0178', null],
+            ['DOS-0179', 'DOS-0180', null],
+            ['DOS-0181', 'DOS-0182', null],
+            ['DOS-0183', 'DOS-0184', null],
+            ['DOS-0185', null, 'DOS-0186']
+          ],
+          notes: ['DOS-0187', 'DOS-0188', 'DOS-0189', 'DOS-0190']
+        }
+      ]
+    },
+    {
+      id: 'prcap',
+      label: 'Prolonged-release capsule (once daily)',
+      pops: ['adult', 'child'],
+      info: 'FRM-0015',
+      appearance: ['APP-0034', 'APP-0035', 'APP-0036', 'APP-0037'],
+      routes: [
+        {
+          id: 'swallow',
+          cat: 'Oral',
+          head: 'RTE-0052',
+          pops: {
+            adult: 'ROU-0129',
+            child: 'ROU-0130'
+          },
+          items: ['ADM-0067', 'ADM-0061', 'ADM-0062', 'ADM-0063', 'ADM-0064']
+        },
+        {
+          id: 'open',
+          cat: 'Oral',
+          head: 'RTE-0053',
+          pops: {
+            adult: 'ROU-0131',
+            child: 'ROU-0132'
+          }
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0054',
+          pops: {
+            adult: 'ROU-0133',
+            child: 'ROU-0134'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral (Advagraf XL, once daily)',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0191', 'DOS-0192', null],
+            ['DOS-0193', 'DOS-0194', null],
+            ['DOS-0195', 'DOS-0196', null],
+            ['DOS-0197', 'DOS-0198', null],
+            ['DOS-0199', null, 'DOS-0200']
+          ],
+          notes: ['DOS-0201', 'DOS-0188', 'DOS-0189']
+        }
+      ]
+    },
+    {
+      id: 'inj',
+      label: 'Concentrated injection',
+      pops: ['adult', 'child'],
+      info: 'FRM-0016',
+      appearance: ['APP-0038'],
+      routes: [
+        {
+          id: 'ivinf',
+          cat: 'IV',
+          head: 'RTE-0055',
+          pops: {
+            adult: 'ROU-0135',
+            child: 'ROU-0136'
+          },
+          prep: {
+            reconstitute: ['PRP-0084'],
+            dilute: ['PRP-0085', 'PRP-0086'],
+            give: ['PRP-0087', 'PRP-0088']
+          },
+          items: ['ADM-0068', 'ADM-0069', 'ADM-0070']
+        },
+        {
+          id: 'ivinj',
+          cat: 'IV',
+          head: 'RTE-0056',
+          pops: {
+            adult: 'ROU-0137',
+            child: 'ROU-0138'
+          }
+        },
+        {
+          id: 'im',
+          cat: 'IM',
+          head: 'RTE-0057',
+          pops: {
+            adult: 'ROU-0139',
+            child: 'ROU-0140'
+          }
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0058',
+          pops: {
+            adult: 'ROU-0141',
+            child: 'ROU-0142'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'iv',
+          label: 'IV infusion',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0202', 'DOS-0203', null],
+            ['DOS-0204', 'DOS-0205', null],
+            ['DOS-0206', 'DOS-0207', null],
+            ['DOS-0208', 'DOS-0209', null],
+            ['DOS-0210', null, 'DOS-0211']
+          ],
+          notes: ['DOS-0212']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0041', 'INT-0042', 'INT-0043', 'INT-0044', 'INT-0045'],
+    other: ['INT-0046', 'INT-0047', 'INT-0048', 'INT-0049', 'INT-0050']
+  },
+  safety: {
+    contraindications: ['SAF-0079', 'SAF-0080'],
+    caution: ['SAF-0081', 'SAF-0082', 'SAF-0083'],
+    warnings: ['SAF-0084', 'SAF-0085', 'SAF-0086', 'SAF-0087', 'SAF-0088'],
+    monitoring: ['SAF-0089', 'SAF-0090', 'SAF-0091', 'SAF-0092']
+  }
+});
+
+MEDIAUS.med({
+  id: 'piperacillin-tazobactam',
+  identity: {
+    name: 'IDN-0043',
+    cls: 'IDN-0044',
+    chips: 'IDN-0045',
+    brands: 'IDN-0046',
+    atc: 'IDN-0047',
+    schedule: 'IDN-0048',
+    pbs: 'IDN-0049'
+  },
+  pregnancy: 'PRG-0007',
+  breastfeeding: {
+    main: 'BRF-0007'
+  },
+  forms: [
+    {
+      id: 'inj',
+      label: 'Powder for injection',
+      pops: ['adult', 'child', 'newborn'],
+      info: 'FRM-0017',
+      appearance: ['APP-0039', 'APP-0040'],
+      routes: [
+        {
+          id: 'ivinf',
+          cat: 'IV',
+          head: 'RTE-0059',
+          pops: {
+            adult: 'ROU-0143',
+            child: 'ROU-0144',
+            newborn: 'ROU-0145'
+          },
+          prep: {
+            reconstitute: ['PRP-0089', 'PRP-0090'],
+            dilute: ['PRP-0091', 'PRP-0092', 'PRP-0093', 'PRP-0094'],
+            give: ['PRP-0095', 'PRP-0096', 'PRP-0097']
+          },
+          items: ['ADM-0071', 'ADM-0072', 'ADM-0073', 'ADM-0074']
+        },
+        {
+          id: 'extinf',
+          cat: 'IV',
+          head: 'RTE-0060',
+          pops: {
+            adult: 'ROU-0146',
+            child: 'ROU-0147',
+            newborn: 'ROU-0148'
+          }
+        },
+        {
+          id: 'ivinj',
+          cat: 'IV',
+          head: 'RTE-0061',
+          pops: {
+            adult: 'ROU-0149',
+            child: 'ROU-0150',
+            newborn: 'ROU-0151'
+          }
+        },
+        {
+          id: 'im',
+          cat: 'IM',
+          head: 'RTE-0062',
+          pops: {
+            adult: 'ROU-0152',
+            child: 'ROU-0153',
+            newborn: 'ROU-0154'
+          }
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0063',
+          pops: {
+            adult: 'ROU-0155',
+            child: 'ROU-0156',
+            newborn: 'ROU-0157'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'iv',
+          label: 'IV',
+          head: ['Use', 'Adult', 'Child (by weight)', 'Newborn (by weight)'],
+          rows: [
+            ['DOS-0213', 'DOS-0214', 'DOS-0215', null],
+            ['DOS-0216', 'DOS-0217', null, null],
+            ['DOS-0218', null, 'DOS-0219', null],
+            ['DOS-0220', null, null, 'DOS-0221'],
+            ['DOS-0222', null, null, 'DOS-0223'],
+            ['DOS-0224', 'DOS-0225', 'DOS-0226', null],
+            ['DOS-0227', 'DOS-0228', null, null],
+            ['DOS-0229', 'DOS-0230', null, null]
+          ],
+          notes: ['DOS-0231', 'DOS-0232', 'DOS-0233', 'DOS-0234']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0051', 'INT-0052', 'INT-0053'],
+    other: ['INT-0054', 'INT-0055', 'INT-0056']
+  },
+  safety: {
+    contraindications: ['SAF-0093'],
+    caution: ['SAF-0094', 'SAF-0095', 'SAF-0096', 'SAF-0097', 'SAF-0098'],
+    warnings: ['SAF-0099', 'SAF-0100', 'SAF-0101', 'SAF-0102', 'SAF-0103'],
+    monitoring: ['SAF-0104', 'SAF-0105', 'SAF-0106', 'SAF-0107']
+  }
+});
+
+MEDIAUS.med({
+  id: 'lidocaine',
+  identity: {
+    name: 'IDN-0050',
+    cls: 'IDN-0051',
+    chips: 'IDN-0052',
+    brands: 'IDN-0053',
+    atc: 'IDN-0054',
+    schedule: 'IDN-0055',
+    pbs: 'IDN-0056'
+  },
+  pregnancy: 'PRG-0008',
+  breastfeeding: {
+    main: 'BRF-0008'
+  },
+  forms: [
+    {
+      id: 'inj',
+      label: 'Injection solution',
+      pops: ['adult', 'child', 'newborn'],
+      info: 'FRM-0018',
+      appearance: ['APP-0041'],
+      routes: [
+        {
+          id: 'infil',
+          cat: 'Local',
+          head: 'RTE-0064',
+          pops: {
+            adult: 'ROU-0158',
+            child: 'ROU-0159',
+            newborn: 'ROU-0160'
+          },
+          items: ['ADM-0075', 'ADM-0076', 'ADM-0077', 'ADM-0078', 'ADM-0079']
+        },
+        {
+          id: 'block',
+          cat: 'Local',
+          head: 'RTE-0065',
+          pops: {
+            adult: 'ROU-0161',
+            child: 'ROU-0162',
+            newborn: 'ROU-0163'
+          }
+        },
+        {
+          id: 'epidural',
+          cat: 'Epidural',
+          head: 'RTE-0066',
+          pops: {
+            adult: 'ROU-0164',
+            child: 'ROU-0165',
+            newborn: 'ROU-0166'
+          }
+        },
+        {
+          id: 'spinal',
+          cat: 'Intrathecal',
+          head: 'RTE-0067',
+          pops: {
+            adult: 'ROU-0167',
+            child: 'ROU-0168',
+            newborn: 'ROU-0169'
+          }
+        },
+        {
+          id: 'bier',
+          cat: 'IV',
+          head: 'RTE-0068',
+          pops: {
+            adult: 'ROU-0170',
+            child: 'ROU-0171',
+            newborn: 'ROU-0172'
+          }
+        },
+        {
+          id: 'ivarr',
+          cat: 'IV',
+          head: 'RTE-0069',
+          pops: {
+            adult: 'ROU-0173',
+            child: 'ROU-0174',
+            newborn: 'ROU-0175'
+          },
+          brands: ['BRD-0007', 'BRD-0008'],
+          prep: {
+            reconstitute: ['PRP-0098'],
+            dilute: ['PRP-0099', 'PRP-0100', 'PRP-0101'],
+            give: ['PRP-0102', 'PRP-0103', 'PRP-0104']
+          },
+          positions: ['POS-0012', 'POS-0013'],
+          items: ['ADM-0080', 'ADM-0081', 'ADM-0082', 'ADM-0083']
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0070',
+          pops: {
+            adult: 'ROU-0176',
+            child: 'ROU-0177',
+            newborn: 'ROU-0178'
+          }
+        },
+        {
+          id: 'imdiluent',
+          cat: 'IM',
+          head: 'RTE-0071',
+          pops: {
+            adult: 'ROU-0179',
+            child: 'ROU-0180',
+            newborn: 'ROU-0181'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'local',
+          label: 'Local anaesthesia',
+          head: ['Use', 'Adult', 'Child (by weight)', 'Newborn (by weight)'],
+          rows: [
+            ['DOS-0235', 'DOS-0236', 'DOS-0237', 'DOS-0238'],
+            ['DOS-0239', 'DOS-0240', null, null],
+            ['DOS-0241', 'DOS-0242', null, null],
+            ['DOS-0243', 'DOS-0244', null, null],
+            ['DOS-0245', 'DOS-0246', null, null],
+            ['DOS-0247', 'DOS-0248', null, null]
+          ],
+          notes: ['DOS-0249', 'DOS-0250', 'DOS-0251', 'DOS-0252']
+        },
+        {
+          id: 'iv',
+          label: 'IV (arrhythmias)',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0253', 'DOS-0254', 'DOS-0255'],
+            ['DOS-0256', 'DOS-0257', null],
+            ['DOS-0258', 'DOS-0259', null]
+          ],
+          notes: ['DOS-0260', 'DOS-0261', 'DOS-0262']
+        }
+      ]
+    },
+    {
+      id: 'visc',
+      label: 'Viscous oral solution',
+      pops: ['adult', 'child'],
+      info: 'FRM-0019',
+      appearance: ['APP-0042'],
+      routes: [
+        {
+          id: 'mouth',
+          cat: 'Oral',
+          head: 'RTE-0072',
+          pops: {
+            adult: 'ROU-0182',
+            child: 'ROU-0183'
+          },
+          items: ['ADM-0084', 'ADM-0085', 'ADM-0086', 'ADM-0087']
+        },
+        {
+          id: 'gargle',
+          cat: 'Oral',
+          head: 'RTE-0073',
+          pops: {
+            adult: 'ROU-0184',
+            child: 'ROU-0185'
+          },
+          items: ['ADM-0084', 'ADM-0085', 'ADM-0086', 'ADM-0087']
+        },
+        {
+          id: 'swab',
+          cat: 'Oral',
+          head: 'RTE-0074',
+          pops: {
+            adult: 'ROU-0186',
+            child: 'ROU-0187'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Mouth and throat',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0263', 'DOS-0264', 'DOS-0265'],
+            ['DOS-0266', 'DOS-0267', 'DOS-0268']
+          ],
+          notes: ['DOS-0269', 'DOS-0270']
+        }
+      ]
+    },
+    {
+      id: 'jelly',
+      label: 'Gel (jelly)',
+      pops: ['adult', 'child'],
+      info: 'FRM-0020',
+      appearance: ['APP-0043'],
+      routes: [
+        {
+          id: 'urethral',
+          cat: 'Topical',
+          head: 'RTE-0075',
+          pops: {
+            adult: 'ROU-0188',
+            child: 'ROU-0189'
+          }
+        },
+        {
+          id: 'endo',
+          cat: 'Topical',
+          head: 'RTE-0076',
+          pops: {
+            adult: 'ROU-0190',
+            child: 'ROU-0191'
+          },
+          items: ['ADM-0088']
+        },
+        {
+          id: 'ett',
+          cat: 'Topical',
+          head: 'RTE-0077',
+          pops: {
+            adult: 'ROU-0192',
+            child: 'ROU-0193'
+          },
+          items: ['ADM-0089']
+        }
+      ],
+      dosing: [
+        {
+          id: 'topical',
+          label: 'Topical',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0271', 'DOS-0272', 'DOS-0273'],
+            ['DOS-0274', 'DOS-0275', null],
+            ['DOS-0276', 'DOS-0277', null],
+            ['DOS-0278', 'DOS-0279', null]
+          ],
+          notes: ['DOS-0280']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0057', 'INT-0058', 'INT-0059', 'INT-0060'],
+    other: ['INT-0061', 'INT-0062', 'INT-0063', 'INT-0064']
+  },
+  safety: {
+    contraindications: ['SAF-0108', 'SAF-0109', 'SAF-0110', 'SAF-0111', 'SAF-0112'],
+    caution: ['SAF-0113', 'SAF-0114', 'SAF-0115', 'SAF-0116', 'SAF-0117', 'SAF-0118'],
+    warnings: ['SAF-0119', 'SAF-0120', 'SAF-0121', 'SAF-0122', 'SAF-0123', 'SAF-0124'],
+    monitoring: ['SAF-0125', 'SAF-0126', 'SAF-0127', 'SAF-0128']
+  }
+});
+
+MEDIAUS.med({
+  id: 'empagliflozin',
+  identity: {
+    name: 'IDN-0057',
+    cls: 'IDN-0058',
+    chips: 'IDN-0059',
+    brands: 'IDN-0060',
+    atc: 'IDN-0061',
+    schedule: 'IDN-0062',
+    pbs: 'IDN-0063'
+  },
+  pregnancy: 'PRG-0009',
+  breastfeeding: {
+    main: 'BRF-0009'
+  },
+  forms: [
+    {
+      id: 'tab',
+      label: 'Tablet',
+      pops: ['adult', 'child'],
+      info: 'FRM-0021',
+      appearance: ['APP-0044', 'APP-0045'],
+      routes: [
+        {
+          id: 'swallow',
+          cat: 'Oral',
+          head: 'RTE-0078',
+          pops: {
+            adult: 'ROU-0194',
+            child: 'ROU-0195'
+          },
+          items: ['ADM-0090', 'ADM-0091', 'ADM-0092']
+        },
+        {
+          id: 'crush',
+          cat: 'Oral',
+          head: 'RTE-0079',
+          pops: {
+            adult: 'ROU-0196',
+            child: 'ROU-0197'
+          }
+        },
+        {
+          id: 'tube',
+          cat: 'Enteral tube',
+          head: 'RTE-0080',
+          pops: {
+            adult: 'ROU-0198',
+            child: 'ROU-0199'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'oral',
+          label: 'Oral',
+          head: ['Use', 'Adult', 'Child (10 years and over)'],
+          rows: [
+            ['DOS-0281', 'DOS-0282', 'DOS-0283'],
+            ['DOS-0284', 'DOS-0285', 'DOS-0286'],
+            ['DOS-0287', 'DOS-0288', 'DOS-0289']
+          ],
+          notes: ['DOS-0290', 'DOS-0291', 'DOS-0292', 'DOS-0293', 'DOS-0294']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0065', 'INT-0066', 'INT-0067'],
+    other: []
+  },
+  safety: {
+    contraindications: ['SAF-0129', 'SAF-0130'],
+    caution: ['SAF-0131', 'SAF-0132', 'SAF-0133'],
+    warnings: ['SAF-0134', 'SAF-0135', 'SAF-0136', 'SAF-0137', 'SAF-0138'],
+    monitoring: ['SAF-0139', 'SAF-0140', 'SAF-0141', 'SAF-0142']
+  }
+});
+
+MEDIAUS.med({
+  id: 'ketamine',
+  identity: {
+    name: 'IDN-0064',
+    cls: 'IDN-0065',
+    chips: 'IDN-0066',
+    brands: 'IDN-0067',
+    atc: 'IDN-0068',
+    schedule: 'IDN-0069',
+    pbs: 'IDN-0070'
+  },
+  pregnancy: 'PRG-0010',
+  breastfeeding: {
+    main: 'BRF-0010',
+    positions: ['POS-0014', 'POS-0015']
+  },
+  forms: [
+    {
+      id: 'inj',
+      label: 'Injection solution',
+      pops: ['adult', 'child'],
+      info: 'FRM-0022',
+      appearance: ['APP-0046', 'APP-0047'],
+      routes: [
+        {
+          id: 'ivinj',
+          cat: 'IV',
+          head: 'RTE-0081',
+          pops: {
+            adult: 'ROU-0200',
+            child: 'ROU-0201'
+          },
+          brands: ['BRD-0009', 'BRD-0010', 'BRD-0011', 'BRD-0012'],
+          prep: {
+            reconstitute: ['PRP-0105'],
+            dilute: ['PRP-0106', 'PRP-0107'],
+            give: ['PRP-0108', 'PRP-0109']
+          },
+          items: ['ADM-0093', 'ADM-0094', 'ADM-0095', 'ADM-0096']
+        },
+        {
+          id: 'ivinf',
+          cat: 'IV',
+          head: 'RTE-0082',
+          pops: {
+            adult: 'ROU-0202',
+            child: 'ROU-0203'
+          },
+          brands: ['BRD-0013', 'BRD-0014'],
+          prep: {
+            reconstitute: ['PRP-0105'],
+            dilute: ['PRP-0110', 'PRP-0111'],
+            give: ['PRP-0112', 'PRP-0113']
+          }
+        },
+        {
+          id: 'im',
+          cat: 'IM',
+          head: 'RTE-0083',
+          pops: {
+            adult: 'ROU-0204',
+            child: 'ROU-0205'
+          },
+          brands: ['BRD-0015', 'BRD-0016', 'BRD-0017'],
+          prep: {
+            reconstitute: ['PRP-0105'],
+            dilute: ['PRP-0114'],
+            give: ['PRP-0115']
+          }
+        },
+        {
+          id: 'sc',
+          cat: 'SC',
+          head: 'RTE-0084',
+          pops: {
+            adult: 'ROU-0206',
+            child: 'ROU-0207'
+          }
+        },
+        {
+          id: 'nasal',
+          cat: 'Intranasal',
+          head: 'RTE-0085',
+          pops: {
+            adult: 'ROU-0208',
+            child: 'ROU-0209'
+          }
+        },
+        {
+          id: 'oral',
+          cat: 'Oral',
+          head: 'RTE-0086',
+          pops: {
+            adult: 'ROU-0210',
+            child: 'ROU-0211'
+          }
+        }
+      ],
+      dosing: [
+        {
+          id: 'anaes',
+          label: 'Anaesthesia',
+          head: ['Use', 'Adult', 'Child (by weight)'],
+          rows: [
+            ['DOS-0295', 'DOS-0296', 'DOS-0297'],
+            ['DOS-0298', 'DOS-0299', 'DOS-0300'],
+            ['DOS-0301', 'DOS-0302', null]
+          ],
+          notes: ['DOS-0303', 'DOS-0304', 'DOS-0305', 'DOS-0306']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0068', 'INT-0069', 'INT-0070'],
+    other: ['INT-0071', 'INT-0072', 'INT-0073']
+  },
+  safety: {
+    contraindications: ['SAF-0143', 'SAF-0144'],
+    caution: ['SAF-0145', 'SAF-0146', 'SAF-0147', 'SAF-0148', 'SAF-0149', 'SAF-0150'],
+    warnings: ['SAF-0151', 'SAF-0152', 'SAF-0153', 'SAF-0154'],
+    monitoring: ['SAF-0155', 'SAF-0156']
+  }
+});
+
+MEDIAUS.med({
+  id: 'ipratropium',
+  identity: {
+    name: 'IDN-0071',
+    cls: 'IDN-0072',
+    chips: 'IDN-0073',
+    brands: 'IDN-0074',
+    atc: 'IDN-0075',
+    schedule: 'IDN-0076',
+    pbs: 'IDN-0077'
+  },
+  pregnancy: 'PRG-0011',
+  breastfeeding: {
+    main: 'BRF-0011'
+  },
+  forms: [
+    {
+      id: 'mdi',
+      label: 'Pressurised inhaler',
+      pops: ['adult', 'child'],
+      info: 'FRM-0023',
+      appearance: ['APP-0048'],
+      routes: [
+        {
+          id: 'inhaled',
+          cat: 'Inhaled',
+          head: 'RTE-0087',
+          pops: {
+            adult: 'ROU-0212',
+            child: 'ROU-0213'
+          },
+          items: ['ADM-0098', 'ADM-0097', 'ADM-0099']
+        }
+      ],
+      dosing: [
+        {
+          id: 'inh',
+          label: 'Inhaled',
+          head: ['Use', 'Adult', 'Child (by age)'],
+          rows: [
+            ['DOS-0307', 'DOS-0308', 'DOS-0309'],
+            ['DOS-0310', 'DOS-0311', 'DOS-0312']
+          ],
+          notes: ['DOS-0313', 'DOS-0314']
+        }
+      ]
+    },
+    {
+      id: 'neb',
+      label: 'Nebuliser solution',
+      pops: ['adult', 'child'],
+      info: 'FRM-0024',
+      appearance: ['APP-0049', 'APP-0050'],
+      routes: [
+        {
+          id: 'neb',
+          cat: 'Inhaled',
+          head: 'RTE-0088',
+          pops: {
+            adult: 'ROU-0214',
+            child: 'ROU-0215'
+          },
+          items: ['ADM-0100', 'ADM-0101', 'ADM-0102', 'ADM-0097']
+        }
+      ],
+      dosing: [
+        {
+          id: 'neb',
+          label: 'Nebulised',
+          head: ['Use', 'Adult', 'Child (by age)'],
+          rows: [
+            ['DOS-0315', 'DOS-0316', 'DOS-0317'],
+            ['DOS-0318', 'DOS-0319', 'DOS-0320'],
+            ['DOS-0321', 'DOS-0322', 'DOS-0323']
+          ],
+          notes: ['DOS-0324', 'DOS-0325']
+        }
+      ]
+    }
+  ],
+  interactions: {
+    important: ['INT-0074'],
+    other: ['INT-0075', 'INT-0076']
+  },
+  safety: {
+    contraindications: ['SAF-0157'],
+    caution: ['SAF-0158', 'SAF-0159'],
+    warnings: ['SAF-0160', 'SAF-0161', 'SAF-0162', 'SAF-0163'],
+    monitoring: ['SAF-0164', 'SAF-0165']
+  }
+});
+
 // Lists outside a medicine. All demo data.
 MEDIAUS.set('OTHERS', ['OTH-0001', 'OTH-0002', 'OTH-0003', 'OTH-0004', 'OTH-0005', 'OTH-0006']);
 MEDIAUS.set('EXTRA_PILLS', ['APP-0018', 'APP-0019', 'APP-0020', 'APP-0021']);
