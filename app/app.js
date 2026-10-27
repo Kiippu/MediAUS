@@ -323,7 +323,7 @@
   var AREAS = [
     { id: 'heart', label: 'Heart & circulation', match: ['antiarrhythmic', 'cardiac glycoside', 'antianginal', 'cholesterol'],
       icon: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>' },
-    { id: 'infection', label: 'Infections', match: ['antibiotic'],
+    { id: 'antibiotics', label: 'Antibiotics', match: ['antibiotic'],
       icon: '<circle cx="12" cy="12" r="5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>' },
     { id: 'pain', label: 'Pain & fever', match: ['analgesic', 'anaesthetic'],
       icon: '<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/><path d="M12 11v6"/>' },
@@ -345,9 +345,16 @@
     return items.concat(D.OTHERS.map(function (o) { return { name: o.name, cls: o.cls, sched: o.schedule, routes: o.routes }; }));
   }
   // Brand that matched the query, when the name didn't.
+  // Brand lists are prose ("Tablets: Lioresal®, Clofen®. IV: ..."), so split into names and skip labels.
+  var BRAND_LABEL = /^(tablets?|capsules?|injections?|iv|liquid|intrathecal|inhaler|generics?|other generics|others|many generics|nebuliser solutions)$/i;
+  function brandMatch(brands, q) {
+    if (!brands || !q) return '';
+    return brands.split(/[,;:()]|\.\s|\band\b/).map(function (b) { return b.trim().replace(/^(including|and)\s+/i, ''); })
+      .filter(function (b) { return /[a-z]/i.test(b) && !BRAND_LABEL.test(b) && b.toLowerCase().indexOf(q) >= 0; })[0] || '';
+  }
   function brandHit(it, q) {
     if (!it.med || !q || it.name.toLowerCase().indexOf(q) >= 0) return '';
-    return it.med.brands.split(',').map(function (b) { return b.trim(); }).filter(function (b) { return b.toLowerCase().indexOf(q) >= 0; })[0] || '';
+    return brandMatch(it.med.brands, q);
   }
   function findItems(route) {
     var q = state.query.trim().toLowerCase(), a = areaOf(state.area);
@@ -741,10 +748,23 @@
     });
     return out;
   }
+  // Everything the picker can add: all built medicines, then checker-only demo entries, then search-only ones.
+  var CHECK_LIST = (function () {
+    var list = [], seen = {};
+    function add(id, name, cls, brands) { if (!seen[id]) { seen[id] = true; list.push({ id: id, name: name, cls: cls, brands: brands || '' }); } }
+    D.ORDER.forEach(function (id) { var m = D.MEDS[id]; add(id, m.name, m.cls, m.brands); });
+    Object.keys(CHECK_MEDS).forEach(function (id) { add(id, CHECK_MEDS[id], 'Checker only · full entry not built yet'); });
+    D.OTHERS.forEach(function (o) { add(o.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), o.name, o.cls + ' · full entry not built yet'); });
+    return list;
+  })();
+  var CHECK_BY_ID = {};
+  CHECK_LIST.forEach(function (x) { CHECK_BY_ID[x.id] = x; });
+  function checkName(id) { return CHECK_BY_ID[id] ? CHECK_BY_ID[id].name : id; }
+
   function medThumb(id, s) {
     var m = D.MEDS[id];
     if (m) return '<span style="flex:none;width:' + s + 'px;height:' + s + 'px;border-radius:12px;background:#E5F4F2;display:flex;align-items:center;justify-content:center">' + drawPill(m.forms[0].appearance[0], Math.round(s * 0.75)) + '</span>';
-    return '<span style="flex:none;width:' + s + 'px;height:' + s + 'px;border-radius:12px;background:#EEF2F3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#5B6F75">' + esc(CHECK_MEDS[id].slice(0, 2)) + '</span>';
+    return '<span style="flex:none;width:' + s + 'px;height:' + s + 'px;border-radius:12px;background:#EEF2F3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#5B6F75">' + esc(checkName(id).slice(0, 2)) + '</span>';
   }
 
   function checkHero(sel, hits) {
@@ -768,13 +788,13 @@
     var rows = sel.map(function (id, i) {
       var mine = hits.filter(function (p) { return p.a === id || p.b === id; });
       var worst = mine[0];
-      var sub = D.MEDS[id] ? esc(D.MEDS[id].cls) : 'Checker only · full entry not built yet';
+      var sub = esc(CHECK_BY_ID[id] ? CHECK_BY_ID[id].cls : 'Checker only');
       var count = worst ? '<span style="font-size:12px;font-weight:700;color:' + SEV[worst.sev].fg + '">' + mine.length + (mine.length === 1 ? ' interaction' : ' interactions') + '</span>' : '';
       return '<div style="display:flex;align-items:center;gap:12px;padding:10px 4px 10px 12px;' + (i ? 'border-top:1px solid #EEF2F3' : '') + '">' + medThumb(id, 44) +
-        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:700">' + esc(CHECK_MEDS[id]) + '</span><span style="font-size:12px;color:#5B6F75">' + sub + '</span>' + count + '</span>' +
-        '<button data-act="remove:' + id + '" aria-label="Remove ' + esc(CHECK_MEDS[id]) + '" style="flex:none;width:44px;height:44px;border:0;border-radius:22px;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#5B6F75', 14) + '</button></div>';
+        '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:700">' + esc(checkName(id)) + '</span><span style="font-size:12px;color:#5B6F75">' + sub + '</span>' + count + '</span>' +
+        '<button data-act="remove:' + id + '" aria-label="Remove ' + esc(checkName(id)) + '" style="flex:none;width:44px;height:44px;border:0;border-radius:22px;background:transparent;display:flex;align-items:center;justify-content:center">' + ICON.x('#5B6F75', 14) + '</button></div>';
     }).join('');
-    var total = Object.keys(CHECK_MEDS).length;
+    var total = CHECK_LIST.length;
     var adder = '<div style="border-top:1px solid #EEF2F3;padding:12px;display:flex;flex-direction:column;gap:6px;background:#F7FAFA">' +
       '<label style="display:flex;align-items:center;gap:10px;border:1.5px solid #D9E3E4;border-radius:12px;padding:0 12px;min-height:48px;background:#FFFFFF">' +
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A6F67" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>' +
@@ -790,15 +810,12 @@
   function addCandidates(raw) {
     var q = raw.trim().toLowerCase(), out = [];
     if (!q) return out;
-    Object.keys(CHECK_MEDS).forEach(function (id) {
-      var name = CHECK_MEDS[id], n = name.toLowerCase(), m = D.MEDS[id], score = -1, brand = '';
+    CHECK_LIST.forEach(function (c) {
+      var id = c.id, name = c.name, n = name.toLowerCase(), score = -1, brand = '';
       if (n.indexOf(q) === 0) score = 0;
-      else if (n.split(/\s+/).some(function (w) { return w.indexOf(q) === 0; })) score = 1;
+      else if (n.split(/[\s()+]+/).some(function (w) { return w.indexOf(q) === 0; })) score = 1;
       else if (n.indexOf(q) >= 0) score = 2;
-      else if (m) {
-        brand = m.brands.split(',').map(function (x) { return x.trim(); }).filter(function (x) { return x.toLowerCase().indexOf(q) >= 0; })[0] || '';
-        if (brand) score = 3;
-      }
+      else if ((brand = brandMatch(c.brands, q))) score = 3;
       var added = state.selected.indexOf(id) >= 0;
       if (score >= 0) out.push({ id: id, name: name, brand: brand, score: added ? 9 : score, added: added });
     });
@@ -818,7 +835,7 @@
     var shown = open.slice(0, ADD_MAX).concat(list.filter(function (x) { return x.added; }).slice(0, 2));
     var html = shown.map(function (x, i) {
       var on = !x.added && i === state.addIdx;
-      var sub = x.brand ? 'Brand: ' + markq(x.brand, q) : (D.MEDS[x.id] ? esc(D.MEDS[x.id].cls) : 'Checker only');
+      var sub = x.brand ? 'Brand: ' + markq(x.brand, q) : esc(CHECK_BY_ID[x.id].cls);
       var right = x.added ? '<span style="flex:none;font-size:11px;font-weight:700;color:#5B6F75">In your list</span>' :
         '<span aria-hidden="true" style="flex:none;width:28px;height:28px;border-radius:14px;background:' + (on ? '#1A6F67' : '#E5F4F2') + ';display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + (on ? '#FFFFFF' : '#1A6F67') + '" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>';
       return '<button ' + (x.added ? 'disabled aria-disabled="true"' : 'data-act="add:' + x.id + '"') + ' role="option" id="opt-' + i + '" aria-selected="' + on + '" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:10px;padding:6px 8px;min-height:52px;background:' + (on ? '#E5F4F2' : 'transparent') + ';opacity:' + (x.added ? '.6' : '1') + '">' + medThumb(x.id, 36) +
@@ -877,7 +894,7 @@
     var quiet = [];
     for (var i = 0; i < sel.length; i++) for (var j = i + 1; j < sel.length; j++) {
       var a = sel[i], b = sel[j];
-      if (!hits.some(function (p) { return (p.a === a && p.b === b) || (p.a === b && p.b === a); })) quiet.push(CHECK_MEDS[a] + ' + ' + CHECK_MEDS[b]);
+      if (!hits.some(function (p) { return (p.a === a && p.b === b) || (p.a === b && p.b === a); })) quiet.push(checkName(a) + ' + ' + checkName(b));
     }
     var results = sel.length < 2 ? '' :
       '<div style="display:flex;flex-direction:column;gap:10px"><h2 style="' + H2 + '">Potential Interactions</h2>' +
@@ -1465,7 +1482,7 @@
       case 'back': goBack(); break;
       case 'prov': if (provBlocks[+arg]) navigate('prov', { prov: provBlocks[+arg] }); break;
       case 'checkwith':
-        if (state.selected.indexOf(state.medId) < 0 && CHECK_MEDS[state.medId]) state.selected = [state.medId].concat(state.selected);
+        if (state.selected.indexOf(state.medId) < 0 && CHECK_BY_ID[state.medId]) state.selected = [state.medId].concat(state.selected);
         navigate('check');
         break;
       case 'remove': state.selected = state.selected.filter(function (x) { return x !== arg; }); render(true); break;

@@ -73,6 +73,12 @@ async def main():
         assert await pg.locator('[data-act="remove:methotrexate"]').count() == 1, 'enter adds top match'
         assert await pg.evaluate("document.activeElement.id") == 'addq', 'focus stays in picker'
         await shot('19-check-added')
+        # picker covers every medicine in the app, not just the demo checker list
+        await pg.fill('#addq', 'metf'); await pg.wait_for_timeout(100)
+        assert await pg.locator('#addlist [data-act="add:metformin"]').count() == 1, 'metformin in picker'
+        await pg.fill('#addq', 'diabex'); await pg.wait_for_timeout(100)
+        assert 'Brand: Diabex' in await pg.inner_text('#addlist'), 'brand match'
+        await pg.fill('#addq', '')
         # every screen but home uses the shared header
         await pg.click('nav >> text=More'); await shot('20-profile')
         assert await pg.locator('h1:has-text("Profile")').count() == 1

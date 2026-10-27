@@ -1,5 +1,5 @@
 /* MediAUS service worker: network first, cache fallback, so updates show straight away while testing. */
-var CACHE = 'mediaus-v13';
+var CACHE = 'mediaus-v14';
 var ASSETS = [
   './',
   'index.html',
