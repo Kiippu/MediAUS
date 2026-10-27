@@ -33,6 +33,7 @@ async def main():
         print('gaps with no lead yet:', len(r['gapsNoLead']), ' '.join(r['gapsNoLead']))
         print('sources read over 12 months ago:', r['oldReads'] or 'none')
         print('sources not cited anywhere:', r['unusedSources'] or 'none')
+        print('ATC groups with no members yet:', ' '.join(r['emptyAtcGroups']) or 'none')
         for w in res['warnings']:
             print('warning:', w)
         for e in res['errors']:

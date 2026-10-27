@@ -7,6 +7,8 @@ Read the "MediAUS technical handover" doc first, then the "MediAUS data provenan
 - `facts/<medicine>.js`: fact tables. One record per displayed line or table cell. The id prefix names the table (`TABLES` in `core.js`).
 - `meds.js`: medicine skeletons. Structure, order and the app's own words only (form names, dose set names, headings). Fact ids, never clinical text.
 - `reviews.js`: SME sign-off sessions.
+- `agents.js`: AGT. Everything an interaction can be with that has no full entry (medicines, foods, herbals, vaccines, products): key, name, kind, atc, also. The full medicines are agents too, keyed by medicine id.
+- `groups.js`: GRP and MEM. A group is `basis: 'atc'` (members = agents whose ATC code starts with a prefix) or `basis: 'list'` (members = MEM records, each cited; a member can be another group).
 - `resolve.js`: builds `MEDIAUS_DATA` for `app.js`. Every object it builds carries `_f`, the fact id behind it.
 
 Every fact: `status` (draft | verify | signed | gap | demo | retired), `pop`, `changed` (YYYY-MM-DD), `cites: [{ src, loc?, as?, note?, broad? }]`, `lookIn: [source ids]`, `review`. Then the fields for its kind.
@@ -22,6 +24,8 @@ Every fact: `status` (draft | verify | signed | gap | demo | retired), `pop`, `c
 - Sources conflict: one POS fact per source. Don't pick one.
 - Routes differ by brand: BRD facts on the route.
 - Forms are physical forms (tablet, injection), never routes.
+- Interaction links: an INT line's `with` lists agent keys and `g:<group>` keys for what its text names, nothing wider. Prefer a group over listing its members. Unknown keys fail the provenance test. Recoding `with` is an edit (set `changed`).
+- A new medicine joins drug-class groups through its own ATC code; don't edit old INT lines for it. Mechanism groups (QT, CYP3A4) need a cited MEM record.
 - Rephrase, don't copy. Facts only; no PI/CMI text pasted.
 - Keep comments short.
 

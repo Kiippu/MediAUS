@@ -53,7 +53,7 @@
       if (M.STATUS.indexOf(f.status) < 0) E(where + ': unknown status ' + f.status);
       if (!f.changed || !DAY.test(f.changed)) E(where + ': changed must be YYYY-MM-DD');
       report.byStatus[f.status] = (report.byStatus[f.status] || 0) + 1;
-      var med = medOf[id] || 'demo';
+      var med = medOf[id] || (['AGENT', 'GROUP', 'MEMBER'].indexOf(table) >= 0 ? 'interaction links' : 'demo');
       var bm = report.byMed[med] = report.byMed[med] || {};
       bm[f.status] = (bm[f.status] || 0) + 1;
 
@@ -96,6 +96,26 @@
     });
   });
   Object.keys(SRC).forEach(function (id) { if (!used[id]) report.unusedSources.push(id); });
+
+  // ---------- interaction links (unknown 'with' targets are load errors from resolve.js) ----------
+  report.emptyAtcGroups = Object.keys(D.GROUPS).filter(function (k) { return D.GROUPS[k].basis === 'atc' && !D.groupMembers(k).length; });
+  report.listGroupsNoMembers = Object.keys(D.GROUPS).filter(function (k) { return D.GROUPS[k].basis === 'list' && !D.GROUPS[k].members.length; });
+  report.listGroupsNoMembers.forEach(function (k) { E('group ' + k + ': list group with no MEM records'); });
+  // A line whose text names an agent its links don't reach: probably a missing 'with' code.
+  var names = D.AGENTS.map(function (a) {
+    var ns = [a.name.split(' (')[0]].concat(a.also || []).filter(function (n) { return n.length > 3; });
+    return { key: a.key, re: new RegExp('\\b(?:' + ns.map(function (n) { return n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')\\b', 'i') };
+  });
+  db.ORDER.forEach(function (mid) {
+    var m = D.MEDS[mid];
+    m.interactions.important.concat(m.interactions.other).forEach(function (it) {
+      var reached = {};
+      it['with'].forEach(function (t) { (t.indexOf('g:') === 0 ? D.groupMembers(t.slice(2)) : [t]).forEach(function (k) { reached[k] = true; }); });
+      names.forEach(function (n) {
+        if (n.key !== mid && !reached[n.key] && n.re.test((it.title || '') + ' ' + it.text)) W(it._f + ': text names ' + n.key + ' but its links do not reach it');
+      });
+    });
+  });
   db.ORDER.forEach(function (mid) { if (!D.MEDS[mid]) E('medicine ' + mid + ' did not build'); });
 
   function monthsBetween(a, b) { var x = a.split('-'), y = b.split('-'); return (y[0] - x[0]) * 12 + (y[1] - x[1]); }

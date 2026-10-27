@@ -2908,5 +2908,5 @@ MEDIAUS.med({
 MEDIAUS.set('OTHERS', []); // all six built out 27 Oct 2026 (OTH-0001 to 0006 retired)
 MEDIAUS.set('EXTRA_PILLS', []); // replaced by sourced appearances (APP-0018 to 0021 retired)
 MEDIAUS.set('BARCODES', ['BAR-0001', 'BAR-0002', 'BAR-0003', 'BAR-0004', 'BAR-0005', 'BAR-0006', 'BAR-0007', 'BAR-0008']);
-MEDIAUS.set('CHECK_MEDS', ['CKM-0001', 'CKM-0002', 'CKM-0003', 'CKM-0004', 'CKM-0005', 'CKM-0006', 'CKM-0007', 'CKM-0008', 'CKM-0009', 'CKM-0010']);
-MEDIAUS.set('CHECK_PAIRS', ['CHK-0001', 'CHK-0002', 'CHK-0003', 'CHK-0004', 'CHK-0005', 'CHK-0006', 'CHK-0007', 'CHK-0008', 'CHK-0009', 'CHK-0010']);
+MEDIAUS.set('CHECK_MEDS', []); // retired 27 Oct 2026: agents.js
+MEDIAUS.set('CHECK_PAIRS', []); // retired 27 Oct 2026: pairs come from INT links

@@ -163,6 +163,76 @@ window.MEDIAUS_DATA = (function () {
   (S.CHECK_MEDS || []).forEach(function (id) { var f = get(id); CHECK_MEDS[f.key] = f.name; CHECK_MED_IDS[f.key] = id; });
   var PAIRS = (S.CHECK_PAIRS || []).map(function (id) { var f = get(id), o = base(id); o.a = f.a; o.b = f.b; o.sev = f.sev; o.title = f.title; o.text = f.text; return o; });
 
+  // ---------- interaction links: agents, groups, index ----------
+  // Agents = the full medicines (keyed by id) + AGT records. Groups expand to agents by ATC prefix or MEM records.
+  var ATC_RE = /[A-Z]\d{2}[A-Z]{2}\d{2}|[A-Z]\d{2}[A-Z]{1,2}/g;
+  var AGENTS = [], AGENT = {};
+  db.ORDER.forEach(function (id) {
+    var m = MEDS[id], sk = db.MEDS[id];
+    var a = { key: id, name: m.name, kind: 'medicine', medId: id, cls: m.cls, brands: m.brands, also: [], atc: String(m.atc || '').match(ATC_RE) || [], _atc: sk.identity.atc };
+    AGENTS.push(a); AGENT[id] = a;
+  });
+  (S.AGENTS || []).forEach(function (id) {
+    var f = get(id), a = base(id);
+    a.key = f.key; a.name = f.name; a.kind = f.kind; a.atc = f.atc || []; a.also = f.also || []; a._atc = id;
+    if (AGENT[a.key]) errors.push(id + ': agent key ' + a.key + ' already used');
+    AGENTS.push(a); AGENT[a.key] = a;
+  });
+  var GROUP = {};
+  (S.GROUPS || []).forEach(function (id) {
+    var f = get(id), g = base(id);
+    g.key = f.key; g.name = f.name; g.basis = f.basis; g.atc = f.atc || []; g.members = [];
+    if (GROUP[g.key]) errors.push(id + ': group key ' + g.key + ' already used');
+    GROUP[g.key] = g;
+  });
+  (S.MEMBERS || []).forEach(function (id) {
+    var f = get(id), g = GROUP[f.group];
+    if (!g) return errors.push(id + ': unknown group ' + f.group);
+    if (g.basis !== 'list') errors.push(id + ': group ' + f.group + ' takes members from ATC codes, not records');
+    g.members.push({ member: f.member, _f: id });
+  });
+  // Agents a 'with' target reaches: key -> how (null = named directly; else the group, and the fact that puts the agent in it).
+  function expand(t, seen) {
+    var out = {};
+    if (t.indexOf('g:') !== 0) { if (AGENT[t]) out[t] = null; return out; }
+    var g = GROUP[t.slice(2)];
+    if (!g || (seen = seen || {})[g.key]) return out;
+    seen[g.key] = true;
+    if (g.basis === 'atc') {
+      AGENTS.forEach(function (a) {
+        var code = a.atc.filter(function (c) { return g.atc.some(function (p) { return c.indexOf(p) === 0; }); })[0];
+        if (code) out[a.key] = { group: g, code: code, ids: [g._f, a._atc] };
+      });
+    } else {
+      g.members.forEach(function (mb) {
+        var sub = expand(mb.member, seen);
+        Object.keys(sub).forEach(function (k) { if (!(k in out)) out[k] = { group: g, ids: [g._f, mb._f].concat(sub[k] ? sub[k].ids : []) }; });
+      });
+    }
+    return out;
+  }
+  // REACH[a + '|' + b] = a's interaction lines that reach b. Built once.
+  var REACH = {};
+  db.ORDER.forEach(function (a) {
+    var m = MEDS[a];
+    m.interactions.important.concat(m.interactions.other).forEach(function (it) {
+      var hit = {};
+      it['with'].forEach(function (t) {
+        if (t.indexOf('g:') === 0 ? !GROUP[t.slice(2)] : !AGENT[t]) errors.push(it._f + ": unknown 'with' target " + t);
+        var r = expand(t);
+        Object.keys(r).forEach(function (b) { if (b !== a && (!(b in hit) || r[b] === null)) hit[b] = r[b]; });
+      });
+      Object.keys(hit).forEach(function (b) { (REACH[a + '|' + b] = REACH[a + '|' + b] || []).push({ med: m, item: it, how: hit[b] }); });
+    });
+  });
+  // Every line in either entry that reaches the other, most serious first.
+  function reach(a, b) {
+    var SEV_RANK = { major: 0, moderate: 1, minor: 2, conflict: 2.5, none: 3 };
+    return (REACH[a + '|' + b] || []).concat(REACH[b + '|' + a] || [])
+      .sort(function (x, y) { return SEV_RANK[x.item.sev] - SEV_RANK[y.item.sev]; });
+  }
+  function groupMembers(key) { return Object.keys(expand('g:' + key)); }
+
   // ---------- provenance helpers for the views ----------
   function locKey(l) { return l.split('.').map(function (n) { return ('000' + n).slice(-4); }).join('.'); }
   // Union of cites over facts, grouped by source in first-seen order.
@@ -202,6 +272,7 @@ window.MEDIAUS_DATA = (function () {
     COLORS: COLORS, MEDS: MEDS, ORDER: db.ORDER.slice(),
     OTHERS: OTHERS, EXTRA_PILLS: EXTRA_PILLS, BARCODES: BARCODES,
     CHECK_MEDS: CHECK_MEDS, CHECK_MED_IDS: CHECK_MED_IDS, PAIRS: PAIRS,
+    AGENTS: AGENTS, AGENT: AGENT, GROUPS: GROUP, reach: reach, groupMembers: groupMembers,
     prov: {
       fact: get, source: source, sources: SRC, reviews: db.REVIEWS, render: render, citeLabel: citeLabel,
       citesOf: citesOf, citeLine: citeLine, lookInsOf: lookInsOf, lookInLine: lookInLine

@@ -1,5 +1,5 @@
 /* MediAUS service worker: network first, cache fallback, so updates show straight away while testing. */
-var CACHE = 'mediaus-v15';
+var CACHE = 'mediaus-v16';
 var ASSETS = [
   './',
   'index.html',
@@ -25,6 +25,8 @@ var ASSETS = [
   'data/facts/atorvastatin.js',
   'data/facts/ibuprofen.js',
   'data/facts/demo.js',
+  'data/agents.js',
+  'data/groups.js',
   'data/meds.js',
   'data/resolve.js',
   'app.js',

@@ -86,6 +86,13 @@ async def main():
         await pg.fill('#addq', 'metformin'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
         t = await pg.inner_text('#app')
         assert 'NSAIDs: may affect kidney function' in t, 'metformin + ibuprofen from the metformin entry'
+        assert 'Matched through NSAIDs' in t and 'M01AE01' in t, 'metformin + ibuprofen through the NSAIDs group'
+        # non-medicines and other names
+        await pg.fill('#addq', 'frusemide'); await pg.wait_for_timeout(100)
+        assert 'Also called frusemide' in await pg.inner_text('#addlist'), 'other name match'
+        await pg.fill('#addq', 'alcohol'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(100)
+        t = await pg.inner_text('#app')
+        assert 'Alcohol: avoid; raises lactic acidosis risk' in t, 'metformin + alcohol'
         await pg.locator('text=Potential Interactions').scroll_into_view_if_needed(); await shot('19b-check-pairs')
         # every screen but home uses the shared header
         await pg.click('nav >> text=More'); await shot('20-profile')

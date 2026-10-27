@@ -20,9 +20,12 @@ window.MEDIAUS = (function () {
     SAF: 'SAFETY',        // one contraindication, caution, warning or monitoring line
     PRG: 'PREGNANCY',
     BRF: 'BREASTFEEDING',
+    AGT: 'AGENT',         // something an interaction can be with, that has no full entry
+    GRP: 'GROUP',         // a named set of agents (by ATC code or by list)
+    MEM: 'MEMBER',        // one member of a list group
     OTH: 'OTHER_MED',     // search-only medicine (demo)
-    CKM: 'CHECKER_MED',   // checker medicine name (demo)
-    CHK: 'CHECKER_PAIR',  // checker pair (demo)
+    CKM: 'CHECKER_MED',   // checker medicine name (demo, retired: now AGT)
+    CHK: 'CHECKER_PAIR',  // checker pair (demo, retired: now INT links)
     BAR: 'BARCODE'        // pack barcode (demo)
   };
   // Provenance status of a fact (not the clinical status of a route).
