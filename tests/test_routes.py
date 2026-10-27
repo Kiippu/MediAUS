@@ -56,6 +56,11 @@ async def main():
         await pg.goto('http://localhost:8090/', wait_until='networkidle'); await pg.click('text=Get Started')
         await pg.click('[data-act="med:amoxicillin:cap"]'); await pg.click('[role=tab]:has-text("Interactions")'); await top(500); await shot('15-amox-int')
         await pg.click('[role=tab]:has-text("Administration")'); await pg.click('[data-act="rsel:open"]'); await top(300); await shot('16-amox-open')
+        # tap the open route again to collapse it
+        await pg.click('[data-act="rsel:open"]')
+        assert await pg.locator('[aria-expanded="true"]').count() == 0, 'route collapses'
+        await pg.click('[data-act="rsel:open"]')
+        assert await pg.locator('[data-act="rsel:open"][aria-expanded="true"]').count() == 1, 'route reopens'
         # pill identifier hidden on the medicine page too
         await pg.click('[role=tab]:has-text("Overview")')
         assert await pg.locator('text=Save to List').count() == 1

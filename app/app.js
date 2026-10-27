@@ -608,11 +608,18 @@
     return '<div style="display:flex;flex-direction:column;gap:2px">' + out + '</div>';
   }
 
+  // Open route card: the chosen one, else the first. '-' = all closed.
+  function openRouteId(f) {
+    if (state.routeId === '-') return '';
+    var r = f.routes.filter(function (x) { return x.id === state.routeId; })[0] || f.routes[0];
+    return r ? r.id : '';
+  }
+
   function tabAdmin() {
     var f = form(), pops = formPops(f), g = curPop(f), gl = GROUPS[g];
-    var sel = f.routes.filter(function (r) { return r.id === state.routeId; })[0] || f.routes[0];
+    var openId = openRouteId(f);
     var cards = f.routes.map(function (r) {
-      var open = r.id === sel.id;
+      var open = r.id === openId;
       var gp = r.pops && g !== 'all' ? (r.pops[g] || { status: 'unverified', note: 'Not found in the sources read.' }) : null;
       var st = gp ? gp.status : r.status;
       var v = RSTATUS[st] || RSTATUS.unverified;
@@ -1450,7 +1457,7 @@
       case 'med': navigate('med', { medId: arg, formId: arg2 || D.MEDS[arg].forms[0].id, tab: 'overview', routeId: '', doseId: '' }); break;
       case 'medtab': navigate('med', { medId: arg, formId: D.MEDS[arg].forms[0].id, tab: arg2, routeId: '', doseId: '' }); break;
       case 'medr': navigate('med', { medId: arg, formId: arg2, tab: 'admin', routeId: parts[3] || '', doseId: '' }); break;
-      case 'rsel': state.routeId = arg; render(true); break;
+      case 'rsel': state.routeId = arg === openRouteId(form()) ? '-' : arg; render(true); break; // tap the open one to close it
       case 'dsel': state.doseId = arg; render(true); break;
       case 'form': state.formId = arg; state.routeId = ''; state.doseId = ''; history.replaceState(snapshot(), ''); render(true); break;
       case 'pop': state.pop = arg; render(true); break;
