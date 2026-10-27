@@ -1,5 +1,5 @@
 /* AGENTS: everything an interaction line can name that has no full entry. Fields: CLAUDE.md.
-   The 17 medicines with a full entry are agents too, keyed by their medicine id (resolve.js adds them).
+   The 27 medicines with a full entry are agents too, keyed by their medicine id (resolve.js adds them).
    key: permanent, used in INT 'with'. kind: medicine | food | herbal | vaccine | product.
    atc: WHO ATC codes, which decide membership of ATC groups (groups.js). also: other names people search for.
    Medicines: status verify until each ATC code is checked against the WHO index. */
@@ -11,7 +11,7 @@ MEDIAUS.facts({
   'AGT-0005': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'methotrexate', name: 'Methotrexate', kind: 'medicine', atc: ['L01BA01', 'L04AX03'] },
   'AGT-0006': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'coc', name: 'Combined oral contraceptive', kind: 'medicine', atc: ['G03AA'], also: ['the pill', 'oral contraceptive'] },
   'AGT-0007': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'sofosbuvir', name: 'Sofosbuvir', kind: 'medicine', atc: ['J05AP08'] },
-  'AGT-0008': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'heparin', name: 'Heparin', kind: 'medicine', atc: ['B01AB01'] },
+  'AGT-0008': { status: 'retired', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'heparin', name: 'Heparin', kind: 'medicine', atc: ['B01AB01'] },
   'AGT-0009': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'aminophylline', name: 'Aminophylline', kind: 'medicine', atc: ['R03DA05'] },
   'AGT-0010': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'theophylline', name: 'Theophylline', kind: 'medicine', atc: ['R03DA04'] },
   'AGT-0011': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'diltiazem', name: 'Diltiazem', kind: 'medicine', atc: ['C08DB01'] },
@@ -80,7 +80,7 @@ MEDIAUS.facts({
   'AGT-0074': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'fusidic-acid', name: 'Fusidic acid (systemic)', kind: 'medicine', atc: ['J01XC01'] },
   'AGT-0075': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'glecaprevir-pibrentasvir', name: 'Glecaprevir with pibrentasvir', kind: 'medicine', atc: ['J05AP57'] },
   'AGT-0076': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'niacin', name: 'Niacin (nicotinic acid)', kind: 'medicine', atc: ['C10AD02'], also: ['nicotinic acid'] },
-  'AGT-0077': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'colchicine', name: 'Colchicine', kind: 'medicine', atc: ['M04AC01'] },
+  'AGT-0077': { status: 'retired', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'colchicine', name: 'Colchicine', kind: 'medicine', atc: ['M04AC01'] },
   'AGT-0078': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'daptomycin', name: 'Daptomycin', kind: 'medicine', atc: ['J01XX09'] },
   'AGT-0079': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'letermovir', name: 'Letermovir', kind: 'medicine', atc: ['J05AX18'] },
   'AGT-0080': { status: 'verify', changed: '2026-10-27', lookIn: ['S-who-atc'], key: 'aspirin', name: 'Aspirin', kind: 'medicine', atc: ['B01AC06', 'N02BA01'], also: ['acetylsalicylic acid'] },
@@ -89,6 +89,39 @@ MEDIAUS.facts({
   'AGT-0083': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-prograf-pi-2026-09', loc: '4.5' }], key: 'st-johns-wort', name: 'St John’s wort', kind: 'herbal', also: ['hypericum'] },
   'AGT-0084': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-brufen-pi-2026-04', loc: '4.5' }], key: 'ginkgo', name: 'Ginkgo biloba', kind: 'herbal', also: ['ginkgo'] },
   'AGT-0085': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-prograf-pi-2026-09', loc: '4.4' }], key: 'live-vaccine', name: 'Live vaccines', kind: 'vaccine', also: ['MMR', 'varicella vaccine', 'yellow fever vaccine', 'BCG'] },
-  'AGT-0086': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-diabex-pi-2026-08', loc: '4.4, 4.5' }], key: 'contrast-iodinated', name: 'Iodinated contrast', kind: 'product', also: ['contrast dye', 'CT contrast'] }
+  'AGT-0086': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-diabex-pi-2026-08', loc: '4.4, 4.5' }], key: 'contrast-iodinated', name: 'Iodinated contrast', kind: 'product', also: ['contrast dye', 'CT contrast'] },
+  'AGT-0087': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'interferon', name: 'Interferons', kind: 'medicine', atc: ['L03AB'], also: ['interferon alfa', 'peginterferon'] },
+  'AGT-0088': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'zidovudine', name: 'Zidovudine', kind: 'medicine', atc: ['J05AF01'], also: ['AZT'] },
+  'AGT-0089': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'cilostazol', name: 'Cilostazol', kind: 'medicine', atc: ['B01AC23'] },
+  'AGT-0090': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'clopidogrel', name: 'Clopidogrel', kind: 'medicine', atc: ['B01AC04'] },
+  'AGT-0091': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'citalopram', name: 'Citalopram', kind: 'medicine', atc: ['N06AB04'] },
+  'AGT-0092': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'clomipramine', name: 'Clomipramine', kind: 'medicine', atc: ['N06AA04'] },
+  'AGT-0093': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'imipramine', name: 'Imipramine', kind: 'medicine', atc: ['N06AA02'] },
+  'AGT-0094': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'fluconazole', name: 'Fluconazole', kind: 'medicine', atc: ['J02AC01'] },
+  'AGT-0095': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'andexanet-alfa', name: 'Andexanet alfa', kind: 'medicine', atc: ['V03AB38'] },
+  'AGT-0096': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'alteplase', name: 'Alteplase', kind: 'medicine', atc: ['B01AD02'], also: ['tPA'] },
+  'AGT-0097': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'potassium', name: 'Potassium supplements', kind: 'medicine', atc: ['A12BA'], also: ['potassium chloride'] },
+  'AGT-0098': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'nicotine', name: 'Nicotine', kind: 'medicine', atc: ['N07BA01'] },
+  'AGT-0099': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'chlordiazepoxide', name: 'Chlordiazepoxide', kind: 'medicine', atc: ['N05BA02'] },
+  'AGT-0100': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'oxazepam', name: 'Oxazepam', kind: 'medicine', atc: ['N05BA04'] },
+  'AGT-0101': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'antithrombin', name: 'Antithrombin III', kind: 'medicine', atc: ['B01AB02'], also: ['antithrombin'] },
+  'AGT-0102': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'gabapentin', name: 'Gabapentin', kind: 'medicine', atc: ['N02BF01'] },
+  'AGT-0103': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'pregabalin', name: 'Pregabalin', kind: 'medicine', atc: ['N02BF02'] },
+  'AGT-0104': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'venlafaxine', name: 'Venlafaxine', kind: 'medicine', atc: ['N06AX16'] },
+  'AGT-0105': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'duloxetine', name: 'Duloxetine', kind: 'medicine', atc: ['N06AX21'] },
+  'AGT-0106': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'desvenlafaxine', name: 'Desvenlafaxine', kind: 'medicine', atc: ['N06AX23'] },
+  'AGT-0107': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'droperidol', name: 'Droperidol', kind: 'medicine', atc: ['N05AD08'] },
+  'AGT-0108': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'doxorubicin', name: 'Doxorubicin', kind: 'medicine', atc: ['L01DB01'] },
+  'AGT-0109': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'trastuzumab', name: 'Trastuzumab', kind: 'medicine', atc: ['L01FD01'] },
+  'AGT-0110': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'cytarabine', name: 'Cytarabine', kind: 'medicine', atc: ['L01BC01'] },
+  'AGT-0111': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'pentostatin', name: 'Pentostatin', kind: 'medicine', atc: ['L01XX08'] },
+  'AGT-0112': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'chloral-hydrate', name: 'Chloral hydrate', kind: 'medicine', atc: ['N05CC01'] },
+  'AGT-0113': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'disulfiram', name: 'Disulfiram', kind: 'medicine', atc: ['N07BB01'] },
+  'AGT-0114': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'ciprofloxacin', name: 'Ciprofloxacin', kind: 'medicine', atc: ['J01MA02'] },
+  'AGT-0115': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'aprepitant', name: 'Aprepitant', kind: 'medicine', atc: ['A04AD12'] },
+  'AGT-0116': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'indometacin', name: 'Indometacin', kind: 'medicine', atc: ['M01AB01'], also: ['indomethacin'] },
+  'AGT-0117': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'azathioprine', name: 'Azathioprine', kind: 'medicine', atc: ['L04AX01'] },
+  'AGT-0118': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'ondansetron', name: 'Ondansetron', kind: 'medicine', atc: ['A04AA01'] },
+  'AGT-0119': { status: 'draft', changed: '2026-10-28', cites: [{ src: 'S-dilaudid-tab-pi-2025-09', loc: '4.4' }, { src: 'S-sublimaze-pi-2025-09', loc: '4.5' }], key: 'cannabis', name: 'Cannabis', kind: 'herbal', also: ['marijuana', 'medicinal cannabis'] }
 });
-MEDIAUS.set('AGENTS', ['AGT-0001', 'AGT-0002', 'AGT-0003', 'AGT-0004', 'AGT-0005', 'AGT-0006', 'AGT-0007', 'AGT-0008', 'AGT-0009', 'AGT-0010', 'AGT-0011', 'AGT-0012', 'AGT-0013', 'AGT-0014', 'AGT-0015', 'AGT-0016', 'AGT-0017', 'AGT-0018', 'AGT-0019', 'AGT-0020', 'AGT-0021', 'AGT-0022', 'AGT-0023', 'AGT-0024', 'AGT-0025', 'AGT-0026', 'AGT-0027', 'AGT-0028', 'AGT-0029', 'AGT-0030', 'AGT-0031', 'AGT-0032', 'AGT-0033', 'AGT-0034', 'AGT-0035', 'AGT-0036', 'AGT-0037', 'AGT-0038', 'AGT-0039', 'AGT-0040', 'AGT-0041', 'AGT-0042', 'AGT-0043', 'AGT-0044', 'AGT-0045', 'AGT-0046', 'AGT-0047', 'AGT-0048', 'AGT-0049', 'AGT-0050', 'AGT-0051', 'AGT-0052', 'AGT-0053', 'AGT-0054', 'AGT-0055', 'AGT-0056', 'AGT-0057', 'AGT-0058', 'AGT-0059', 'AGT-0060', 'AGT-0061', 'AGT-0062', 'AGT-0063', 'AGT-0064', 'AGT-0065', 'AGT-0066', 'AGT-0067', 'AGT-0068', 'AGT-0069', 'AGT-0070', 'AGT-0071', 'AGT-0072', 'AGT-0073', 'AGT-0074', 'AGT-0075', 'AGT-0076', 'AGT-0077', 'AGT-0078', 'AGT-0079', 'AGT-0080', 'AGT-0081', 'AGT-0082', 'AGT-0083', 'AGT-0084', 'AGT-0085', 'AGT-0086']);
+MEDIAUS.set('AGENTS', ['AGT-0001', 'AGT-0002', 'AGT-0003', 'AGT-0004', 'AGT-0005', 'AGT-0006', 'AGT-0007', 'AGT-0009', 'AGT-0010', 'AGT-0011', 'AGT-0012', 'AGT-0013', 'AGT-0014', 'AGT-0015', 'AGT-0016', 'AGT-0017', 'AGT-0018', 'AGT-0019', 'AGT-0020', 'AGT-0021', 'AGT-0022', 'AGT-0023', 'AGT-0024', 'AGT-0025', 'AGT-0026', 'AGT-0027', 'AGT-0028', 'AGT-0029', 'AGT-0030', 'AGT-0031', 'AGT-0032', 'AGT-0033', 'AGT-0034', 'AGT-0035', 'AGT-0036', 'AGT-0037', 'AGT-0038', 'AGT-0039', 'AGT-0040', 'AGT-0041', 'AGT-0042', 'AGT-0043', 'AGT-0044', 'AGT-0045', 'AGT-0046', 'AGT-0047', 'AGT-0048', 'AGT-0049', 'AGT-0050', 'AGT-0051', 'AGT-0052', 'AGT-0053', 'AGT-0054', 'AGT-0055', 'AGT-0056', 'AGT-0057', 'AGT-0058', 'AGT-0059', 'AGT-0060', 'AGT-0061', 'AGT-0062', 'AGT-0063', 'AGT-0064', 'AGT-0065', 'AGT-0066', 'AGT-0067', 'AGT-0068', 'AGT-0069', 'AGT-0070', 'AGT-0071', 'AGT-0072', 'AGT-0073', 'AGT-0074', 'AGT-0075', 'AGT-0076', 'AGT-0078', 'AGT-0079', 'AGT-0080', 'AGT-0081', 'AGT-0082', 'AGT-0083', 'AGT-0084', 'AGT-0085', 'AGT-0086', 'AGT-0087', 'AGT-0088', 'AGT-0089', 'AGT-0090', 'AGT-0091', 'AGT-0092', 'AGT-0093', 'AGT-0094', 'AGT-0095', 'AGT-0096', 'AGT-0097', 'AGT-0098', 'AGT-0099', 'AGT-0100', 'AGT-0101', 'AGT-0102', 'AGT-0103', 'AGT-0104', 'AGT-0105', 'AGT-0106', 'AGT-0107', 'AGT-0108', 'AGT-0109', 'AGT-0110', 'AGT-0111', 'AGT-0112', 'AGT-0113', 'AGT-0114', 'AGT-0115', 'AGT-0116', 'AGT-0117', 'AGT-0118', 'AGT-0119']);

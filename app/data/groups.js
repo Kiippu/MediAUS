@@ -51,7 +51,13 @@ MEDIAUS.facts({
   'GRP-0046': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-cordarone-pi-2026-05' }], key: 'statin-cyp3a4', name: 'Statins metabolised by CYP3A4', basis: 'list' },
   'GRP-0047': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-prograf-pi-2026-09', loc: '4.5' }], key: 'cyp3a4-inhibitor', name: 'CYP3A4 inhibitors', basis: 'list' },
   'GRP-0048': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-panadol-pi-2025-07', loc: '4.5' }, { src: 'S-paracetamol-kabi-pi-2025-07', loc: '4.5' }], key: 'enzyme-inducer', name: 'Liver enzyme inducers', basis: 'list' },
-  'GRP-0049': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-lioresal-tab-pi-2025-06', loc: '4.5' }, { src: 'S-prograf-pi-2026-09', loc: '4.5' }], key: 'nephrotoxic', name: 'Medicines that can harm the kidneys', basis: 'list' }
+  'GRP-0049': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-lioresal-tab-pi-2025-06', loc: '4.5' }, { src: 'S-prograf-pi-2026-09', loc: '4.5' }], key: 'nephrotoxic', name: 'Medicines that can harm the kidneys', basis: 'list' },
+  'GRP-0050': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'thrombolytic', name: 'Thrombolytics', basis: 'atc', atc: ['B01AD'] },
+  'GRP-0051': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'snri', name: 'SNRIs', basis: 'atc', atc: ['N06AX16', 'N06AX21', 'N06AX23'] },
+  'GRP-0052': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'gabapentinoid', name: 'Gabapentinoids', basis: 'atc', atc: ['N02BF', 'N03AX12', 'N03AX16'] },
+  'GRP-0053': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'antihistamine', name: 'Antihistamines (systemic)', basis: 'atc', atc: ['R06A'] },
+  'GRP-0054': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'phenothiazine', name: 'Phenothiazine antipsychotics', basis: 'atc', atc: ['N05AA', 'N05AB', 'N05AC'] },
+  'GRP-0055': { status: 'verify', changed: '2026-10-28', lookIn: ['S-who-atc'], key: 'anthracycline', name: 'Anthracyclines', basis: 'atc', atc: ['L01DB'] }
 });
 MEDIAUS.facts({
   'MEM-0001': { status: 'verify', changed: '2026-10-27', lookIn: [{ src: 'S-cordarone-pi-2026-05', loc: '4.4' }], group: 'qt-prolonging', member: 'amiodarone' },
@@ -71,5 +77,5 @@ MEDIAUS.facts({
   'MEM-0015': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-prograf-pi-2026-09', loc: '4.5' }], group: 'nephrotoxic', member: 'co-trimoxazole' },
   'MEM-0016': { status: 'draft', changed: '2026-10-27', cites: [{ src: 'S-prograf-pi-2026-09', loc: '4.5' }], group: 'nephrotoxic', member: 'amphotericin-b' }
 });
-MEDIAUS.set('GROUPS', ['GRP-0001', 'GRP-0002', 'GRP-0003', 'GRP-0004', 'GRP-0005', 'GRP-0006', 'GRP-0007', 'GRP-0008', 'GRP-0009', 'GRP-0010', 'GRP-0011', 'GRP-0012', 'GRP-0013', 'GRP-0014', 'GRP-0015', 'GRP-0016', 'GRP-0017', 'GRP-0018', 'GRP-0019', 'GRP-0020', 'GRP-0021', 'GRP-0022', 'GRP-0023', 'GRP-0024', 'GRP-0025', 'GRP-0026', 'GRP-0027', 'GRP-0028', 'GRP-0029', 'GRP-0030', 'GRP-0031', 'GRP-0032', 'GRP-0033', 'GRP-0034', 'GRP-0035', 'GRP-0036', 'GRP-0037', 'GRP-0038', 'GRP-0039', 'GRP-0040', 'GRP-0041', 'GRP-0042', 'GRP-0043', 'GRP-0044', 'GRP-0045', 'GRP-0046', 'GRP-0047', 'GRP-0048', 'GRP-0049']);
+MEDIAUS.set('GROUPS', ['GRP-0001', 'GRP-0002', 'GRP-0003', 'GRP-0004', 'GRP-0005', 'GRP-0006', 'GRP-0007', 'GRP-0008', 'GRP-0009', 'GRP-0010', 'GRP-0011', 'GRP-0012', 'GRP-0013', 'GRP-0014', 'GRP-0015', 'GRP-0016', 'GRP-0017', 'GRP-0018', 'GRP-0019', 'GRP-0020', 'GRP-0021', 'GRP-0022', 'GRP-0023', 'GRP-0024', 'GRP-0025', 'GRP-0026', 'GRP-0027', 'GRP-0028', 'GRP-0029', 'GRP-0030', 'GRP-0031', 'GRP-0032', 'GRP-0033', 'GRP-0034', 'GRP-0035', 'GRP-0036', 'GRP-0037', 'GRP-0038', 'GRP-0039', 'GRP-0040', 'GRP-0041', 'GRP-0042', 'GRP-0043', 'GRP-0044', 'GRP-0045', 'GRP-0046', 'GRP-0047', 'GRP-0048', 'GRP-0049', 'GRP-0050', 'GRP-0051', 'GRP-0052', 'GRP-0053', 'GRP-0054', 'GRP-0055']);
 MEDIAUS.set('MEMBERS', ['MEM-0001', 'MEM-0002', 'MEM-0003', 'MEM-0004', 'MEM-0005', 'MEM-0006', 'MEM-0007', 'MEM-0008', 'MEM-0009', 'MEM-0010', 'MEM-0011', 'MEM-0012', 'MEM-0013', 'MEM-0014', 'MEM-0015', 'MEM-0016']);

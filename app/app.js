@@ -7,14 +7,14 @@
   var MUTED = '#5B6F75';
 
   // ---------- version & features ----------
-  var APP_VERSION = '1.2.0';
+  var APP_VERSION = '1.3.0';
   // Hidden for the MVP while we focus on core data. Set true to bring back.
   var FEATURES = { pill: false, scan: false };
   var SEEN_KEY = 'mediaus.seenVersion';
   // "What's new" pop-up, shown once per version.
   var WHATS_NEW = {
     items: [
-      '17 medicines, up from 3',
+      '27 medicines: new are aciclovir, esomeprazole, heparin, rivaroxaban, colchicine, hydromorphone, fentanyl, ropivacaine, cyclophosphamide and sodium nitroprusside',
       'Dosing and Administration grouped by Adults, Children and Newborns',
       'Preparation steps for each route: reconstitute, dilute and give',
       'A Sources trail on every fact: tap a source line to see the documents, sections and dates behind it',
@@ -73,7 +73,7 @@
   var ROUTES = ['All', 'Oral', 'Enteral tube', 'IV', 'IM', 'SC', 'Intrathecal', 'Local', 'Sublingual', 'Rectal', 'Inhaled', 'Topical'];
   var PERKS = ['Full interaction checker', 'Pregnancy & breastfeeding safety', 'Detailed dosing and administration', FEATURES.pill && 'AI photo pill identifier', FEATURES.scan && 'Barcode scanner for medicine packs', 'Ad-free experience'].filter(Boolean);
   var TABS = [['overview', 'Overview'], ['dosage', 'Dosage'], ['admin', 'Administration'], ['interactions', 'Interactions'], ['pregnancy', 'Pregnancy'], ['more', 'More']];
-  var SHAPES = ['round', 'oval', 'oblong', 'capsule'];
+  var SHAPES = ['round', 'oval', 'oblong', 'capsule', 'triangle'];
   var SWATCHES = ['white', 'ivory', 'yellow', 'blue', 'pink', 'orange', 'red', 'green', 'maroon'];
 
   // All pills for the identifier
@@ -138,6 +138,10 @@
     } else if (a.shape === 'oblong') {
       body = '<rect x="5" y="11" width="70" height="28" rx="14" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/>' +
         (a.scored ? '<line x1="40" y1="11" x2="40" y2="39" stroke="#000" stroke-opacity="0.18" stroke-width="1.5"/>' : '') + text;
+    } else if (a.shape === 'triangle') {
+      body = '<path d="M40 3L74 46H6z" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5" stroke-linejoin="round"/>' +
+        (a.scored ? '<line x1="40" y1="5" x2="40" y2="45" stroke="#000" stroke-opacity="0.18" stroke-width="1.5"/>' : '') +
+        text.replace('y="' + (25 + fs / 3) + '"', 'y="' + (33 + fs / 3) + '"');
     } else if (a.shape === 'capsule') {
       body = '<path d="M40 11H19a14 14 0 0 0 0 28h21z" fill="' + c1 + '" stroke="' + stroke + '" stroke-width="1.5"/><path d="M40 11h21a14 14 0 0 1 0 28H40z" fill="' + c2 + '" stroke="' + stroke + '" stroke-width="1.5"/>' +
         '<path d="M14 17h14" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2.5" stroke-linecap="round"/>' + text;
@@ -319,7 +323,7 @@
 
   // Draft browse groups. SME to confirm.
   var AREAS = [
-    { id: 'heart', label: 'Heart & circulation', match: ['antiarrhythmic', 'cardiac glycoside', 'antianginal', 'cholesterol'],
+    { id: 'heart', label: 'Heart & circulation', match: ['antiarrhythmic', 'cardiac glycoside', 'antianginal', 'cholesterol', 'anticoagulant', 'antihypertensive'],
       icon: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>' },
     { id: 'antibiotics', label: 'Antibiotics', match: ['antibiotic'],
       icon: '<circle cx="12" cy="12" r="5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>' },

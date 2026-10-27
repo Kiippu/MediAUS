@@ -1,5 +1,5 @@
 /* MediAUS service worker: network first, cache fallback, so updates show straight away while testing. */
-var CACHE = 'mediaus-v16';
+var CACHE = 'mediaus-v17';
 var ASSETS = [
   './',
   'index.html',
@@ -24,6 +24,16 @@ var ASSETS = [
   'data/facts/salbutamol.js',
   'data/facts/atorvastatin.js',
   'data/facts/ibuprofen.js',
+  'data/facts/aciclovir.js',
+  'data/facts/esomeprazole.js',
+  'data/facts/heparin.js',
+  'data/facts/rivaroxaban.js',
+  'data/facts/colchicine.js',
+  'data/facts/hydromorphone.js',
+  'data/facts/fentanyl.js',
+  'data/facts/ropivacaine.js',
+  'data/facts/cyclophosphamide.js',
+  'data/facts/sodium-nitroprusside.js',
   'data/facts/demo.js',
   'data/agents.js',
   'data/groups.js',
