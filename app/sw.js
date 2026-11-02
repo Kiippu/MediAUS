@@ -1,5 +1,5 @@
 /* MediAUS service worker: network first, cache fallback, so updates show straight away while testing. */
-var CACHE = 'mediaus-v17';
+var CACHE = 'mediaus-v18';
 var ASSETS = [
   './',
   'index.html',
@@ -40,6 +40,7 @@ var ASSETS = [
   'data/meds.js',
   'data/resolve.js',
   'app.js',
+  'feedback.js',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/icon-512.png',

@@ -7,13 +7,14 @@
   var MUTED = '#5B6F75';
 
   // ---------- version & features ----------
-  var APP_VERSION = '1.3.0';
+  var APP_VERSION = '1.4.0';
   // Hidden for the MVP while we focus on core data. Set true to bring back.
-  var FEATURES = { pill: false, scan: false };
+  var FEATURES = { pill: false, scan: false, feedback: true }; // feedback: MVP testing tab (feedback.js)
   var SEEN_KEY = 'mediaus.seenVersion';
   // "What's new" pop-up, shown once per version.
   var WHATS_NEW = {
     items: [
+      'Feedback tab on the right edge: report a problem or request a medicine while we test',
       '27 medicines: new are aciclovir, esomeprazole, heparin, rivaroxaban, colchicine, hydromorphone, fentanyl, ropivacaine, cyclophosphamide and sodium nitroprusside',
       'Dosing and Administration grouped by Adults, Children and Newborns',
       'Preparation steps for each route: reconstitute, dilute and give',
@@ -1242,6 +1243,7 @@
         row(ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>'), 'Appearance', 'System') +
         row(ic('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'), 'Region', 'Australia') +
         row(ic('<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/>'), 'About', 'Version ' + APP_VERSION, 'whatsnew') +
+        (FEATURES.feedback ? row(ic('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>'), 'Feedback and your reports', window.MEDIAUS_FB && window.MEDIAUS_FB.count() ? String(window.MEDIAUS_FB.count()) : '', 'fb') : '') +
       '</div>' +
       '<p style="margin:0;font-size:12px;line-height:1.5;color:#5B6F75">Prototype with sample data for review. Not for clinical use.</p>' +
       '</div>';
@@ -1427,6 +1429,7 @@
       if (el.offsetLeft + el.offsetWidth > row.scrollLeft + row.clientWidth || el.offsetLeft < row.scrollLeft) row.scrollLeft = el.offsetLeft - 16;
     });
     afterRender();
+    if (window.MEDIAUS_FB) window.MEDIAUS_FB.update();
   }
 
   function snapshot() { return { screen: state.screen, tab: state.tab, medId: state.medId, formId: state.formId, prov: state.screen === 'prov' ? state.prov : null }; }
@@ -1448,6 +1451,7 @@
   }
 
   window.addEventListener('popstate', function (e) {
+    if (window.MEDIAUS_FB && window.MEDIAUS_FB.onPop()) return; // back closes the feedback panel first
     if (depth > 0) depth--;
     var s = e.state || { screen: 'home' };
     if (s.screen === 'splash' || !featureOn(s.screen)) s.screen = 'home';
@@ -1473,6 +1477,7 @@
     switch (act) {
       case 'start': navigate('home', null, { replace: true }); maybeWhatsNew(); break;
       case 'whatsnew': state.whatsNew = true; render(true); break;
+      case 'fb': if (window.MEDIAUS_FB) window.MEDIAUS_FB.open(window.MEDIAUS_FB.count() ? 'mine' : 'form'); break;
       case 'wnclose': markSeen(); state.whatsNew = false; render(true); break;
       case 'wnstay': break;
       case 'go': navigate(arg); break;
@@ -1577,6 +1582,28 @@
     if (document.hidden && cam.stream) { stopCamera(); }
     else if (!document.hidden && state.screen === 'scan') { render(); }
   });
+
+  // Hook for feedback.js: what's on screen, sent with a report.
+  function fbContext() {
+    var scr = state.screen, onMed = scr === 'med', ids = [];
+    (scr === 'prov' && state.prov ? [state.prov] : provBlocks).forEach(function (b) { (b.ids || []).forEach(function (id) { if (id && ids.indexOf(id) < 0) ids.push(id); }); });
+    var c = { screen: scr, screenLabel: onMed ? 'Medicine' : (TITLES[scr] || scr), camera: scr === 'scan' && scanUnlocked(), modal: !!state.whatsNew, facts: ids.slice(0, 80) };
+    if (onMed) {
+      var m = med(), f = form(), t = TABS.filter(function (x) { return x[0] === state.tab; })[0];
+      c.medId = state.medId; c.medName = m.name; c.formId = f.id; c.formLabel = f.label; c.tab = state.tab; c.tabLabel = t ? t[1] : state.tab;
+      c.pop = state.pop; if (state.routeId && state.routeId !== '-') c.routeId = state.routeId; if (state.doseId) c.doseId = state.doseId;
+    }
+    if (scr === 'search') { c.query = state.query; c.route = state.route; }
+    if (scr === 'check') c.selected = state.selected.slice();
+    if (scr === 'prov' && state.prov) c.provTitle = state.prov.title;
+    return c;
+  }
+  window.MEDIAUS_APP = {
+    version: APP_VERSION,
+    feedback: FEATURES.feedback,
+    ctx: fbContext,
+    openMed: function (id) { if (D.MEDS[id]) navigate('med', { medId: id, formId: D.MEDS[id].forms[0].id, tab: 'overview', routeId: '', doseId: '' }); }
+  };
 
   history.replaceState(snapshot(), '');
   render();

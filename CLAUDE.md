@@ -34,7 +34,8 @@ Every fact: `status` (draft | verify | signed | gap | demo | retired), `pop`, `c
 - Source lines come from `provLine(ids, title)`; tapping one opens the Sources (trail) screen for those facts.
 - New data file: add it to `app/index.html` and to `ASSETS` in `app/sw.js`.
 - Bump `CACHE` in `app/sw.js` when shipping changes.
-- Test: `python -m http.server 8090 -d app`, then `python tests/test_provenance.py`, `python tests/test_routes.py` and `python tests/test_population.py`.
+- Feedback tab (MVP testing): `app/feedback.js`, outside `#app`; app.js feeds it through `window.MEDIAUS_APP` and `FEATURES.feedback`. `serve.ps1` saves reports to `feedback/reports.jsonl` (git-ignored; tester data, never commit).
+- Test: `python -m http.server 8090 -d app`, then `python tests/test_provenance.py`, `python tests/test_routes.py`, `python tests/test_population.py` and `python tests/test_feedback.py`.
 
 ## Team
 Dev (software engineer) and SME (registered nurse). The SME signs off clinical data.

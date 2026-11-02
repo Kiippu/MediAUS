@@ -47,6 +47,17 @@ SECURE LINK (recommended for Android)
    - Anyone who has the link can open the app while the window is open.
      The link changes every time you start it. Close the window to stop.
 
+FEEDBACK FROM TESTERS
+   - Every screen has a "Feedback" tab on the right edge. Testers can report
+     a problem or request a medicine. Profile > "Feedback and your reports"
+     lists what that phone has sent.
+   - Reports are saved on this computer in  feedback\reports.jsonl
+     (one report per line). The server window shows the path when it starts.
+   - Reports only arrive while the server window is open. Until then they
+     wait on the phone and send when the app can reach MediAUS again, or the
+     tester taps "Share it instead" to text or email it.
+   - The feedback folder is not in git. Don't commit or share it.
+
 TESTING THE BARCODE SCANNER (Pro feature, has a demo mode)
    - The camera needs the secure https link (or localhost on this computer).
    - On this computer, open  http://localhost:8080/test-barcodes.html
